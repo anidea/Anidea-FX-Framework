@@ -55,13 +55,13 @@ void setup() {
 //  myGame = new lightsout(); //Lights out game description
 //  myGame = new senetgame(); //PR Senet game description
 //  myGame = new sequencedetect(); //Sequencedetect description
-  myGame = new sixwire(); //Sixwire description
+//  myGame = new sixwire(); //Sixwire description
 
-  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5 };   // This must be unique for each device you have
+  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5 };   // This must be unique for each device
   IPAddress MyIP(10, 0, 1, 210);                          // This must be unique for each device
   IPAddress gateway(10, 0, 1, 1);
   IPAddress subnet(255, 255, 255, 0);
-  IPAddress HostIP(10,0,1,115);                           // This should be the IP of the device running ClueControllIP, Node-Red, ERM, etc
+  IPAddress HostIP(10,0,1,115);                           // This should be the IP of the device running the management software
   int CCRegister = 5; // Register for Clue Control
 
   // Uncomment only one of these lines for the network you want
