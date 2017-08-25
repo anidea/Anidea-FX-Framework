@@ -54,7 +54,7 @@ class houdinimc : public Network
 
     EthernetClient client = server.available();
 
-    char serverName[];    
+    char serverName[];
 };
 
 #endif

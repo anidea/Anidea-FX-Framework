@@ -10,12 +10,16 @@ void houdinimc::loop(void)
 
   if (pMyGame->_puzzleSolved == 1 && sent == 0)
   {
-    sprintf(pageAdd, " / " + typeid(this).name + "_solved"); (!getPage(HostIP, serverPort, pageAdd));
+    sprintf(pageAdd, " / ");
+    sprintf(pageAdd, pMyGame->gameName.c_str());
+    sprintf(pageAdd, "_solved"); (!getPage(HostIP, serverPort, pageAdd));
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1)
   {
-    sprintf(pageAdd, " / " + typeid(this).name + "_reset"); (!getPage(HostIP, serverPort, pageAdd));
+    sprintf(pageAdd, " / ");
+    sprintf(pageAdd, pMyGame->gameName.c_str());
+    sprintf(pageAdd, "_reset"); (!getPage(HostIP, serverPort, pageAdd));
     sent = 0;
   }
 }
