@@ -97,8 +97,8 @@ lightsout::lightsout() : Game()
   //pinMode(INPUT4, INPUT); - need for i2c
   ///pinMode(INPUT5, INPUT); - need for i2c
 
-
   Serial.println("Lights Out Game");
+  gameName = "lightsout";
 
   // Init I2C devices
   Wire.begin();
@@ -606,7 +606,7 @@ void lightsout::dumpMatrix(void)
   }
 }
 
-int getDebouncedInput(int input)
+int lightsout::getDebouncedInput(int input)
 {
   int inputCount = 0;
   

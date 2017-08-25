@@ -51,21 +51,23 @@ void Game::loop(void)
   delay(10); // Keep game running at a reasonable rate, not micro speed. 100x a second, ehternet adds significant delays
 
   // If enabled at all, detect input state
-  #ifdef GAME_INPUT_RESET
+  if (GAME_INPUT_RESET)
+  {
     if (digitalRead(GAME_INPUT_RESET) == 1)   // Check for reset and kill game if active
     {
       reset();
       return;
     }
- #endif
+  }
  
   // If enabled at all, detect input state
-  #ifdef GAME_INPUT_ENABLE
+  if (GAME_INPUT_ENABLE)
+  {
     if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
     {
       return;
     }
-  #endif
+  }
 }
 
 ///////////////////////////////////

@@ -61,6 +61,7 @@ sixwire::sixwire() : Game()
   pinMode(INPUT5, INPUT);
 
   Serial.println("sixwire initialized");
+  gameName = "sixwire";
 
   reset();
 }

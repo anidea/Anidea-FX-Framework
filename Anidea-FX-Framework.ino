@@ -34,6 +34,7 @@
 #include "game_lightsout.h"
 #include "game_sequencedetect.h"
 #include "game_sixwire.h"
+#include "game_inputsequence.h"
 
 // Generic game and network objects
 Game *myGame;
@@ -53,9 +54,9 @@ void setup() {
   // Uncomment only one of these lines for the game you want
 //  myGame = new simplegame(); //Simple game provided as an example
 //  myGame = new lightsout(); //Lights out game description
-//  myGame = new senetgame(); //PR Senet game description
 //  myGame = new sequencedetect(); //Sequencedetect description
 //  myGame = new sixwire(); //Sixwire description
+  myGame = new inputsequence(); //Sequencedetect description
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5 };   // This must be unique for each device
   IPAddress MyIP(10, 0, 1, 210);                          // This must be unique for each device
@@ -65,7 +66,7 @@ void setup() {
   int CCRegister = 5; // Register for Clue Control
 
   // Uncomment only one of these lines for the network you want
-//  myNetwork = new escaperoommaster(MyMac, MyIP, gateway, subnet, HostIP);
+  myNetwork = new escaperoommaster(MyMac, MyIP, gateway, subnet, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, gateway, subnet, HostIP, CCRegister);
 //  myNetwork = new nodered(MyMac, MyIP, gateway, subnet, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, gateway, subnet, HostIP);

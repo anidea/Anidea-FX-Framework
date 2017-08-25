@@ -18,26 +18,25 @@
 #define fx300_h
 
 //FX300 Header
-#define RELAY0  2
-#define RELAY1  3
+const int RELAY0 = 2;
+const int RELAY1 = 3;
 
-#define OUTPUT0    4
-#define OUTPUT1    5
-#define OUTPUT2    6
-#define OUTPUT3    7
-#define OUTPUT4    8
-#define OUTPUT5    9
+const int OUTPUT0 = 4;
+const int OUTPUT1 = 5;
+const int OUTPUT2 = 6;
+const int OUTPUT3 = 7;
+const int OUTPUT4 = 8;
+const int OUTPUT5 = 9;
 
-#define INPUT0  14
-#define INPUT1  15
-#define INPUT2  16
-#define INPUT3  17
-#define INPUT4  18
-#define INPUT5  19
+const int INPUT0 = 14;
+const int INPUT1 = 15;
+const int INPUT2 = 16;
+const int INPUT3 = 17;
+const int INPUT4 = 18;
+const int INPUT5 = 19;
 
-#define LED     -1  // disabled for ethernet
+const int LED = -1;
 
-#define HALL    6
-
+const int HALL = 6;
 
 #endif

@@ -6,16 +6,6 @@
 #include "network.h"
 #include "game.h"
 
-// Software configuration defines
-#define DEBOUNCE_COUNT        6   // Try to keep even
-#define DEBOUNCE_TIME         5
-
-// Game Definition Variables
-#define PATCH_COUNT         6
-
-// FX300 Relays
-#define SOLVED       RELAY1
-
 class Network;
 
 class sixwire : public Game
@@ -32,6 +22,16 @@ class sixwire : public Game
     virtual void reset(); // Call to reset game
 
   private:
+    // Software configuration defines
+    static const int DEBOUNCE_COUNT = 6;   // Try to keep even
+    static const int DEBOUNCE_TIME = 5;
+    
+    // Game Definition Variables
+    static const int PATCH_COUNT = 6;
+
+    // FX300 Relays
+    static const int SOLVED = RELAY1;
+  
     int getDebouncedInput(int);
   
     // FX300 Inputs for game

@@ -70,7 +70,6 @@
    
 */
 
-
 ///////////////////////////////////
 // Constructor for the game
 //
@@ -94,8 +93,8 @@ sequencedetect::sequencedetect() : Game()
   pinMode(INPUT4, INPUT);
   pinMode(INPUT5, INPUT);
 
-
   Serial.println("FX300 6 input sequence detector");
+  gameName = "sequencedetect";
 
   reset();
 
@@ -127,14 +126,15 @@ void sequencedetect::tick(void)
 
   #ifdef GAME_LIGHT_OUTPUT_SIMONSAYS
 
-  #ifdef GAME_INPUT_ENABLE
-  if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
+  if (GAME_INPUT_ENABLE)
   {
-    currentLightOn = 1;
-    terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME;
-    return;
+    if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
+    {
+      currentLightOn = 1;
+      terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME;
+      return;
+    }
   }
-  #endif
 
   // Display sequnce in the background while puzzle is not trying to be solved
 
@@ -204,24 +204,8 @@ void sequencedetect::loop(void)
 {
   // put your main code here, to run repeatedly:
 
-  delay(10); // Keep game running at a reasonable rate, not micro speed. 100x a second, ehternet adds significant delays
-
-  // If enabled at all, detect input state
-  #ifdef GAME_INPUT_RESET
-    if (digitalRead(GAME_INPUT_RESET) == 1)   // Check for reset and kill game if active
-    {
-      reset();
-      return;
-    }
-  #endif
-  
-  // If enabled at all, detect input state
-  #ifdef GAME_INPUT_ENABLE
-    if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
-    {
-      return;
-    }
-  #endif
+  // Do generic loop actions
+  Game::loop();
 
   // Detect programming mode
   if (analogRead(HALL) < HALL_NORTH_THRESH) // Detect a north pole of a magnet
@@ -234,7 +218,7 @@ void sequencedetect::loop(void)
 
   switch (_gameState)
   {
-    case 0:
+    case GAMESTATE_START:
       // Setup state
 
       // run reset
@@ -246,7 +230,7 @@ void sequencedetect::loop(void)
 
       break;
 
-    case 10:
+    case GAMESTATE_RUN:
       // Check for time experation
 
       #ifdef GAME_MAX_SOLVE_TIME
@@ -266,7 +250,7 @@ void sequencedetect::loop(void)
       {
         // Sequence end detected
 
-        _gameState++;
+        _gameState = GAMESTATE_SOLVED;
         
       }else{
 
@@ -392,14 +376,14 @@ void sequencedetect::loop(void)
       
       break;
 
-    case 11:
+    case GAMESTATE_SOLVED:
       // Run solved and any other one time routine
       solved();
       
       break;
  
     default:
-    case 255:
+    case GAMESTATE_ENDLOOP:
       // Wait for reset
       break;
       

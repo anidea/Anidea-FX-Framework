@@ -66,6 +66,7 @@ simplegame::simplegame() : Game()
   pinMode(INPUT5, INPUT);
 
   Serial.println("simplegame initialized");
+  gameName = "simplegame";
 
   reset();
 }

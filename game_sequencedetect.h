@@ -23,43 +23,6 @@
 #include "network.h"
 #include "game.h"
 
-#define HALL_NORTH_THRESH (.4 * 0x3FF)
-#define HALL_SOUTH_THRESH (.6 * 0x3FF)
-
-// Software configuration defines - used for simple debounce
-#define DEBOUNCE_COUNT        6   // Try to keep even
-#define DEBOUNCE_TIME         5
-
-// Configure the steady state input filter
-// Inputs must be steady for COUNT * TIME before being accepted
-#define STEADY_STATE_INPUTS_COUNT    25
-#define STEADY_STATE_INPUTS_TIME     10  // 25 * 10 = 1/4 second
-#define NO_INPUT_DETECTED           -1
-
-// Game Definition Variables
-#define GAME_INPUT_COUNT          5                   // Number of inputs/buttons/hall sensors in the sequence
-#define SEQUENCE_GAME_LIGHT_OUTPUT         GAME_INPUT_COUNT    // Number of light outputs
-#define GAME_MAX_SEQUENCE         10                  // Max sequence lenght.  Really limited by the eeprom memory, but here to sanity
-#define GAME_MAX_SOLVE_TIME       150                 // in tenths of seconds (15 seconds)
-
-// Light output mode, enable only one
-//#define GAME_LIGHT_OUTPUT_NONE        // No lights
-//#define GAME_LIGHT_OUTPUT_SEQUENCE    // Turn a light on for every good button received (note hardware limitations)
-#define GAME_LIGHT_OUTPUT_SIMONSAYS   // Play the sequence out - NOT incremental challenge like orginal game
-
-// Light output mode options
-#define GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME  5  // In tenths of seconds
-#define GAME_LIGHT_OUTPUT_SIMONSAYS_OFF_TIME  1 // In tenths of seconds
-#define GAME_LIGHT_OUTPUT_SIMONSAYS_GAP_TIME  10 // In tenths of seconds
-
-//#define GAME_LIGHT_OUTPUT_SEQUENCE_ONEATATIME // Enable if you want only one light on a time, otherwise they will be additive
-
-#define GAME_INPUT_RESET  INPUT5  // When high and enabled (defined), the game will be reset
-#define GAME_INPUT_ENABLE INPUT5  // When low and enabled (defined), the game will be enabled
-
-// FX300 Relays
-#define SOLVED       RELAY1
-
 class sequencedetect : public Game
 {
   public:
@@ -91,6 +54,39 @@ class sequencedetect : public Game
     int scanInputsSteady(void);
     void allLightsOnOff(int state);
 
+    static const int HALL_NORTH_THRESH = (.4 * 0x3FF);
+    static const int HALL_SOUTH_THRESH = (.6 * 0x3FF);
+    
+    // Software configuration defines - used for simple debounce
+    static const int DEBOUNCE_COUNT = 6;   // Try to keep even
+    static const int DEBOUNCE_TIME = 5;
+    
+    // Configure the steady state input filter
+    // Inputs must be steady for COUNT * TIME before being accepted
+    static const int STEADY_STATE_INPUTS_COUNT = 25;
+    static const int STEADY_STATE_INPUTS_TIME = 10;  // 25 * 10 = 1/4 second
+    static const int NO_INPUT_DETECTED = -1;
+    
+    // Game Definition Variables
+    static const int GAME_INPUT_COUNT = 5;                   // Number of inputs/buttons/hall sensors in the sequence
+    static const int SEQUENCE_GAME_LIGHT_OUTPUT = GAME_INPUT_COUNT;    // Number of light outputs
+    static const int GAME_MAX_SEQUENCE = 10;                  // Max sequence lenght.  Really limited by the eeprom memory, but here to sanity
+    static const int GAME_MAX_SOLVE_TIME = 150;                 // in tenths of seconds (15 seconds)
+    
+    // Light output mode, enable only one
+    //static const int GAME_LIGHT_OUTPUT_NONE = 1; // No lights
+    //static const int GAME_LIGHT_OUTPUT_SEQUENCE = 1; // Turn a light on for every good button received (note hardware limitations)
+    static const int GAME_LIGHT_OUTPUT_SIMONSAYS = 1; // Play the sequence out - NOT incremental challenge like orginal game
+    
+    // Light output mode options
+    static const int GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME = 5;  // In tenths of seconds
+    static const int GAME_LIGHT_OUTPUT_SIMONSAYS_OFF_TIME = 1; // In tenths of seconds
+    static const int GAME_LIGHT_OUTPUT_SIMONSAYS_GAP_TIME = 10; // In tenths of seconds
+    
+    //const int GAME_LIGHT_OUTPUT_SEQUENCE_ONEATATIME = 1; // Enable if you want only one light on a time, otherwise they will be additive
+    
+    // FX300 Relays
+    static const int SOLVED = RELAY1;
 
     // FX300 Inputs for game
     int _inputButtonPinList[GAME_INPUT_COUNT] =  {INPUT0, INPUT1, INPUT2, INPUT3, INPUT4};
