@@ -74,8 +74,8 @@ class sequencedetect : public Game
     static const int GAME_MAX_SOLVE_TIME = 150;                 // in tenths of seconds (15 seconds)
     
     // Light output mode, enable only one
-    //static const int GAME_LIGHT_OUTPUT_NONE = 1; // No lights
-    //static const int GAME_LIGHT_OUTPUT_SEQUENCE = 1; // Turn a light on for every good button received (note hardware limitations)
+    static const int GAME_LIGHT_OUTPUT_NONE = 0; // No lights
+    static const int GAME_LIGHT_OUTPUT_SEQUENCE = 0; // Turn a light on for every good button received (note hardware limitations)
     static const int GAME_LIGHT_OUTPUT_SIMONSAYS = 1; // Play the sequence out - NOT incremental challenge like orginal game
     
     // Light output mode options
@@ -83,7 +83,7 @@ class sequencedetect : public Game
     static const int GAME_LIGHT_OUTPUT_SIMONSAYS_OFF_TIME = 1; // In tenths of seconds
     static const int GAME_LIGHT_OUTPUT_SIMONSAYS_GAP_TIME = 10; // In tenths of seconds
     
-    //const int GAME_LIGHT_OUTPUT_SEQUENCE_ONEATATIME = 1; // Enable if you want only one light on a time, otherwise they will be additive
+    const int GAME_LIGHT_OUTPUT_SEQUENCE_ONEATATIME = 0; // Enable if you want only one light on a time, otherwise they will be additive
     
     // FX300 Relays
     static const int SOLVED = RELAY1;

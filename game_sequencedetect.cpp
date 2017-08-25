@@ -96,6 +96,9 @@ sequencedetect::sequencedetect() : Game()
   Serial.println("FX300 6 input sequence detector");
   gameName = "sequencedetect";
 
+  GAME_INPUT_RESET = INPUT5;  // When high and enabled (defined), the game will be reset
+  GAME_INPUT_ENABLE = INPUT5;  // When low and enabled (defined), the game will be enabled
+
   reset();
 
   // Check for anything in the eeprom
@@ -120,78 +123,77 @@ void sequencedetect::tick(void)
 
   freeRunningTimer++;
 
-  #ifdef GAME_MAX_SOLVE_TIME
-  if (_gameResetDownTimer) _gameResetDownTimer--;
-  #endif
-
-  #ifdef GAME_LIGHT_OUTPUT_SIMONSAYS
-
-  if (GAME_INPUT_ENABLE)
+  if (GAME_MAX_SOLVE_TIME)
   {
-    if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
-    {
-      currentLightOn = 1;
-      terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME;
-      return;
-    }
+    if (_gameResetDownTimer) _gameResetDownTimer--;
   }
 
-  // Display sequnce in the background while puzzle is not trying to be solved
-
-  if (_runLightSequence == 1) 
+  if (GAME_LIGHT_OUTPUT_SIMONSAYS)
   {
-    // No buttons pressed yet in sequence
-
-    if (terminalCountLightIncrement)
+    if (GAME_INPUT_ENABLE)
     {
-      terminalCountLightIncrement--;
-    }else{
-
-      // Increment ligths
-
-      if (currentLightOn == 1)
+      if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
       {
-        // Turn lights off
-        currentLightOn = 0;
-        
-        terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_OFF_TIME;
-
-        if (currentLightSequence >= 0)
-        {
-          // Turn off light only if we aren't at the beginning of the sequence
-          digitalWrite(_outputLightsPinList[EEPROM.read(currentLightSequence)], LOW); // Turn off current light
-        }
-
-      }else{
-        // Turn lights on
         currentLightOn = 1;
-
         terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME;
-
-        currentLightSequence++;
-  
-        int nextLight = EEPROM.read(currentLightSequence);
-  
-        if (nextLight == 0xFF)
-        {
-          // Last light - delay and start over
-          currentLightSequence = -1; // Back at beginning, but make negative so we logic above can flow.
-
-          terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_GAP_TIME; // Set to alternate value since we reset
-        }else{
-          // Next light
-          
-          digitalWrite(_outputLightsPinList[EEPROM.read(currentLightSequence)], HIGH); // Turn on next light
-          
-        }
-
+        return;
       }
-
+    }
+  
+    // Display sequnce in the background while puzzle is not trying to be solved
+  
+    if (_runLightSequence == 1) 
+    {
+      // No buttons pressed yet in sequence
+  
+      if (terminalCountLightIncrement)
+      {
+        terminalCountLightIncrement--;
+      }else{
+  
+        // Increment ligths
+  
+        if (currentLightOn == 1)
+        {
+          // Turn lights off
+          currentLightOn = 0;
+          
+          terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_OFF_TIME;
+  
+          if (currentLightSequence >= 0)
+          {
+            // Turn off light only if we aren't at the beginning of the sequence
+            digitalWrite(_outputLightsPinList[EEPROM.read(currentLightSequence)], LOW); // Turn off current light
+          }
+  
+        }else{
+          // Turn lights on
+          currentLightOn = 1;
+  
+          terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME;
+  
+          currentLightSequence++;
+    
+          int nextLight = EEPROM.read(currentLightSequence);
+    
+          if (nextLight == 0xFF)
+          {
+            // Last light - delay and start over
+            currentLightSequence = -1; // Back at beginning, but make negative so we logic above can flow.
+  
+            terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_GAP_TIME; // Set to alternate value since we reset
+          }else{
+            // Next light
+            
+            digitalWrite(_outputLightsPinList[EEPROM.read(currentLightSequence)], HIGH); // Turn on next light
+            
+          }
+  
+        }
+  
+      }
     }
   }
-
-
-  #endif
   
 }
 
@@ -233,16 +235,17 @@ void sequencedetect::loop(void)
     case GAMESTATE_RUN:
       // Check for time experation
 
-      #ifdef GAME_MAX_SOLVE_TIME
-      if ((_gameResetDownTimer == 0) && (_inputSequencePosition > 0))
+      if (GAME_MAX_SOLVE_TIME)
       {
-        Serial.println("Game Timer Expired");
-        
-        // Fail, reset
-        _gameState = 0; // Reset puzzle
-        
+        if ((_gameResetDownTimer == 0) && (_inputSequencePosition > 0))
+        {
+          Serial.println("Game Timer Expired");
+          
+          // Fail, reset
+          _gameState = 0; // Reset puzzle
+          
+        }
       }
-      #endif
   
       scanCurrentInputButton = scanInputsSteady();
 
@@ -260,12 +263,11 @@ void sequencedetect::loop(void)
           {
             _waitForNoInput = 0;
 
-            #if defined(GAME_LIGHT_OUTPUT_SIMONSAYS)
-  
-            // Turn off all lights when button released
-            allLightsOnOff(LOW);
-            #endif
-          
+            if (GAME_LIGHT_OUTPUT_SIMONSAYS)
+            {
+              // Turn off all lights when button released
+              allLightsOnOff(LOW);
+            }
           }
         }
 
@@ -283,42 +285,42 @@ void sequencedetect::loop(void)
   
               Serial.println("First good button");
   
-              #ifdef GAME_MAX_SOLVE_TIME
-              _gameResetDownTimer = GAME_MAX_SOLVE_TIME; // Reset max time
-              #endif
+              if (GAME_MAX_SOLVE_TIME)
+              {
+                _gameResetDownTimer = GAME_MAX_SOLVE_TIME; // Reset max time
+              }
   
-              #ifdef GAME_LIGHT_OUTPUT_SIMONSAYS
+              if (GAME_LIGHT_OUTPUT_SIMONSAYS)
+              {
                 // Turn all the lights off
     
                 _runLightSequence = 0;
   
                 allLightsOnOff(LOW);
-              #endif
+              }
   
             }
   
   
   
-            #if defined(GAME_LIGHT_OUTPUT_SEQUENCE_ONEATATIME)
-            
-            // Turn off previous led
-            if (_inputSequencePosition > 0)
+            if (GAME_LIGHT_OUTPUT_SEQUENCE_ONEATATIME)
             {
-              // can't do this if no lights are on, filter this
-              digitalWrite(_outputLightsPinList[_inputSequencePosition - 1], LOW); // Turn off the current lamp to show things are progessing
+              // Turn off previous led
+              if (_inputSequencePosition > 0)
+              {
+                // can't do this if no lights are on, filter this
+                digitalWrite(_outputLightsPinList[_inputSequencePosition - 1], LOW); // Turn off the current lamp to show things are progessing
+              }
             }
-            
-            #elif defined(GAME_LIGHT_OUTPUT_SIMONSAYS) && 0 // This mode disabled in favor of a light while pushed mode
-  
-            // Turn off previous led
-            if (_scanPreviousInputButton > 0)
+            else if (GAME_LIGHT_OUTPUT_SIMONSAYS && 0) // This mode disabled in favor of a light while pushed mode
             {
-              // can't do this if no lights are on, filter this
-              digitalWrite(_outputLightsPinList[_scanPreviousInputButton], LOW); // Turn off the current lamp to show things are progessing
+              // Turn off previous led
+              if (_scanPreviousInputButton > 0)
+              {
+                // can't do this if no lights are on, filter this
+                digitalWrite(_outputLightsPinList[_scanPreviousInputButton], LOW); // Turn off the current lamp to show things are progessing
+              }
             }
-            
-            
-            #endif
   
             Serial.print("Game Sequence ");
             Serial.print(_inputSequencePosition);
@@ -330,25 +332,24 @@ void sequencedetect::loop(void)
             // Next in sequence
             _inputSequencePosition++;
   
-            #if defined(GAME_LIGHT_OUTPUT_SEQUENCE) 
-            
-            if (_inputSequencePosition < SEQUENCE_GAME_LIGHT_OUTPUT)
+            if (GAME_LIGHT_OUTPUT_SEQUENCE) 
             {
-              // Make sure we don't try to turn on a light that doesn't exist, would be at least one at this point from the previous inc operation
-              digitalWrite(_outputLightsPinList[_inputSequencePosition - 1], HIGH); // Turn on the next lamp to show things are progessing
-            
+              if (_inputSequencePosition < SEQUENCE_GAME_LIGHT_OUTPUT)
+              {
+                // Make sure we don't try to turn on a light that doesn't exist, would be at least one at this point from the previous inc operation
+                digitalWrite(_outputLightsPinList[_inputSequencePosition - 1], HIGH); // Turn on the next lamp to show things are progessing
+              
+              }
             }
-  
-            #elif defined(GAME_LIGHT_OUTPUT_SIMONSAYS)
-  
-            if (scanCurrentInputButton < SEQUENCE_GAME_LIGHT_OUTPUT)
+            else if (GAME_LIGHT_OUTPUT_SIMONSAYS)
             {
-              // Make sure we don't try to turn on a light that doesn't exist, would be at least one at this point from the previous inc operation
-              digitalWrite(_outputLightsPinList[scanCurrentInputButton], HIGH); // Turn on the next lamp to show things are progessing
-            
+              if (scanCurrentInputButton < SEQUENCE_GAME_LIGHT_OUTPUT)
+              {
+                // Make sure we don't try to turn on a light that doesn't exist, would be at least one at this point from the previous inc operation
+                digitalWrite(_outputLightsPinList[scanCurrentInputButton], HIGH); // Turn on the next lamp to show things are progessing
+              
+              }
             }
-            
-            #endif
     
             
            
@@ -456,10 +457,11 @@ void sequencedetect::reset(void)
   digitalWrite(SOLVED, HIGH);    // Turn on maglock
   digitalWrite(LED, LOW);           // Mimick LED for solved 
 
-  #if defined(GAME_LIGHT_OUTPUT_NONE) || defined(GAME_LIGHT_OUTPUT_SEQUENCE) || defined(GAME_LIGHT_OUTPUT_SIMONSAYS)
-  // Turn all the lights off
-  allLightsOnOff(LOW);
-  #endif
+  if (GAME_LIGHT_OUTPUT_NONE || GAME_LIGHT_OUTPUT_SEQUENCE || GAME_LIGHT_OUTPUT_SIMONSAYS)
+  {
+    // Turn all the lights off
+    allLightsOnOff(LOW);
+  }
   
 }
 
@@ -569,9 +571,10 @@ int sequencedetect::scanInputsSteady(void)
   
   */
 
-  #if (GAME_INPUT_COUNT > 8)
-  #error Too many inputs for the number of bits
-  #endif
+  if (GAME_INPUT_COUNT > 8)
+  {
+    Serial.println("error Too many inputs for the number of bits");
+  }
   
   // Increase size types if ever on a machine with more inputs
   uint8_t allInputs, allPreviousInputs;

@@ -504,9 +504,10 @@ int lightsout::scanInputsSteady(void)
   
   */
 
-  #if (GAME_INPUT_COUNT > 8)
-  #error Too many inputs for the number of bits
-  #endif
+  if (GAME_INPUT_COUNT > 8)
+  {
+    Serial.println("error Too many inputs for the number of bits");
+  }
   
   // Increase size types if ever on a machine with more inputs
   uint8_t allInputs, allPreviousInputs;

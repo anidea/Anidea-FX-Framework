@@ -131,16 +131,17 @@ void inputsequence::loop(void)
 
     case GAMESTATE_RUN:
 
-      #ifdef GAME_MAX_SOLVE_TIME
-      if ((_gameResetDownTimer == 0) && (_inputSequencePosition > 0))
+      if (GAME_MAX_SOLVE_TIME)
       {
-        Serial.println("Game Timer Expired");
-        
-        // Fail, reset
-        _gameState = 0; // Reset puzzle
-        
+        if ((_gameResetDownTimer == 0) && (_inputSequencePosition > 0))
+        {
+          Serial.println("Game Timer Expired");
+          
+          // Fail, reset
+          _gameState = 0; // Reset puzzle
+          
+        }
       }
-      #endif
   
       scanCurrentInputButton = scanInputsSteady();
 
@@ -173,9 +174,10 @@ void inputsequence::loop(void)
             {  
               Serial.println("First good button");
   
-              #ifdef GAME_MAX_SOLVE_TIME
-              _gameResetDownTimer = GAME_MAX_SOLVE_TIME; // Reset max time
-              #endif  
+              if (GAME_MAX_SOLVE_TIME)
+              {
+                _gameResetDownTimer = GAME_MAX_SOLVE_TIME; // Reset max time
+              } 
             }
   
             Serial.print("Game Sequence ");
@@ -232,7 +234,7 @@ void inputsequence::forceSolved(void)
   
   //Do game specific solved state
   digitalWrite(feedbackLight, HIGH);        // Turn Off maglock
-  digitalWrite(solvedOutput, HIGH);          // Mimick LED for solved 
+  digitalWrite(solvedOutput, LOW);          // Mimick LED for solved 
 }
 
 void inputsequence::solved(void)
@@ -244,7 +246,7 @@ void inputsequence::solved(void)
 
   //Do game specific solved state
   digitalWrite(feedbackLight, HIGH);    // Turn on maglock
-  digitalWrite(solvedOutput, HIGH);           // Mimick LED for solved
+  digitalWrite(solvedOutput, LOW);           // Mimick LED for solved
 }
 
 void inputsequence::reset(void)
@@ -259,7 +261,7 @@ void inputsequence::reset(void)
 
   // Set outputs
   digitalWrite(feedbackLight, LOW);    // Turn on maglock
-  digitalWrite(solvedOutput, LOW);           // Mimick LED for solved 
+  digitalWrite(solvedOutput, HIGH);           // Mimick LED for solved 
 }
 
 void inputsequence::recordInputButtonSequence(void)
@@ -343,9 +345,10 @@ int inputsequence::scanInputsSteady(void)
   
   */
 
-  #if (GAME_INPUT_COUNT > 8)
-  #error Too many inputs for the number of bits
-  #endif
+  if (GAME_INPUT_COUNT > 8)
+  {
+    Serial.println("error Too many inputs for the number of bits");
+  }
   
   // Increase size types if ever on a machine with more inputs
   uint8_t allInputs, allPreviousInputs;
