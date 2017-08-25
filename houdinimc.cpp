@@ -5,14 +5,17 @@ void houdinimc::loop(void)
 {
   listenForEthernetClients();
 
+  Serial.println("IP??");
+  Serial.println(HostIP);
+
   if (pMyGame->_puzzleSolved == 1 && sent == 0)
   {
-    sprintf(pageAdd, " / Custom_Term"); (!getPage(server, serverPort, pageAdd));
+    sprintf(pageAdd, " / " + typeid(this).name + "_solved"); (!getPage(HostIP, serverPort, pageAdd));
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1)
   {
-    sprintf(pageAdd, " / Custom_Term"); (!getPage(server, serverPort, pageAdd));
+    sprintf(pageAdd, " / " + typeid(this).name + "_reset"); (!getPage(HostIP, serverPort, pageAdd));
     sent = 0;
   }
 }
@@ -24,12 +27,24 @@ byte houdinimc::getPage(IPAddress ipBuf, int thisPort, char *page)
 
   Serial.print(F("connecting…"));
 
+  Serial.println(ipBuf);
+  Serial.println(thisPort);
+
   if (client.connect(ipBuf, thisPort) == 1)
   {
     Serial.println(F("connected"));
 
     sprintf(outBuf, "GET % s HTTP / 1.1", page);
     client.println(outBuf);
+    sprintf(serverName,"%d.%d.%d.%d", HostIP[0],HostIP[1],HostIP[2],HostIP[3]);
+    Serial.println();
+    Serial.println(HostIP[0]);
+    Serial.println(HostIP[1]);
+    Serial.println(HostIP[2]);
+    Serial.println(HostIP[3]);
+    Serial.println();
+    Serial.println(serverName);
+    Serial.println();
     sprintf(outBuf, "Host: % s", serverName);
     client.println(outBuf);
     client.println(F("Connection: close\r\n"));
@@ -101,9 +116,7 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
 
 void houdinimc::listenForEthernetClients() 
 {
-  EthernetClient client = server.available();
-
-  if (client) 
+    if (client) 
   {
     Serial.println("Got a client");
     

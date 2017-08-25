@@ -27,11 +27,11 @@
 // Networks
 #include "escaperoommaster.h"
 #include "cluecontrol.h"
+#include "houdinimc.h"
 
 // Include game headers here
 #include "game_simplegame.h"
 #include "game_lightsout.h"
-#include "game_senet.h"
 #include "game_sequencedetect.h"
 #include "game_sixwire.h"
 
@@ -65,9 +65,10 @@ void setup() {
   int CCRegister = 5; // Register for Clue Control
 
   // Uncomment only one of these lines for the network you want
-  myNetwork = new escaperoommaster(MyMac, MyIP, gateway, subnet, HostIP);
+//  myNetwork = new escaperoommaster(MyMac, MyIP, gateway, subnet, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, gateway, subnet, HostIP, CCRegister);
 //  myNetwork = new nodered(MyMac, MyIP, gateway, subnet, HostIP);
+//  myNetwork = new houdinimc(MyMac, MyIP, gateway, subnet, HostIP);
 
   myNetwork->setGame(myGame);
 }

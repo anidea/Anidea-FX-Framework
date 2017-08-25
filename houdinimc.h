@@ -44,7 +44,17 @@ class houdinimc : public Network
     
     void writeClientResponseNotFound(EthernetClient& client);
 
+    byte getPage(IPAddress ipBuf, int thisPort, char *page);
+
     bool sent;
+
+    char pageAdd[64];
+
+    int serverPort = 14999;
+
+    EthernetClient client = server.available();
+
+    char serverName[];    
 };
 
 #endif

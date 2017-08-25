@@ -16,8 +16,14 @@
 
 #include "network.h"
 
-Network::Network(byte MyMac[], IPAddress MyIP, IPAddress gateway, IPAddress subnet, IPAddress HostIP) : server(80)
+Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _gateway, IPAddress _subnet, IPAddress _HostIP) : server(80)
 {
+  MyMac = _MyMac;
+  MyIP = _MyIP;
+  gateway = _gateway;
+  subnet = _subnet;
+  HostIP = _HostIP;
+  
   #if 0
   if (Ethernet.begin(MyMac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
