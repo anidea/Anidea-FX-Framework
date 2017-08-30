@@ -7,7 +7,6 @@ EthernetClient MbmClient;
 
 #define DEBUG
 #ifdef DEBUG
-  #include <SPI.h>
 #endif
 
 CCModBus::CCModBus()
@@ -66,9 +65,9 @@ void CCModBus::SendData()
   if (MbmClient.connect(ClueControlIP,502)) 
   {
     #ifdef DEBUG
-      Serial.print("connected with ClueControl on IP ");
+      Serial.print(F("connected with ClueControl on IP "));
       Serial.println(ClueControlIP);
-      Serial.print("Sending request: ");
+      Serial.print(F("Sending request: "));
       for(int i=0;i<MbmByteArray[5]+6;i++) 
       {
         if(MbmByteArray[i] < 16){Serial.print("0");}
@@ -84,7 +83,7 @@ void CCModBus::SendData()
   else 
   {
     #ifdef DEBUG
-      Serial.print("connection with ClueControl failed at IP ");
+      Serial.print(F("connection with ClueControl failed at IP "));
       Serial.println(ClueControlIP);
     #endif    
     MbmClient.stop();
@@ -111,7 +110,7 @@ void CCModBus::ReceiveModBus()
         MbmClient.stop();
         
         #ifdef DEBUG
-          Serial.println("Received ACK from ClueControl");
+          Serial.println(F("Received ACK from ClueControl"));
           Serial.println ();
         #endif
   
@@ -137,7 +136,7 @@ void CCModBus::ReceiveModBus()
     
     //****************** Decode the received data ******************
     #ifdef DEBUG
-       Serial.print ("Received from CC:  ");
+       Serial.print (F("Received from CC:  "));
        for (int i=0;i<MbsByteArray[5]+6;i++) 
        {
           if(MbsByteArray[i] < 16) {Serial.print("0");}
@@ -163,7 +162,7 @@ void CCModBus::ReceiveModBus()
           MbsByteArray[7]=0;
         
           #ifdef DEBUG
-            Serial.print ("New Value Received from CC:  ");
+            Serial.print (F("New Value Received from CC:  "));
             Serial.println (CCValue);
             Serial.println ();
           #endif

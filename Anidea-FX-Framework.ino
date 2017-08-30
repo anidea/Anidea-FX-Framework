@@ -15,7 +15,6 @@
 */
 
 #include <MsTimer2.h>
-#include <EEPROM.h>
 
 // Uncomment only one of these lines for the board you want
 #include "fx300.h"
@@ -49,6 +48,23 @@ void setup() {
   MsTimer2::set(100, tenHzTimer);
   MsTimer2::start();
 
+  pinMode(RELAY0, OUTPUT);
+  pinMode(RELAY1, OUTPUT);
+  pinMode(OUTPUT0, OUTPUT);
+  pinMode(OUTPUT1, OUTPUT);
+  pinMode(OUTPUT2, OUTPUT);
+  pinMode(OUTPUT3, OUTPUT);
+  pinMode(OUTPUT4, OUTPUT);
+  pinMode(OUTPUT5, OUTPUT);
+  pinMode(LED, OUTPUT);
+
+  pinMode(INPUT0, INPUT);
+  pinMode(INPUT1, INPUT);
+  pinMode(INPUT2, INPUT);
+  pinMode(INPUT3, INPUT);
+  pinMode(INPUT4, INPUT);
+  pinMode(INPUT5, INPUT);
+
   // Start game last after hardware is setup
 
   // Uncomment only one of these lines for the game you want
@@ -56,20 +72,18 @@ void setup() {
 //  myGame = new lightsout(); //Lights out game description
 //  myGame = new sequencedetect(); //Sequencedetect description
 //  myGame = new sixwire(); //Sixwire description
-  myGame = new inputsequence(); //Sequencedetect description
+//  myGame = new inputsequence(); //Sequencedetect description
 
-  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5 };   // This must be unique for each device
+  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
   IPAddress MyIP(10, 0, 1, 210);                          // This must be unique for each device
-  IPAddress gateway(10, 0, 1, 1);
-  IPAddress subnet(255, 255, 255, 0);
-  IPAddress HostIP(10,0,1,115);                           // This should be the IP of the device running the management software
+  IPAddress HostIP(10, 0, 1, 115);                           // This should be the IP of the device running the management software
   int CCRegister = 5; // Register for Clue Control
 
   // Uncomment only one of these lines for the network you want
-  myNetwork = new escaperoommaster(MyMac, MyIP, gateway, subnet, HostIP);
-//  myNetwork = new cluecontrol(MyMac, MyIP, gateway, subnet, HostIP, CCRegister);
-//  myNetwork = new nodered(MyMac, MyIP, gateway, subnet, HostIP);
-//  myNetwork = new houdinimc(MyMac, MyIP, gateway, subnet, HostIP);
+//  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
+//  myNetwork = new cluecontrol(MyMac, MyIP, HostIP, CCRegister);
+//  myNetwork = new nodered(MyMac, MyIP, HostIP);
+//  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
   myNetwork->setGame(myGame);
 }

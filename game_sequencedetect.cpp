@@ -93,8 +93,26 @@ sequencedetect::sequencedetect() : Game()
   pinMode(INPUT4, INPUT);
   pinMode(INPUT5, INPUT);
 
-  Serial.println("FX300 6 input sequence detector");
-  gameName = "sequencedetect";
+  // Only enable the inputs/outputs that are not going to be used by this game
+  INPUT0_OVERRIDE_ENABLE = 0;
+  INPUT1_OVERRIDE_ENABLE = 0;
+  INPUT2_OVERRIDE_ENABLE = 0;
+  INPUT3_OVERRIDE_ENABLE = 0;
+  INPUT4_OVERRIDE_ENABLE = 0;
+  INPUT5_OVERRIDE_ENABLE = 0;
+
+  OUTPUT0_OVERRIDE_ENABLE = 0;
+  OUTPUT1_OVERRIDE_ENABLE = 0;
+  OUTPUT2_OVERRIDE_ENABLE = 0;
+  OUTPUT3_OVERRIDE_ENABLE = 0;
+  OUTPUT4_OVERRIDE_ENABLE = 0;
+  OUTPUT5_OVERRIDE_ENABLE = 1;
+
+  RELAY0_OVERRIDE_ENABLE = 1;
+  RELAY1_OVERRIDE_ENABLE = 0;
+
+  Serial.println(F("FX300 6 input sequence detector"));
+  gameName = F("sequencedetect");
 
   GAME_INPUT_RESET = INPUT5;  // When high and enabled (defined), the game will be reset
   GAME_INPUT_ENABLE = INPUT5;  // When low and enabled (defined), the game will be enabled
@@ -239,7 +257,7 @@ void sequencedetect::loop(void)
       {
         if ((_gameResetDownTimer == 0) && (_inputSequencePosition > 0))
         {
-          Serial.println("Game Timer Expired");
+          Serial.println(F("Game Timer Expired"));
           
           // Fail, reset
           _gameState = 0; // Reset puzzle
@@ -283,7 +301,7 @@ void sequencedetect::loop(void)
             if (_inputSequencePosition == 0)
             {
   
-              Serial.println("First good button");
+              Serial.println(F("First good button"));
   
               if (GAME_MAX_SOLVE_TIME)
               {
@@ -322,11 +340,11 @@ void sequencedetect::loop(void)
               }
             }
   
-            Serial.print("Game Sequence ");
+            Serial.print(F("Game Sequence "));
             Serial.print(_inputSequencePosition);
-            Serial.print(" input ");
+            Serial.print(F(" input "));
             Serial.print(scanCurrentInputButton);
-            Serial.println(" read");
+            Serial.println(F(" read"));
           
   
             // Next in sequence
@@ -361,7 +379,7 @@ void sequencedetect::loop(void)
   
               // Reset sequence
   
-              Serial.println("Wrong button, sequence reset");
+              Serial.println(F("Wrong button, sequence reset"));
     
               _gameState = 0;  // Reset the game sequence
              
@@ -380,6 +398,7 @@ void sequencedetect::loop(void)
     case GAMESTATE_SOLVED:
       // Run solved and any other one time routine
       solved();
+      _gameState = GAMESTATE_ENDLOOP;
       
       break;
  
@@ -399,7 +418,7 @@ void sequencedetect::loop(void)
 void sequencedetect::solved(void)
 {
   // Routine run when the puzzle is solved
-  Serial.println("sequencedetect Solved!");
+  Serial.println(F("sequencedetect Solved!"));
 
   //Call generic solve function
   Game::solved();
@@ -417,7 +436,7 @@ void sequencedetect::solved(void)
 
 void sequencedetect::forceSolved(void)
 {
-  Serial.println("sequencedetect forceSolved");
+  Serial.println(F("sequencedetect forceSolved"));
 
   //Call generic forceSolve function
   Game::forceSolved();
@@ -443,7 +462,7 @@ void sequencedetect::reset(void)
 {
   // Routine run to reset the puzzle.  Run at start or by other means
   
-  Serial.println("sequencedetect Reset");
+  Serial.println(F("sequencedetect Reset"));
   
   //Reset global game variables
   Game::reset();
@@ -477,7 +496,7 @@ void sequencedetect::recordInputButtonSequence(void)
   int inputSequencePosition = 0;
   int exitLoopEarly = 0;
   
-  Serial.println("Programming mode");
+  Serial.println(F("Programming mode"));
 
   // Clear the lights
   allLightsOnOff(LOW);
@@ -500,7 +519,7 @@ void sequencedetect::recordInputButtonSequence(void)
 
     if (inputButton == NO_INPUT_DETECTED)
     {
-      Serial.println("No input detected...");
+      Serial.println(F("No input detected..."));
       
     }else{
 
@@ -510,9 +529,9 @@ void sequencedetect::recordInputButtonSequence(void)
       // Save the input
       EEPROM.write(inputSequencePosition, inputButton);
 
-      Serial.print("Input ");
+      Serial.print(F("Input "));
       Serial.print(inputButton);
-      Serial.println(" recorded.");
+      Serial.println(F(" recorded."));
 
       inputSequencePosition++;  //Record next button
 
@@ -531,16 +550,16 @@ void sequencedetect::recordInputButtonSequence(void)
 
   if (exitLoopEarly)
   {
-    Serial.println("Programming mode complete");
+    Serial.println(F("Programming mode complete"));
   }else{
-    Serial.println("Programming mode complete, max entries");
+    Serial.println(F("Programming mode complete, max entries"));
   }
 
   
   int i = 0;
   uint8_t input;
   
-  Serial.println("Sequence ");
+  Serial.println(F("Sequence "));
 
   while((input = EEPROM.read(i)) != 0xFF)
   {
@@ -548,7 +567,7 @@ void sequencedetect::recordInputButtonSequence(void)
     i++;
   }
     
-  Serial.println("Programmed");
+  Serial.println(F("Programmed"));
 
   // Run scanning lights
   _runLightSequence = 1;
@@ -573,7 +592,7 @@ int sequencedetect::scanInputsSteady(void)
 
   if (GAME_INPUT_COUNT > 8)
   {
-    Serial.println("error Too many inputs for the number of bits");
+    Serial.println(F("error Too many inputs for the number of bits"));
   }
   
   // Increase size types if ever on a machine with more inputs

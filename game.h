@@ -45,6 +45,26 @@ class Game
     int GAME_INPUT_RESET = 0;  // When high and enabled (defined), the game will be reset
     int GAME_INPUT_ENABLE = 0;  // When low and enabled (defined), the game will be enabled
 
+    // Input override enables
+    bool INPUT0_OVERRIDE_ENABLE = 1;
+    bool INPUT1_OVERRIDE_ENABLE = 1;
+    bool INPUT2_OVERRIDE_ENABLE = 1;
+    bool INPUT3_OVERRIDE_ENABLE = 1;
+    bool INPUT4_OVERRIDE_ENABLE = 1;
+    bool INPUT5_OVERRIDE_ENABLE = 1;
+
+    // Output override enables
+    bool OUTPUT0_OVERRIDE_ENABLE = 1;
+    bool OUTPUT1_OVERRIDE_ENABLE = 1;
+    bool OUTPUT2_OVERRIDE_ENABLE = 1;
+    bool OUTPUT3_OVERRIDE_ENABLE = 1;
+    bool OUTPUT4_OVERRIDE_ENABLE = 1;
+    bool OUTPUT5_OVERRIDE_ENABLE = 1;
+
+    // Relay override enables
+    bool RELAY0_OVERRIDE_ENABLE = 1;
+    bool RELAY1_OVERRIDE_ENABLE = 1;
+
   private:
 
 };

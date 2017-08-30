@@ -5,21 +5,20 @@ void houdinimc::loop(void)
 {
   listenForEthernetClients();
 
-  Serial.println("IP??");
-  Serial.println(HostIP);
-
   if (pMyGame->_puzzleSolved == 1 && sent == 0)
   {
-    sprintf(pageAdd, " / ");
-    sprintf(pageAdd, pMyGame->gameName.c_str());
-    sprintf(pageAdd, "_solved"); (!getPage(HostIP, serverPort, pageAdd));
+    Serial.println("test?");
+    sprintf(pageAdd, " / %s_solved", pMyGame->gameName.c_str());
+    Serial.println(pageAdd);
+    (!getPage(HostIP, serverPort, pageAdd));
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1)
   {
-    sprintf(pageAdd, " / ");
-    sprintf(pageAdd, pMyGame->gameName.c_str());
-    sprintf(pageAdd, "_reset"); (!getPage(HostIP, serverPort, pageAdd));
+    Serial.println("test??");
+    sprintf(pageAdd, " / %s_reset", pMyGame->gameName.c_str());
+    Serial.println(pageAdd);
+    (!getPage(HostIP, serverPort, pageAdd));
     sent = 0;
   }
 }
@@ -29,8 +28,7 @@ byte houdinimc::getPage(IPAddress ipBuf, int thisPort, char *page)
   int inChar;
   char outBuf[128];
 
-  Serial.print(F("connecting…"));
-
+  Serial.println(F("connecting…"));
   Serial.println(ipBuf);
   Serial.println(thisPort);
 
@@ -38,20 +36,19 @@ byte houdinimc::getPage(IPAddress ipBuf, int thisPort, char *page)
   {
     Serial.println(F("connected"));
 
+    Serial.println(page);
     sprintf(outBuf, "GET % s HTTP / 1.1", page);
-    client.println(outBuf);
-    sprintf(serverName,"%d.%d.%d.%d", HostIP[0],HostIP[1],HostIP[2],HostIP[3]);
-    Serial.println();
-    Serial.println(HostIP[0]);
-    Serial.println(HostIP[1]);
-    Serial.println(HostIP[2]);
-    Serial.println(HostIP[3]);
-    Serial.println();
+    Serial.println(outBuf);
+//    client.println(outBuf);
+    byte oct1 = HostIP[0];
+    byte oct2 = HostIP[1];
+    byte oct3 = HostIP[2];
+    byte oct4 = HostIP[3];
+    sprintf(serverName, "%d.%d.%d.%d", oct1, oct2, oct3, oct4);
     Serial.println(serverName);
-    Serial.println();
-    sprintf(outBuf, "Host: % s", serverName);
-    client.println(outBuf);
-    client.println(F("Connection: close\r\n"));
+//    sprintf(outBuf, "Host: % s", serverName);
+//    client.println(outBuf);
+//    client.println(F("Connection: close\r\n"));
   }
   else
   {
@@ -99,18 +96,18 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
 {
   Serial.println(requestStr);
 
-  if (requestStr.startsWith("GET /status")) 
+  if (requestStr.startsWith(F("GET /status"))) 
   {
-    Serial.println("polled for status!");
-    writeClientResponse(client, pMyGame->isSolved() ? "triggered" : "not triggered");
-  } else if (requestStr.startsWith("GET /reset")) 
+    Serial.println(F("polled for status!"));
+    writeClientResponse(client, pMyGame->isSolved() ? F("triggered") : F("not triggered"));
+  } else if (requestStr.startsWith(F("GET /reset"))) 
   {
-    Serial.println("Network Room reset");
+    Serial.println(F("Network Room reset"));
     writeClientResponse(client, "ok");
     pMyGame->reset();
-  } else if (requestStr.startsWith("GET /trigger"))
+  } else if (requestStr.startsWith(F("GET /trigger")))
   {
-    Serial.println("Network prop solve");
+    Serial.println(F("Network prop solve"));
     writeClientResponse(client, "ok");
     pMyGame->forceSolved();
   } else {
@@ -122,7 +119,7 @@ void houdinimc::listenForEthernetClients()
 {
     if (client) 
   {
-    Serial.println("Got a client");
+    Serial.println(F("Got a client"));
     
     String requestStr;
     boolean firstLine = true;
@@ -160,22 +157,22 @@ void houdinimc::listenForEthernetClients()
 
 void houdinimc::writeClientResponse(EthernetClient& client, String bodyStr) 
 {
-  Serial.println("HTTP 200");
+  Serial.println(F("HTTP 200"));
   
   // send a standard http response header
-  client.println("HTTP/1.1 200 OK");
-  client.println("Content-Type: text/plain");
-  client.println("Access-Control-Allow-Origin: *");  // ERM will not be able to connect without this header!
+  client.println(F("HTTP/1.1 200 OK"));
+  client.println(F("Content-Type: text/plain"));
+  client.println(F("Access-Control-Allow-Origin: *"));  // ERM will not be able to connect without this header!
   client.println();
   client.print(bodyStr);
 }
 
 void houdinimc::writeClientResponseNotFound(EthernetClient& client) 
 {
-  Serial.println("HTTP 404");
+  Serial.println(F("HTTP 404"));
   
   // send a standard http response header
-  client.println("HTTP/1.1 404 Not Found");
-  client.println("Access-Control-Allow-Origin: *");  // ERM will not be able to connect without this header!
+  client.println(F("HTTP/1.1 404 Not Found"));
+  client.println(F("Access-Control-Allow-Origin: *"));  // ERM will not be able to connect without this header!
   client.println();
 } 

@@ -6,9 +6,6 @@
 #include "network.h"
 #include "game.h"
 
-#define buttonPin INPUT5
-#define lightPin OUTPUT4
-
 class Network;
 
 class simplegame : public Game
@@ -28,6 +25,9 @@ class simplegame : public Game
     int presscounter = 0;
     
     bool pressflag = 0;
+
+    static const int buttonPin = INPUT5;
+    static const int lightPin = OUTPUT4;
 };
 
 #endif

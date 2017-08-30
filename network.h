@@ -14,16 +14,14 @@
    -------------------
 */
 
-
 #ifndef network_h
 #define network_h
 
-#include <SPI.h>
 #include <Ethernet2.h>
-#include "game.h"
 
-#include "CCModBus.h"
+#include "game.h"
 #include "arduino.h"
+
 
 class Game;
 
@@ -32,7 +30,7 @@ class Network
   public:
     Network();
   
-    Network(byte [], IPAddress, IPAddress, IPAddress, IPAddress);
+    Network(byte [], IPAddress, IPAddress);
 
     void sendGameSolved(void);
 
@@ -45,13 +43,28 @@ class Network
     byte *MyMac;
     
     IPAddress MyIP;
-    IPAddress gateway;
-    IPAddress subnet;
     IPAddress HostIP;
 
     Game *pMyGame = NULL;
 
     EthernetServer server;
+
+    bool INPUT0_STATE = 0;
+    bool INPUT1_STATE = 0;
+    bool INPUT2_STATE = 0;
+    bool INPUT3_STATE = 0;
+    bool INPUT4_STATE = 0;
+    bool INPUT5_STATE = 0;
+
+    bool OUTPUT0_STATE = 0;
+    bool OUTPUT1_STATE = 0;
+    bool OUTPUT2_STATE = 0;
+    bool OUTPUT3_STATE = 0;
+    bool OUTPUT4_STATE = 0;
+    bool OUTPUT5_STATE = 0;
+
+    bool RELAY0_STATE = 0;
+    bool RELAY1_STATE = 0;
 
   private:
     

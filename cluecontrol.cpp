@@ -26,6 +26,8 @@ void cluecontrol::loop(void)
   sendGameReset();
   sent = 0;
  }
+
+ 
 }
 
 void cluecontrol::listenForRequest()
@@ -33,7 +35,7 @@ void cluecontrol::listenForRequest()
   if (CCMod.CCValue == ACTIVATE)
    {
         //active=true;   //set the active flag
-        Serial.println("Activate command received");  //for troubleshooting-monitoring
+        Serial.println(F("Activate command received"));  //for troubleshooting-monitoring
         pMyGame->forceSolved();
         CCMod.CCValue = 0;  //clear the value to prevent re-triggering
         
@@ -42,7 +44,7 @@ void cluecontrol::listenForRequest()
    if (CCMod.CCValue == DEACTIVATE)
    {
         //active=false;           //clear the active flag
-        Serial.println("deactivate command received");
+        Serial.println(F("deactivate command received"));
         pMyGame->reset();
         CCMod.CCValue = 0;  //clear the value to prevent re-triggering
    }

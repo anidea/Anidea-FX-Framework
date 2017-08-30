@@ -21,7 +21,7 @@ Game::Game()
   pinMode(INPUT2, INPUT);
   pinMode(INPUT3, INPUT);
 
-  Serial.println("Game object initialized");
+  Serial.println(F("Game object initialized"));
 
   reset();
 }
@@ -77,7 +77,7 @@ void Game::loop(void)
 void Game::forceSolved(void)
 {
   // Routine run when the puzzle is solved
-  Serial.println("Puzzle Force Solved!");
+  Serial.println(F("Puzzle Force Solved!"));
   _puzzleSolved = 1;
   _gameState = GAMESTATE_ENDLOOP;
 
@@ -92,7 +92,7 @@ void Game::forceSolved(void)
 void Game::solved(void)
 {
   // Routine run when the puzzle is solved
-  Serial.println("Puzzle Solved!");
+  Serial.println(F("Puzzle Solved!"));
 
   _puzzleSolved = 1;
   _gameState = GAMESTATE_ENDLOOP;
@@ -109,7 +109,7 @@ void Game::reset(void)
 {
   // Routine run to reset the puzzle.  Run at start or by other means
   
-  Serial.println("Game Reset");
+  Serial.println(F("Game Reset"));
   
   // Reset game vars
   _puzzleSolved = 0;

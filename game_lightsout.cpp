@@ -97,8 +97,26 @@ lightsout::lightsout() : Game()
   //pinMode(INPUT4, INPUT); - need for i2c
   ///pinMode(INPUT5, INPUT); - need for i2c
 
-  Serial.println("Lights Out Game");
-  gameName = "lightsout";
+  // Only enable the inputs/outputs that are not going to be used by this game
+  INPUT0_OVERRIDE_ENABLE = 0;
+  INPUT1_OVERRIDE_ENABLE = 0;
+  INPUT2_OVERRIDE_ENABLE = 0;
+  INPUT3_OVERRIDE_ENABLE = 0;
+  INPUT4_OVERRIDE_ENABLE = 1;
+  INPUT5_OVERRIDE_ENABLE = 1;
+
+  OUTPUT0_OVERRIDE_ENABLE = 0;
+  OUTPUT1_OVERRIDE_ENABLE = 0;
+  OUTPUT2_OVERRIDE_ENABLE = 0;
+  OUTPUT3_OVERRIDE_ENABLE = 0;
+  OUTPUT4_OVERRIDE_ENABLE = 1;
+  OUTPUT5_OVERRIDE_ENABLE = 1;
+
+  RELAY0_OVERRIDE_ENABLE = 1;
+  RELAY1_OVERRIDE_ENABLE = 0;
+
+  Serial.println(F("Lights Out Game"));
+  gameName = F("lightsout");
 
   // Init I2C devices
   Wire.begin();
@@ -203,7 +221,7 @@ void lightsout::loop(void)
       // If we have a button, toggle it and toggle neighbors
       if (_newKey != NO_INPUT_DETECTED)
       {
-        Serial.print("Key pressed ");
+        Serial.print(F("Key pressed "));
         Serial.print(_scanXkey);
         Serial.print(", ");
         Serial.print(_scanYkey);
@@ -269,7 +287,7 @@ void lightsout::reset(void)
 {
   // Routine run to reset the puzzle.  Run at start or by other means
   
-  Serial.println("lightsout Reset");
+  Serial.println(F("lightsout Reset"));
   
   //Reset global game variables
   Game::reset();
@@ -311,9 +329,9 @@ int lightsout::scanMatrix(void)
     for (xScan = 0; xScan < GAME_KEYSCAN_X_COUNT; xScan++)
     {
         #if 0
-        Serial.print("xScan ");
+        Serial.print(F("xScan "));
         Serial.print(xScan);
-        Serial.print(", yScan");
+        Serial.print(F(", yScan"));
         Serial.println(yScan);
         #endif
 
@@ -418,9 +436,9 @@ void lightsout::setLights(int dontUseMatrix, int overrideState)
   {
     #if 0
     // I2c function here
-    Serial.print("I2C Addr ");
+    Serial.print(F("I2C Addr "));
     Serial.print(i2cLightAddresses[j]);
-    Serial.print(", data ");
+    Serial.print(F(", data "));
     Serial.println(lightOutput[j], HEX);
     
 
@@ -440,9 +458,9 @@ void lightsout::setLights(int dontUseMatrix, int overrideState)
     
     if (ret != 0)
     {
-      Serial.print("Addr ");
+      Serial.print(F("Addr "));
       Serial.print(i);
-      Serial.print(", I2C ret ");
+      Serial.print(F(", I2C ret "));
       Serial.println(ret);
     }
     #endif
@@ -506,7 +524,7 @@ int lightsout::scanInputsSteady(void)
 
   if (GAME_INPUT_COUNT > 8)
   {
-    Serial.println("error Too many inputs for the number of bits");
+    Serial.println(F("error Too many inputs for the number of bits"));
   }
   
   // Increase size types if ever on a machine with more inputs

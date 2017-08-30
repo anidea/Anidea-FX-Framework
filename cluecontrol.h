@@ -17,10 +17,10 @@
 #ifndef cluecontrol_h
 #define cluecontrol_h
 
-#include <SPI.h>
 #include <Ethernet2.h>
 #include "game.h"
 #include "arduino.h"
+#include "CCModBus.h"
 
 #define CCCoil      1 //Which coil to use when talking to ClueControl
 #define ACTIVATE    1   //modbus value received to activate the puzzle
@@ -31,7 +31,7 @@ class Game;
 class cluecontrol : public Network
 {
   public:
-    cluecontrol(byte MyMac[], IPAddress MyIP, IPAddress gateway, IPAddress subnet, IPAddress HostIP, int CCRegister) : Network(MyMac, MyIP, gateway, subnet, HostIP)
+    cluecontrol(byte MyMac[], IPAddress MyIP, IPAddress HostIP, int CCRegister) : Network(MyMac, MyIP, HostIP)
     {
       CCMod.ClueControlIP = HostIP;
       Register = CCRegister;

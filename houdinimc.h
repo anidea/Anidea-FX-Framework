@@ -17,7 +17,6 @@
 #ifndef houdinimc_h
 #define houdinimc_h
 
-#include <SPI.h>
 #include <Ethernet2.h>
 #include "game.h"
 #include "arduino.h"
@@ -27,7 +26,7 @@ class Game;
 class houdinimc : public Network
 {
   public:
-    houdinimc(byte MyMac[], IPAddress MyIP, IPAddress gateway, IPAddress subnet, IPAddress HostIP) : Network(MyMac, MyIP, gateway, subnet, HostIP) {};
+    houdinimc(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP) {};
 
     void sendGameSolved(void);
 
@@ -54,7 +53,7 @@ class houdinimc : public Network
 
     EthernetClient client = server.available();
 
-    char serverName[];
+    char serverName[16];
 };
 
 #endif

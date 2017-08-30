@@ -60,8 +60,26 @@ sixwire::sixwire() : Game()
   pinMode(INPUT4, INPUT);
   pinMode(INPUT5, INPUT);
 
-  Serial.println("sixwire initialized");
-  gameName = "sixwire";
+  // Only enable the inputs/outputs that are not going to be used by this game
+  INPUT0_OVERRIDE_ENABLE = 0;
+  INPUT1_OVERRIDE_ENABLE = 0;
+  INPUT2_OVERRIDE_ENABLE = 0;
+  INPUT3_OVERRIDE_ENABLE = 0;
+  INPUT4_OVERRIDE_ENABLE = 0;
+  INPUT5_OVERRIDE_ENABLE = 0;
+
+  OUTPUT0_OVERRIDE_ENABLE = 0;
+  OUTPUT1_OVERRIDE_ENABLE = 0;
+  OUTPUT2_OVERRIDE_ENABLE = 0;
+  OUTPUT3_OVERRIDE_ENABLE = 0;
+  OUTPUT4_OVERRIDE_ENABLE = 0;
+  OUTPUT5_OVERRIDE_ENABLE = 0;
+
+  RELAY0_OVERRIDE_ENABLE = 1;
+  RELAY1_OVERRIDE_ENABLE = 0;
+
+  Serial.println(F("sixwire initialized"));
+  gameName = F("sixwire");
 
   reset();
 }
@@ -118,9 +136,9 @@ void sixwire::loop(void)
             {
               allMatched = 0;
               
-              Serial.print("Failed Match Low ");
+              Serial.print(F("Failed Match Low "));
               Serial.print(i);
-              Serial.print(", ");
+              Serial.print(F(", "));
               Serial.print(j);
               Serial.println();
 
@@ -131,9 +149,9 @@ void sixwire::loop(void)
             {
               allMatched = 0;
 
-              Serial.print("Failed Match High ");
+              Serial.print(F("Failed Match High "));
               Serial.print(i);
-              Serial.print(", ");
+              Serial.print(F(", "));
               Serial.print(j);
               Serial.println("");
 
@@ -159,7 +177,7 @@ void sixwire::loop(void)
       
         _gameState = GAMESTATE_SOLVED;  // Win
 
-        Serial.println("Solved, state 0 to state 1");
+        Serial.println(F("Solved, state 0 to state 1"));
 
       }
 
@@ -181,7 +199,7 @@ void sixwire::loop(void)
 
 void sixwire::forceSolved(void)
 {
-  Serial.println("sixwire forceSolved");
+  Serial.println(F("sixwire forceSolved"));
 
   //Call generic forceSolve function
   Game::forceSolved();
@@ -193,7 +211,7 @@ void sixwire::forceSolved(void)
 
 void sixwire::solved(void)
 {
-  Serial.println("sixwire solved");
+  Serial.println(F("sixwire solved"));
 
   //Call generic solve function
   Game::solved();
@@ -205,7 +223,7 @@ void sixwire::solved(void)
 
 void sixwire::reset(void)
 {
-  Serial.println("sixwire reset");
+  Serial.println(F("sixwire reset"));
 
   //Reset global game variables
   Game::reset();

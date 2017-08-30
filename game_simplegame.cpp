@@ -65,8 +65,26 @@ simplegame::simplegame() : Game()
   pinMode(INPUT4, INPUT);
   pinMode(INPUT5, INPUT);
 
-  Serial.println("simplegame initialized");
-  gameName = "simplegame";
+  // Only enable the inputs/outputs that are not going to be used by this game
+  INPUT0_OVERRIDE_ENABLE = 1;
+  INPUT1_OVERRIDE_ENABLE = 1;
+  INPUT2_OVERRIDE_ENABLE = 1;
+  INPUT3_OVERRIDE_ENABLE = 1;
+  INPUT4_OVERRIDE_ENABLE = 1;
+  INPUT5_OVERRIDE_ENABLE = 0;
+
+  OUTPUT0_OVERRIDE_ENABLE = 1;
+  OUTPUT1_OVERRIDE_ENABLE = 1;
+  OUTPUT2_OVERRIDE_ENABLE = 1;
+  OUTPUT3_OVERRIDE_ENABLE = 1;
+  OUTPUT4_OVERRIDE_ENABLE = 0;
+  OUTPUT5_OVERRIDE_ENABLE = 1;
+
+  RELAY0_OVERRIDE_ENABLE = 1;
+  RELAY1_OVERRIDE_ENABLE = 1;
+
+  Serial.println(F("simplegame initialized"));
+  gameName = F("simplegame");
 
   reset();
 }
@@ -108,7 +126,7 @@ void simplegame::loop(void)
       
       if (presscounter >= 3)
       {
-        Serial.print("presscounter > 3");
+        Serial.print(F("presscounter > 3"));
         _gameState = GAMESTATE_SOLVED;  // Win
         break;
       }
@@ -130,7 +148,7 @@ void simplegame::loop(void)
 
 void simplegame::forceSolved(void)
 {
-  Serial.println("simplegame forceSolved");
+  Serial.println(F("simplegame forceSolved"));
 
   //Call generic forceSolve function
   Game::forceSolved();
@@ -141,7 +159,7 @@ void simplegame::forceSolved(void)
 
 void simplegame::solved(void)
 {
-  Serial.println("simplegame solved");
+  Serial.println(F("simplegame solved"));
 
   //Call generic solve function
   Game::solved();
@@ -152,7 +170,7 @@ void simplegame::solved(void)
 
 void simplegame::reset(void)
 {
-  Serial.println("simplegame reset");
+  Serial.println(F("simplegame reset"));
 
   //Reset global game variables
   Game::reset();

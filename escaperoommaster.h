@@ -17,7 +17,6 @@
 #ifndef escaperoommaster_h
 #define escaperoommaster_h
 
-#include <SPI.h>
 #include <Ethernet2.h>
 #include "game.h"
 #include "arduino.h"
@@ -27,7 +26,7 @@ class Game;
 class escaperoommaster : public Network
 {
   public:
-    escaperoommaster(byte MyMac[], IPAddress MyIP, IPAddress gateway, IPAddress subnet, IPAddress HostIP) : Network(MyMac, MyIP, gateway, subnet, HostIP) {};
+    escaperoommaster(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP) {};
 
     virtual void loop(void);
 
