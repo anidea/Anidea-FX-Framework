@@ -34,6 +34,7 @@
 #include "game_sequencedetect.h"
 #include "game_sixwire.h"
 #include "game_inputsequence.h"
+#include "game_empty.h"
 
 // Generic game and network objects
 Game *myGame;
@@ -73,6 +74,7 @@ void setup() {
 //  myGame = new sequencedetect(); //Sequencedetect description
 //  myGame = new sixwire(); //Sixwire description
 //  myGame = new inputsequence(); //Sequencedetect description
+//  myGame = new empty(); // Empty game to manually control inputs/outputs only
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
   IPAddress MyIP(10, 0, 1, 210);                          // This must be unique for each device
