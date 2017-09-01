@@ -46,65 +46,32 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : server(80)
 
 void Network::loop(void)
 {
-  if (pMyGame->INPUT0_OVERRIDE_ENABLE == 1)
+  // Read input states
+  for (int i = 0; i < NUM_INPUTS; i++)
   {
-    INPUT0_STATE = digitalRead(INPUT0);
-  }
-  if (pMyGame->INPUT1_OVERRIDE_ENABLE == 1)
-  {
-    INPUT1_STATE = digitalRead(INPUT1);
-  }
-  if (pMyGame->INPUT2_OVERRIDE_ENABLE == 1)
-  {
-    INPUT2_STATE = digitalRead(INPUT2);
-  }
-  if (pMyGame->INPUT3_OVERRIDE_ENABLE == 1)
-  {
-    INPUT3_STATE = digitalRead(INPUT3);
-  }
-  if (pMyGame->INPUT4_OVERRIDE_ENABLE == 1)
-  {
-    INPUT4_STATE = digitalRead(INPUT4);
-  }
-  if (pMyGame->INPUT5_OVERRIDE_ENABLE == 1)
-  {
-    INPUT5_STATE = digitalRead(INPUT5);
+    if (pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1)
+    {
+      INPUT_STATES[i] = digitalRead(INPUTS[i]);
+    }
   }
 
-  if (pMyGame->OUTPUT0_OVERRIDE_ENABLE == 1)
+  // Write output states
+  for (int i = 0; i < NUM_OUTPUTS; i++)
   {
-    digitalWrite(OUTPUT0, OUTPUT0_STATE);
-  }
-  if (pMyGame->OUTPUT1_OVERRIDE_ENABLE == 1)
-  {
-    digitalWrite(OUTPUT1, OUTPUT1_STATE);
-  }
-  if (pMyGame->OUTPUT2_OVERRIDE_ENABLE == 1)
-  {
-    digitalWrite(OUTPUT2, OUTPUT2_STATE);
-  }
-  if (pMyGame->OUTPUT3_OVERRIDE_ENABLE == 1)
-  {
-    digitalWrite(OUTPUT3, OUTPUT3_STATE);
-  }
-  if (pMyGame->OUTPUT4_OVERRIDE_ENABLE == 1)
-  {
-    digitalWrite(OUTPUT4, OUTPUT4_STATE);
-  }
-  if (pMyGame->OUTPUT5_OVERRIDE_ENABLE == 1)
-  {
-    digitalWrite(OUTPUT5, OUTPUT5_STATE);
+    if (pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == 1)
+    {
+      digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
+    }
   }
 
-  if (pMyGame->RELAY0_OVERRIDE_ENABLE == 1)
+  // Write relay states
+  for (int i = 0; i < NUM_RELAYS; i++)
   {
-    digitalWrite(RELAY0, RELAY0_STATE);
+    if (pMyGame->RELAY_OVERRIDE_ENABLE[i] == 1)
+    {
+      digitalWrite(RELAYS[i], RELAY_STATES[i]);
+    }
   }
-  if (pMyGame->RELAY1_OVERRIDE_ENABLE == 1)
-  {
-    digitalWrite(RELAY1, RELAY1_STATE);
-  }
-
 }
 
 void Network::sendGameSolved(void)

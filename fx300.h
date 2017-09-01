@@ -39,4 +39,16 @@ const int LED = -1;
 
 const int HALL = 6;
 
+const int NUM_INPUTS = 6;
+
+const int NUM_OUTPUTS = 6;
+
+const int NUM_RELAYS = 2;
+
+const int INPUTS[NUM_INPUTS] = {INPUT0, INPUT1, INPUT2, INPUT3, INPUT4, INPUT5};
+
+const int OUTPUTS[NUM_OUTPUTS] = {OUTPUT0, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, OUTPUT5};
+
+const int RELAYS[NUM_RELAYS] = {RELAY0, RELAY1};
+
 #endif

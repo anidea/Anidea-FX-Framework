@@ -22,7 +22,6 @@
 #include "arduino.h"
 #include "CCModBus.h"
 
-#define CCCoil      1 //Which coil to use when talking to ClueControl
 #define ACTIVATE    1   //modbus value received to activate the puzzle
 #define DEACTIVATE  2   //modbus value received to deactivate the puzzle
 
@@ -36,21 +35,21 @@ class cluecontrol : public Network
       CCMod.ClueControlIP = HostIP;
       Register = CCRegister;
     };
-  
-    void sendGameSolved(void);
-
-    void sendGameReset(void);
 
     virtual void loop(void);
 
   private:
     void listenForRequest();
 
+    void setTriggers();
+
     bool sent;
     
     CCModBus CCMod;
 
     int Register = 0;
+
+    bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
 };
 
 #endif

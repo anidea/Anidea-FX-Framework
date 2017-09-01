@@ -49,22 +49,11 @@ class Network
 
     EthernetServer server;
 
-    bool INPUT0_STATE = 0;
-    bool INPUT1_STATE = 0;
-    bool INPUT2_STATE = 0;
-    bool INPUT3_STATE = 0;
-    bool INPUT4_STATE = 0;
-    bool INPUT5_STATE = 0;
+    bool INPUT_STATES[6] = {false};
 
-    bool OUTPUT0_STATE = 0;
-    bool OUTPUT1_STATE = 0;
-    bool OUTPUT2_STATE = 0;
-    bool OUTPUT3_STATE = 0;
-    bool OUTPUT4_STATE = 0;
-    bool OUTPUT5_STATE = 0;
+    bool OUTPUT_STATES[6] = {false};
 
-    bool RELAY0_STATE = 0;
-    bool RELAY1_STATE = 0;
+    bool RELAY_STATES[2] = {false};
 
   private:
     

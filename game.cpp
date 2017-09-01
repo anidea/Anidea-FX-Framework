@@ -21,6 +21,15 @@ Game::Game()
   pinMode(INPUT2, INPUT);
   pinMode(INPUT3, INPUT);
 
+  for(int i = 0; i < NUM_INPUTS; ++i) //Or loop the array and init them.
+      INPUT_OVERRIDE_ENABLE[i] = true;
+
+  for(int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
+      OUTPUT_OVERRIDE_ENABLE[i] = true;
+
+  for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
+      RELAY_OVERRIDE_ENABLE[i] = true;
+
   Serial.println(F("Game object initialized"));
 
   reset();

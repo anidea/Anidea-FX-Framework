@@ -46,24 +46,13 @@ class Game
     int GAME_INPUT_ENABLE = 0;  // When low and enabled (defined), the game will be enabled
 
     // Input override enables
-    bool INPUT0_OVERRIDE_ENABLE = 1;
-    bool INPUT1_OVERRIDE_ENABLE = 1;
-    bool INPUT2_OVERRIDE_ENABLE = 1;
-    bool INPUT3_OVERRIDE_ENABLE = 1;
-    bool INPUT4_OVERRIDE_ENABLE = 1;
-    bool INPUT5_OVERRIDE_ENABLE = 1;
+    bool INPUT_OVERRIDE_ENABLE[NUM_INPUTS] = {};
 
     // Output override enables
-    bool OUTPUT0_OVERRIDE_ENABLE = 1;
-    bool OUTPUT1_OVERRIDE_ENABLE = 1;
-    bool OUTPUT2_OVERRIDE_ENABLE = 1;
-    bool OUTPUT3_OVERRIDE_ENABLE = 1;
-    bool OUTPUT4_OVERRIDE_ENABLE = 1;
-    bool OUTPUT5_OVERRIDE_ENABLE = 1;
+    bool OUTPUT_OVERRIDE_ENABLE[6] = {};
 
     // Relay override enables
-    bool RELAY0_OVERRIDE_ENABLE = 1;
-    bool RELAY1_OVERRIDE_ENABLE = 1;
+    bool RELAY_OVERRIDE_ENABLE[2] = {};
 
   private:
 
