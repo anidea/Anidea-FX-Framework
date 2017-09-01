@@ -79,11 +79,10 @@ void setup() {
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
   IPAddress MyIP(10, 0, 1, 210);                          // This must be unique for each device
   IPAddress HostIP(10, 0, 1, 115);                           // This should be the IP of the device running the management software
-  int CCRegister = 5; // Register for Clue Control
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
-//  myNetwork = new cluecontrol(MyMac, MyIP, HostIP, CCRegister);
+//  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
 //  myNetwork = new nodered(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 

@@ -3,23 +3,38 @@
 
 void houdinimc::loop(void)
 {
+  Network::loop();
   listenForEthernetClients();
+  sendChanges();
+}
 
+void houdinimc::sendChanges(void)
+{
   if (pMyGame->_puzzleSolved == 1 && sent == 0)
   {
-    Serial.println("test?");
-    sprintf(pageAdd, " / %s_solved", pMyGame->gameName.c_str());
-    Serial.println(pageAdd);
+    sprintf(pageAdd, " /%d_solved", MyIP[3]);
     (!getPage(HostIP, serverPort, pageAdd));
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1)
   {
-    Serial.println("test??");
-    sprintf(pageAdd, " / %s_reset", pMyGame->gameName.c_str());
-    Serial.println(pageAdd);
+    sprintf(pageAdd, " /%d_reset", MyIP[3]);
     (!getPage(HostIP, serverPort, pageAdd));
     sent = 0;
+  }
+
+  for (int i = 0; i < NUM_INPUTS; i++)
+  {
+    if (INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
+    {
+      Serial.print(F("INPUT"));
+      Serial.print(i);
+      Serial.println(F(" status changed"));
+      sprintf(pageAdd, " /%d_INPUT%d_%s", MyIP[3], i, INPUT_STATES[i] ? "ON" : "OFF");
+      Serial.println(pageAdd);
+      (!getPage(HostIP, serverPort, pageAdd));
+      INPUT_STATE_OLD[i] = INPUT_STATES[i];
+    }
   }
 }
 
@@ -28,27 +43,22 @@ byte houdinimc::getPage(IPAddress ipBuf, int thisPort, char *page)
   int inChar;
   char outBuf[128];
 
-  Serial.println(F("connecting…"));
-  Serial.println(ipBuf);
-  Serial.println(thisPort);
+  Serial.println(F("connecting..."));
 
   if (client.connect(ipBuf, thisPort) == 1)
   {
     Serial.println(F("connected"));
 
-    Serial.println(page);
-    sprintf(outBuf, "GET % s HTTP / 1.1", page);
-    Serial.println(outBuf);
-//    client.println(outBuf);
+    sprintf(outBuf, "GET %s HTTP/1.1", page);
+    client.println(outBuf);
     byte oct1 = HostIP[0];
     byte oct2 = HostIP[1];
     byte oct3 = HostIP[2];
     byte oct4 = HostIP[3];
     sprintf(serverName, "%d.%d.%d.%d", oct1, oct2, oct3, oct4);
-    Serial.println(serverName);
-//    sprintf(outBuf, "Host: % s", serverName);
-//    client.println(outBuf);
-//    client.println(F("Connection: close\r\n"));
+    sprintf(outBuf, "Host: %s", serverName);
+    client.println(outBuf);
+    client.println(F("Connection: close\r\n"));
   }
   else
   {
@@ -96,28 +106,91 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
 {
   Serial.println(requestStr);
 
-  if (requestStr.startsWith(F("GET /status"))) 
+  if (requestStr.startsWith(F("GET /status")))
   {
     Serial.println(F("polled for status!"));
     writeClientResponse(client, pMyGame->isSolved() ? F("triggered") : F("not triggered"));
-  } else if (requestStr.startsWith(F("GET /reset"))) 
+  }
+  else if (requestStr.startsWith(F("GET /reset"))) 
   {
     Serial.println(F("Network Room reset"));
-    writeClientResponse(client, "ok");
+    writeClientResponse(client, F("ok"));
     pMyGame->reset();
-  } else if (requestStr.startsWith(F("GET /trigger")))
+  }
+  else if (requestStr.startsWith(F("GET /trigger"))) 
   {
     Serial.println(F("Network prop solve"));
-    writeClientResponse(client, "ok");
+    writeClientResponse(client, F("ok"));
     pMyGame->forceSolved();
-  } else {
+  }
+  else if (requestStr.startsWith(F("GET /INPUT")))
+  {
+    for (int i = 0; i < NUM_INPUTS; i++)
+    {
+      if (requestStr.startsWith("GET /INPUT" + String(i)) && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
+      {
+        Serial.print(F("polled for INPUT"));
+        Serial.print(i);
+        Serial.println(F(" status!"));
+        writeClientResponse(client, INPUT_STATES[i] ? F("triggered") : F("not triggered"));
+      }
+    }
+  }
+  else if (requestStr.startsWith(F("GET /OUTPUT")))
+  {
+    for (int i = 0; i < NUM_OUTPUTS; i++)
+    {
+      if (requestStr.startsWith("GET /OUTPUT" + String(i) + "_OFF") && pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == 1) 
+      {
+        Serial.print(F("OUTPUT"));
+        Serial.print(i);
+        Serial.println(F(" turned off"));
+        writeClientResponse(client, F("ok"));
+        OUTPUT_STATES[i] = 0;
+      }
+      else if (requestStr.startsWith("GET /OUTPUT" + String(i) + "_ON") && pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == 1) 
+      {
+        Serial.print(F("OUTPUT"));
+        Serial.print(i);
+        Serial.println(F(" turned on"));
+        writeClientResponse(client, F("ok"));
+        OUTPUT_STATES[i] = 1;
+      }
+    }
+  }
+  else if (requestStr.startsWith(F("GET /RELAY")))
+  {
+    for (int i = 0; i < NUM_RELAYS; i++)
+    {
+      if (requestStr.startsWith("GET /RELAY" + String(i) + "_OFF") && pMyGame->RELAY_OVERRIDE_ENABLE[i] == 1) 
+      {
+        Serial.print(F("RELAY"));
+        Serial.print(i);
+        Serial.println(F(" turned off"));
+        writeClientResponse(client, F("ok"));
+        RELAY_STATES[i] = 0;
+      }
+      else if (requestStr.startsWith("GET /RELAY" + String(i) + "_ON") && pMyGame->RELAY_OVERRIDE_ENABLE[i] == 1) 
+      {
+        Serial.print(F("RELAY"));
+        Serial.print(i);
+        Serial.println(F(" turned off"));
+        writeClientResponse(client, F("ok"));
+        RELAY_STATES[i] = 1;
+      }
+    }
+  }
+  else
+  {
     writeClientResponseNotFound(client);
   }
 }
 
 void houdinimc::listenForEthernetClients() 
 {
-    if (client) 
+  EthernetClient client = server.available();
+  
+  if (client) 
   {
     Serial.println(F("Got a client"));
     
@@ -141,7 +214,7 @@ void houdinimc::listenForEthernetClients()
         } else if (c != '\r') 
         {
           currentLineIsBlank = false;
-
+    
           if (firstLine) 
           {
             requestStr.concat(c);

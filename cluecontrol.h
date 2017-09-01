@@ -30,10 +30,9 @@ class Game;
 class cluecontrol : public Network
 {
   public:
-    cluecontrol(byte MyMac[], IPAddress MyIP, IPAddress HostIP, int CCRegister) : Network(MyMac, MyIP, HostIP)
+    cluecontrol(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP)
     {
       CCMod.ClueControlIP = HostIP;
-      Register = CCRegister;
     };
 
     virtual void loop(void);
@@ -46,8 +45,6 @@ class cluecontrol : public Network
     bool sent;
     
     CCModBus CCMod;
-
-    int Register = 0;
 
     bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
 };
