@@ -70,15 +70,15 @@ void setup() {
 
   // Uncomment only one of these lines for the game you want
 //  myGame = new simplegame(); //Simple game provided as an example
-//  myGame = new lightsout(); //Lights out game description
-//  myGame = new sequencedetect(); //Sequencedetect description
-//  myGame = new sixwire(); //Sixwire description
-//  myGame = new inputsequence(); //Sequencedetect description
+//  myGame = new lightsout(); //Lights out game
+//  myGame = new sequencedetect(); //Sequencedetect
+//  myGame = new sixwire(); //Sixwire
+//  myGame = new inputsequence(); //Detects a sequence of inputs
 //  myGame = new empty(); // Empty game to manually control inputs and outputs only
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
-  IPAddress MyIP(10, 0, 1, 210);                          // This must be unique for each device
-  IPAddress HostIP(10, 0, 1, 115);                           // This should be the IP of the device running the management software
+  IPAddress MyIP(10, 0, 1, 210);                         // This must be unique for each device
+  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
