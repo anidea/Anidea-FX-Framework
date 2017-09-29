@@ -45,15 +45,15 @@ class Network
     IPAddress MyIP;
     IPAddress HostIP;
 
-    Game *pMyGame = NULL;
+    static Game *pMyGame;
 
     EthernetServer server;
 
-    bool INPUT_STATES[6] = {false};
+    static bool INPUT_STATES[NUM_INPUTS];
 
-    bool OUTPUT_STATES[6] = {false};
+    static bool OUTPUT_STATES[NUM_OUTPUTS];
 
-    bool RELAY_STATES[2] = {false};
+    static bool RELAY_STATES[NUM_RELAYS];
 
   private:
     

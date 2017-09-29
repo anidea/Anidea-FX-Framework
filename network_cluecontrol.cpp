@@ -1,5 +1,5 @@
 #include "network.h"
-#include "cluecontrol.h"
+#include "network_cluecontrol.h"
 
 void cluecontrol::loop(void)
 {

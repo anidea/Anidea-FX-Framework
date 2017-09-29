@@ -16,6 +16,12 @@
 
 #include "network.h"
 
+Game *Network::pMyGame = NULL;
+
+bool Network::OUTPUT_STATES[NUM_OUTPUTS] = {false};
+bool Network::INPUT_STATES[NUM_INPUTS] = {false};
+bool Network::RELAY_STATES[NUM_RELAYS] = {false};
+
 Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : server(80)
 {
   MyMac = _MyMac;

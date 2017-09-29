@@ -208,3 +208,54 @@ Where 0 is the number of the relay you are setting.
 
 Example:  
 ![houdinioutputexample](https://user-images.githubusercontent.com/31215073/30439877-facff67e-9942-11e7-80a8-0f918a1287a4.png)
+
+### MQTT
+
+All communication with the prop is done on the mqtt topic "Prop" followed by the last 3 digits of the IP. So in thise case the topic is "Prop123".  
+Inputs and outputs are sent through the topic as JSON objects.  
+
+#### Input
+When the prop sends out the game state the object is formatted as follows:
+```
+{
+    "TYPE": "GAMESTATE",
+    "DIRECTION": "FROM",
+    "VALUE": 1
+}
+```
+This indicates that this is a message from the prop about the gamestate. The "VALUE" will be 1 if the prop has been solved or 0 if it has been reset.
+
+For specific inputs the object is formatted as follows:  
+```
+{
+    "TYPE": "INPUT",
+    "INPUT": 0,
+    "VALUE": 1
+}
+```
+This indicates that the message is for an input and the input is number 0. The "VALUE" is the value of the input.
+
+#### Output
+To set the game state the object is formatted as follows:
+```
+{
+    "TYPE": "GAMESTATE",
+    "DIRECTION": "TO",
+    "VALUE": 1
+}
+```
+This indicates that this is a message to the prop about the gamestate. The "VALUE" should be 1 to solve the prop or 0 to reset the prop.
+
+To set a specific output the object is formatted as follows:
+```
+{
+    "TYPE": "OUTPUT",
+    "OUTPUT": 0,
+    "VALUE": 1
+}
+```
+This indicates that the nessage is for an output and the output is number 0. The "VALUE" is the value you are setting the output to.
+
+#### Node-RED
+An easy way to work with the mqtt interface is using Node-RED. Here is an example layout:
+![node-redexample](https://user-images.githubusercontent.com/31215073/31030159-53be35c6-a522-11e7-8afa-d47c1a696a16.png)

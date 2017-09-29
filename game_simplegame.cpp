@@ -116,6 +116,7 @@ void simplegame::loop(void)
     case GAMESTATE_RUN:
       if (buttonstate == 1 && pressflag == 0)
       {
+        Serial.println("Button pressed");
         presscounter++;
         pressflag = 1;
       }

@@ -1,108 +1,13 @@
 #include "network.h"
-#include "houdinimc.h"
+#include "network_escaperoommaster.h"
 
-void houdinimc::loop(void)
+void escaperoommaster::loop(void)
 {
   Network::loop();
   listenForEthernetClients();
-  sendChanges();
 }
 
-void houdinimc::sendChanges(void)
-{
-  if (pMyGame->_puzzleSolved == 1 && sent == 0)
-  {
-    sprintf(pageAdd, " /%d_solved", MyIP[3]);
-    (!getPage(HostIP, serverPort, pageAdd));
-    sent = 1;
-  }
-  else if (pMyGame->_puzzleSolved == 0 && sent == 1)
-  {
-    sprintf(pageAdd, " /%d_reset", MyIP[3]);
-    (!getPage(HostIP, serverPort, pageAdd));
-    sent = 0;
-  }
-
-  for (int i = 0; i < NUM_INPUTS; i++)
-  {
-    if (INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
-    {
-      Serial.print(F("INPUT"));
-      Serial.print(i);
-      Serial.println(F(" status changed"));
-      sprintf(pageAdd, " /%d_INPUT%d_%s", MyIP[3], i, INPUT_STATES[i] ? "ON" : "OFF");
-      Serial.println(pageAdd);
-      (!getPage(HostIP, serverPort, pageAdd));
-      INPUT_STATE_OLD[i] = INPUT_STATES[i];
-    }
-  }
-}
-
-byte houdinimc::getPage(IPAddress ipBuf, int thisPort, char *page)
-{
-  int inChar;
-  char outBuf[128];
-
-  Serial.println(F("connecting..."));
-
-  if (client.connect(ipBuf, thisPort) == 1)
-  {
-    Serial.println(F("connected"));
-
-    sprintf(outBuf, "GET %s HTTP/1.1", page);
-    client.println(outBuf);
-    byte oct1 = HostIP[0];
-    byte oct2 = HostIP[1];
-    byte oct3 = HostIP[2];
-    byte oct4 = HostIP[3];
-    sprintf(serverName, "%d.%d.%d.%d", oct1, oct2, oct3, oct4);
-    sprintf(outBuf, "Host: %s", serverName);
-    client.println(outBuf);
-    client.println(F("Connection: close\r\n"));
-  }
-  else
-  {
-    Serial.println(F("failed"));
-    return 0;
-  }
-
-  // connectLoop controls the hardware fail timeout
-  int connectLoop = 0;
-
-  while (client.connected())
-  {
-    while (client.available())
-    {
-      inChar = client.read();
-      Serial.write(inChar);
-      // set connectLoop to zero if a packet arrives
-      connectLoop = 0;
-    }
-
-    connectLoop++;
-
-    // if more than 10000 milliseconds since the last packet
-    if (connectLoop > 10000)
-    {
-      // then close the connection from this end.
-      Serial.println();
-      Serial.println(F("Timeout"));
-      client.stop();
-    }
-    // this is a delay for the connectLoop timing
-    delay(1);
-  }
-
-  Serial.println();
-
-  Serial.println(F("disconnecting."));
-  // close client end
-  client.stop();
-
-  return 1;
-}
-
-void houdinimc::processRequest(EthernetClient& client, String requestStr) 
+void escaperoommaster::processRequest(EthernetClient& client, String requestStr) 
 {
   Serial.println(requestStr);
 
@@ -186,11 +91,11 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
   }
 }
 
-void houdinimc::listenForEthernetClients() 
+void escaperoommaster::listenForEthernetClients() 
 {
   EthernetClient client = server.available();
-  
-  if (client) 
+
+  if (client)
   {
     Serial.println(F("Got a client"));
     
@@ -214,7 +119,7 @@ void houdinimc::listenForEthernetClients()
         } else if (c != '\r') 
         {
           currentLineIsBlank = false;
-    
+
           if (firstLine) 
           {
             requestStr.concat(c);
@@ -228,7 +133,7 @@ void houdinimc::listenForEthernetClients()
   }
 }
 
-void houdinimc::writeClientResponse(EthernetClient& client, String bodyStr) 
+void escaperoommaster::writeClientResponse(EthernetClient& client, String bodyStr) 
 {
   Serial.println(F("HTTP 200"));
   
@@ -240,7 +145,7 @@ void houdinimc::writeClientResponse(EthernetClient& client, String bodyStr)
   client.print(bodyStr);
 }
 
-void houdinimc::writeClientResponseNotFound(EthernetClient& client) 
+void escaperoommaster::writeClientResponseNotFound(EthernetClient& client) 
 {
   Serial.println(F("HTTP 404"));
   

@@ -8,11 +8,10 @@
 
 /*
 
-  FX300 6 input sequence detector
-  Tests for sequence of up to 6 inputs and controls output lights accordingly
+  LightsOut game
 
   This application is targeted for the FX300, an Arduino compatible controller from Anidea Engineering.  
-  While this program is free, (MIT LECENSE) please consider purchasing and FX300 to support me making more free code.
+  While this program is free, (MIT LECENSE) please consider purchasing an FX300 to support me making more free code.
 
   2017 Gabriel Goldstein
   Anidea Engineering
@@ -61,7 +60,7 @@
 
   GAME PLAY
 
-   If enbaled below, RESET high will hold the game in reset and clear the game play
+   If enabled below, RESET high will hold the game in reset and clear the game play
 
    If enabled below, ENABLE low will allow the game to be played
 

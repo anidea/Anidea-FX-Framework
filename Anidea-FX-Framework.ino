@@ -24,9 +24,10 @@
 #include "network.h"
 
 // Networks
-#include "escaperoommaster.h"
-#include "cluecontrol.h"
-#include "houdinimc.h"
+#include "network_escaperoommaster.h"
+#include "network_cluecontrol.h"
+#include "network_houdinimc.h"
+#include "network_mqtt.h"
 
 // Include game headers here
 #include "game_simplegame.h"
@@ -83,7 +84,7 @@ void setup() {
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
-//  myNetwork = new nodered(MyMac, MyIP, HostIP);
+//  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
   myNetwork->setGame(myGame);
