@@ -79,11 +79,15 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
 
   JsonObject& root = jsonBuffer.parseObject(payload);
 
-  char* type = root["TYPE"];
+  const char* type = root["TYPE"];
   if (strcmp(type, "OUTPUT") == 0) // Change output state
   {
     int OUTPUTnum = root["OUTPUT"];
     bool OUTPUTstate = root["VALUE"];
+    Serial.print("Setting output ");
+    Serial.print(OUTPUTnum);
+    Serial.print(" to ");
+    Serial.println(OUTPUTstate);
     OUTPUT_STATES[OUTPUTnum] = OUTPUTstate;
   }
   else if (strcmp(type, "RELAY") == 0) // Change relay state
@@ -95,7 +99,7 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
   else if (strcmp(type, "GAMESTATE") == 0) // Change gamestate
   {
     Serial.println("GAMESTATE");
-    char* dir = root["DIRECTION"];
+    const char* dir = root["DIRECTION"];
     if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
     {
       Serial.println("GAMESTATE TO");

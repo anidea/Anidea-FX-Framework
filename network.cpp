@@ -37,13 +37,12 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : server(80)
 
   Ethernet.begin(MyMac, MyIP);
   
-  delay(5000);
+  delay(1000);
   Serial.println(F("Ethernet interface started"));
  
   // print the Host Address:
   Serial.print(F("Host IP address: "));
   Serial.println(HostIP);
-  Serial.println();
     
   // print your local IP address:
   Serial.print(F("My IP address: "));

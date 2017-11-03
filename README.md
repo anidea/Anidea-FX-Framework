@@ -1,10 +1,21 @@
 # Anidea FX Controller
 
-This application is targeted for the AEI FX series of boards, an Arduino compatible series of controllers from Anidea Engineering.  While this program is free (MIT LECENSE), please consider purchasing and FX300 to support us making more free code.
+This application is targeted for the AEI FX series of boards, an Arduino compatible series of controllers from Anidea Engineering.  While this program is free (MIT LECENSE), please consider purchasing an FX300 or FX350 to support us making more free code. While this framework will run on an FX300 you will need the FX350 to use any of the management software connectivity.
 
-You can purchase a FX300 at http://get.anidea-engineering.com/fx300_order_request
+You can purchase an FX300 at http://get.anidea-engineering.com/fx300_order_request  
+You can purchase an FX350 at http://get.anidea-engineering.com/fx350_order_request
 
-Generic framework for running different games on escape room props and connecting them with different management software.
+This is a generic framework for running different games on escape room props and connecting them with different management software.
+
+## Downloading
+Please note that when you first download and unzip the software you must rename the containing folder to "Anidea-FX-Framework" or the Arduino software will not be able to open it.
+
+## Required Libraries
+To compile the program you must have the following libraries installed:
+* MsTimer2
+* Ethernet2
+* PubSubClient
+* ArduinoJson
 
 ## Includes
 At the top of the includes there are several boards included. Only one can be uncommented to tell the program which pin definitions and functions to use.

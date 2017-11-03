@@ -9,7 +9,7 @@
   Anidea Engineering
   http://www.anidea-engineering.com
 
-  written and tested with Arduino 1.8.1
+  written and tested with Arduino 1.8.5
 
    -------------------
 */
@@ -44,7 +44,7 @@ Network *myNetwork;
 //-------------------------------------------------------------------
 
 void setup() {
-  Serial.begin(115200);          //  setup serial
+  Serial.begin(115200); // Setup serial
 
   // Setup timer for simon says, etc.
   MsTimer2::set(100, tenHzTimer);
