@@ -31,7 +31,6 @@
 
 // Include game headers here
 #include "game_simplegame.h"
-#include "game_lightsout.h"
 #include "game_sequencedetect.h"
 #include "game_sixwire.h"
 #include "game_inputsequence.h"
@@ -71,7 +70,6 @@ void setup() {
 
   // Uncomment only one of these lines for the game you want
 //  myGame = new simplegame(); //Simple game provided as an example
-//  myGame = new lightsout(); //Lights out game
 //  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
