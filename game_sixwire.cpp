@@ -42,24 +42,6 @@
 
 sixwire::sixwire() : Game()
 {
-  // Things that need to be set up when the game is first created
-  pinMode(RELAY0, OUTPUT);
-  pinMode(RELAY1, OUTPUT);
-  pinMode(OUTPUT0, OUTPUT);
-  pinMode(OUTPUT1, OUTPUT);
-  pinMode(OUTPUT2, OUTPUT);
-  pinMode(OUTPUT3, OUTPUT);
-  pinMode(OUTPUT4, OUTPUT);
-  pinMode(OUTPUT5, OUTPUT);
-  pinMode(LED, OUTPUT);
-
-  pinMode(INPUT0, INPUT);
-  pinMode(INPUT1, INPUT);
-  pinMode(INPUT2, INPUT);
-  pinMode(INPUT3, INPUT);
-  pinMode(INPUT4, INPUT);
-  pinMode(INPUT5, INPUT);
-
   // Only enable the inputs/outputs that are not going to be used by this game
   INPUT_OVERRIDE_ENABLE[0] = 0;
   INPUT_OVERRIDE_ENABLE[1] = 0;
@@ -79,7 +61,6 @@ sixwire::sixwire() : Game()
   RELAY_OVERRIDE_ENABLE[1] = 0;
 
   Serial.println(F("sixwire initialized"));
-  gameName = F("sixwire");
 
   reset();
 }
@@ -195,18 +176,6 @@ void sixwire::loop(void)
 
       break;
   }
-}
-
-void sixwire::forceSolved(void)
-{
-  Serial.println(F("sixwire forceSolved"));
-
-  //Call generic forceSolve function
-  Game::forceSolved();
-  
-  //Do game specific solved state
-  digitalWrite(SOLVED, LOW);        // Turn Off maglock
-  digitalWrite(LED, HIGH);          // Mimick LED for solved
 }
 
 void sixwire::solved(void)

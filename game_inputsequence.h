@@ -1,6 +1,7 @@
 #ifndef game_inputsequence__h
 #define game_inputsequence__h
 
+#include <EEPROM.h>
 #include "arduino.h"
 #include "fx300.h"
 #include "network.h"
@@ -14,8 +15,6 @@ class inputsequence : public Game
     inputsequence();
 
     virtual void loop();
-
-    virtual void forceSolved();
 
     void solved();
 

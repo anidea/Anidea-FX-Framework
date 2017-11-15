@@ -1,5 +1,3 @@
-#include <EEPROM.h>
-
 #include "fx300.h"
 #include "game_inputsequence.h"
 
@@ -66,24 +64,6 @@
 
 inputsequence::inputsequence() : Game()
 {
-  // Things that need to be set up when the game is first created
-  pinMode(RELAY0, OUTPUT);
-  pinMode(RELAY1, OUTPUT);
-  pinMode(OUTPUT0, OUTPUT);
-  pinMode(OUTPUT1, OUTPUT);
-  pinMode(OUTPUT2, OUTPUT);
-  pinMode(OUTPUT3, OUTPUT);
-  pinMode(OUTPUT4, OUTPUT);
-  pinMode(OUTPUT5, OUTPUT);
-  pinMode(LED, OUTPUT);
-
-  pinMode(INPUT0, INPUT);
-  pinMode(INPUT1, INPUT);
-  pinMode(INPUT2, INPUT);
-  pinMode(INPUT3, INPUT);
-  pinMode(INPUT4, INPUT);
-  pinMode(INPUT5, INPUT);
-
   // Only enable the inputs/outputs that are not going to be used by this game
   INPUT_OVERRIDE_ENABLE[0] = 0;
   INPUT_OVERRIDE_ENABLE[1] = 0;
@@ -103,17 +83,8 @@ inputsequence::inputsequence() : Game()
   RELAY_OVERRIDE_ENABLE[1] = 1;
 
   Serial.println(F("inputsequence initialized"));
-  gameName = F("inputsequence");
 
   reset();
-
-  // Check for anything in the eeprom
-  if (EEPROM.read(0) == 0xFF)
-  {
-    // value out of range, go right into record sequence mode
-    recordInputButtonSequence();
-  }
-  
 }
 
 void inputsequence::loop(void)
@@ -122,6 +93,13 @@ void inputsequence::loop(void)
   
   // Do generic loop actions
   Game::loop();
+
+  // Check for anything in the eeprom
+  if (EEPROM.read(EEPROM_START) == 0xFF)
+  {
+    // value out of range, go right into record sequence mode
+    recordInputButtonSequence();
+  }
 
   // Detect programming mode
   if (analogRead(HALL) < HALL_NORTH_THRESH) // Detect a north pole of a magnet
@@ -163,7 +141,7 @@ void inputsequence::loop(void)
   
       scanCurrentInputButton = scanInputsSteady();
 
-      if (0xFF == EEPROM.read(_inputSequencePosition))
+      if (0xFF == EEPROM.read(EEPROM_START + _inputSequencePosition))
       {
         // Sequence end detected
 
@@ -181,7 +159,7 @@ void inputsequence::loop(void)
 
         if (_waitForNoInput == 0)
         {
-          if (scanCurrentInputButton == EEPROM.read(_inputSequencePosition))
+          if (scanCurrentInputButton == EEPROM.read(EEPROM_START + _inputSequencePosition))
           {
             // Current button read is the same as the recorded sequence
   
@@ -244,18 +222,6 @@ void inputsequence::loop(void)
   }
 }
 
-void inputsequence::forceSolved(void)
-{
-  Serial.println(F("inputsequence forceSolved"));
-
-  //Call generic forceSolve function
-  Game::forceSolved();
-  
-  //Do game specific solved state
-  digitalWrite(feedbackLight, HIGH);        // Turn Off maglock
-  digitalWrite(solvedOutput, LOW);          // Mimick LED for solved 
-}
-
 void inputsequence::solved(void)
 {
   Serial.println(F("inputsequence solved"));
@@ -313,7 +279,7 @@ void inputsequence::recordInputButtonSequence(void)
       digitalWrite(feedbackLight, HIGH);
 
       // Save the input
-      EEPROM.write(inputSequencePosition, inputButton);
+      EEPROM.write(EEPROM_START + inputSequencePosition, inputButton);
 
       Serial.print(F("Input "));
       Serial.print(inputButton);
@@ -331,7 +297,7 @@ void inputsequence::recordInputButtonSequence(void)
   }
 
   // Programming mode ended
-  EEPROM.write(inputSequencePosition, 0xFF);    // End of the sequence
+  EEPROM.write(EEPROM_START + inputSequencePosition, 0xFF);    // End of the sequence
 
   Serial.println(F("Programming mode complete"));
   
@@ -340,7 +306,7 @@ void inputsequence::recordInputButtonSequence(void)
   
   Serial.println(F("Sequence "));
 
-  while((input = EEPROM.read(i)) != 0xFF)
+  while((input = EEPROM.read(EEPROM_START + i)) != 0xFF)
   {
     Serial.println(input, DEC);
     i++;

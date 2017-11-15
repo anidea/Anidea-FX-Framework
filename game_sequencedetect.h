@@ -19,6 +19,7 @@
 
 #include "arduino.h"
 
+#include <EEPROM.h>
 #include "fx300.h"
 #include "network.h"
 #include "game.h"
@@ -30,8 +31,6 @@ class sequencedetect : public Game
 
     virtual void loop();
 
-    virtual void forceSolved();
-
     void solved();
 
     virtual void reset(); // Call to reset game
@@ -39,8 +38,6 @@ class sequencedetect : public Game
     virtual void tick();
 
   private:
-    void (*solvedCallback)(void)= NULL;
-  
     // Global Game Variables
     int _puzzleSolved = 0;
     int _gameState = 0;

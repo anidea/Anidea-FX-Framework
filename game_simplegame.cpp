@@ -48,22 +48,7 @@
 simplegame::simplegame() : Game()
 {
   // Things that need to be set up when the game is first created
-  pinMode(RELAY0, OUTPUT);
-  pinMode(RELAY1, OUTPUT);
-  pinMode(OUTPUT0, OUTPUT);
-  pinMode(OUTPUT1, OUTPUT);
-  pinMode(OUTPUT2, OUTPUT);
-  pinMode(OUTPUT3, OUTPUT);
-  pinMode(OUTPUT4, OUTPUT);
-  pinMode(OUTPUT5, OUTPUT);
-  pinMode(LED, OUTPUT);
-
-  pinMode(INPUT0, INPUT);
-  pinMode(INPUT1, INPUT);
-  pinMode(INPUT2, INPUT);
-  pinMode(INPUT3, INPUT);
-  pinMode(INPUT4, INPUT);
-  pinMode(INPUT5, INPUT);
+  
 
   // Only enable the inputs/outputs that are not going to be used by this game
   INPUT_OVERRIDE_ENABLE[0] = 1;
@@ -84,7 +69,6 @@ simplegame::simplegame() : Game()
   RELAY_OVERRIDE_ENABLE[1] = 1;
 
   Serial.println(F("simplegame initialized"));
-  gameName = F("simplegame");
 
   reset();
 }
@@ -149,13 +133,10 @@ void simplegame::loop(void)
 
 void simplegame::forceSolved(void)
 {
-  Serial.println(F("simplegame forceSolved"));
+  // Only define this function if something specific needs to be done when the prop is solved manually
 
   //Call generic forceSolve function
   Game::forceSolved();
-  
-  //Do game specific solved state
-  digitalWrite(lightPin, HIGH);
 }
 
 void simplegame::solved(void)

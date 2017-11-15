@@ -18,6 +18,7 @@
 #define escaperoommaster_h
 
 #include <Ethernet2.h>
+#include <ArduinoJson.h>
 #include "game.h"
 #include "arduino.h"
 
@@ -38,6 +39,8 @@ class escaperoommaster : public Network
     void writeClientResponse(EthernetClient& client, String bodyStr);
     
     void writeClientResponseNotFound(EthernetClient& client);
+
+    void createJSON(EthernetClient& client);
 };
 
 #endif

@@ -50,18 +50,18 @@ void mqtt::sendChanges(void)
 
   for (int i = 0; i < NUM_INPUTS; i++)
   {
-    if (INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) // Loop through inputs and send state if changed
+    if (pMyGame->INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) // Loop through inputs and send state if changed
     {
       StaticJsonBuffer<200> jsonBuffer;
       JsonObject& root = jsonBuffer.createObject();
       root["TYPE"] = "INPUT";
       root["INPUT"] = i;
-      root["STATE"] = INPUT_STATES[i];
+      root["STATE"] = pMyGame->INPUT_STATES[i];
       char data[64];
       root.printTo(data);
       Serial.println(data);
       client.publish(propName, data);
-      INPUT_STATE_OLD[i] = INPUT_STATES[i];
+      INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
   }
 }
@@ -88,13 +88,15 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
     Serial.print(OUTPUTnum);
     Serial.print(" to ");
     Serial.println(OUTPUTstate);
-    OUTPUT_STATES[OUTPUTnum] = OUTPUTstate;
+    pMyGame->OUTPUT_STATES[OUTPUTnum] = OUTPUTstate;
+    pMyGame->OUTPUT_STATES_FLAG[OUTPUTnum] = true;
   }
   else if (strcmp(type, "RELAY") == 0) // Change relay state
   {
     int RELAYnum = root["RELAY"];
     bool RELAYstate = root["VALUE"];
-    RELAY_STATES[RELAYnum] = RELAYstate;
+    pMyGame->RELAY_STATES[RELAYnum] = RELAYstate;
+    pMyGame->RELAY_STATES_FLAG[RELAYnum] = true;
   }
   else if (strcmp(type, "GAMESTATE") == 0) // Change gamestate
   {
@@ -111,6 +113,34 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
       else if (state == 0)
       {
         pMyGame->reset();
+      }
+    }
+  }
+  else if (strcmp(type, "ENABLE") == 0) // Change enable
+  {
+    Serial.println("ENABLE");
+    const char* dir = root["DIRECTION"];
+    if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
+    {
+      Serial.println("ENABLE TO");
+      bool state = root["VALUE"];
+      if (state == 1)
+      {
+        pMyGame->enable();
+      }
+      else if (state == 0)
+      {
+        pMyGame->disable();
+      }
+      else if (state == 2)
+      {
+        pMyGame->reset();
+        pMyGame->enable();
+      }
+      else if (state == 3)
+      {
+        pMyGame->reset();
+        pMyGame->disable();
       }
     }
   }

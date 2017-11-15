@@ -28,6 +28,7 @@
 #include "network_cluecontrol.h"
 #include "network_houdinimc.h"
 #include "network_mqtt.h"
+#include "network_empty.h"
 
 // Include game headers here
 #include "game_simplegame.h"
@@ -35,6 +36,7 @@
 #include "game_sixwire.h"
 #include "game_inputsequence.h"
 #include "game_empty.h"
+#include "game_room.h"
 
 // Generic game and network objects
 Game *myGame;
@@ -49,23 +51,6 @@ void setup() {
   MsTimer2::set(100, tenHzTimer);
   MsTimer2::start();
 
-  pinMode(RELAY0, OUTPUT);
-  pinMode(RELAY1, OUTPUT);
-  pinMode(OUTPUT0, OUTPUT);
-  pinMode(OUTPUT1, OUTPUT);
-  pinMode(OUTPUT2, OUTPUT);
-  pinMode(OUTPUT3, OUTPUT);
-  pinMode(OUTPUT4, OUTPUT);
-  pinMode(OUTPUT5, OUTPUT);
-  pinMode(LED, OUTPUT);
-
-  pinMode(INPUT0, INPUT);
-  pinMode(INPUT1, INPUT);
-  pinMode(INPUT2, INPUT);
-  pinMode(INPUT3, INPUT);
-  pinMode(INPUT4, INPUT);
-  pinMode(INPUT5, INPUT);
-
   // Start game last after hardware is setup
 
   // Uncomment only one of these lines for the game you want
@@ -74,16 +59,18 @@ void setup() {
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
 //  myGame = new empty(); // Empty game to manually control inputs and outputs only
+//  myGame = new room(); // Used to control a whole room
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
-  IPAddress MyIP(10, 0, 1, 210);                         // This must be unique for each device
-  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software
+  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
 //  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
+//  myNetwork = new network_empty(); //Empty network for use with FX300
 
   myNetwork->setGame(myGame);
 }

@@ -15,8 +15,6 @@ class sixwire : public Game
 
     virtual void loop();
 
-    virtual void forceSolved();
-
     void solved();
 
     virtual void reset(); // Call to reset game

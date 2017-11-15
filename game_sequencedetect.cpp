@@ -1,5 +1,4 @@
 #include <MsTimer2.h>
-#include <EEPROM.h>
 
 #include "fx300.h"
 #include "game_sequencedetect.h"
@@ -75,24 +74,6 @@
 //
 sequencedetect::sequencedetect() : Game()
 {
-  pinMode(RELAY0, OUTPUT);
-  pinMode(RELAY1, OUTPUT);
-  pinMode(OUTPUT0, OUTPUT);
-  pinMode(OUTPUT1, OUTPUT);
-  pinMode(OUTPUT2, OUTPUT);
-  pinMode(OUTPUT3, OUTPUT);
-  pinMode(OUTPUT4, OUTPUT);
-  pinMode(OUTPUT5, OUTPUT);
-  pinMode(LED, OUTPUT);
-
-
-  pinMode(INPUT0, INPUT);
-  pinMode(INPUT1, INPUT);
-  pinMode(INPUT2, INPUT);
-  pinMode(INPUT3, INPUT);
-  pinMode(INPUT4, INPUT);
-  pinMode(INPUT5, INPUT);
-
   // Only enable the inputs/outputs that are not going to be used by this game
   INPUT_OVERRIDE_ENABLE[0] = 0;
   INPUT_OVERRIDE_ENABLE[1] = 0;
@@ -112,21 +93,8 @@ sequencedetect::sequencedetect() : Game()
   RELAY_OVERRIDE_ENABLE[1] = 0;
 
   Serial.println(F("FX300 6 input sequence detector"));
-  gameName = F("sequencedetect");
-
-  GAME_INPUT_RESET = INPUT5;  // When high and enabled (defined), the game will be reset
-  GAME_INPUT_ENABLE = INPUT5;  // When low and enabled (defined), the game will be enabled
 
   reset();
-
-  // Check for anything in the eeprom
-  if (EEPROM.read(0) == 0xFF)
-  {
-    // value out of range, go right into record sequence mode
-    recordInputButtonSequence();
-  }
-  
-
 }
 ///////////////////////////////////
 // void tick(void)
@@ -148,16 +116,6 @@ void sequencedetect::tick(void)
 
   if (GAME_LIGHT_OUTPUT_SIMONSAYS)
   {
-    if (GAME_INPUT_ENABLE)
-    {
-      if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
-      {
-        currentLightOn = 1;
-        terminalCountLightIncrement = GAME_LIGHT_OUTPUT_SIMONSAYS_ON_TIME;
-        return;
-      }
-    }
-  
     // Display sequnce in the background while puzzle is not trying to be solved
   
     if (_runLightSequence == 1) 
@@ -181,7 +139,7 @@ void sequencedetect::tick(void)
           if (currentLightSequence >= 0)
           {
             // Turn off light only if we aren't at the beginning of the sequence
-            digitalWrite(_outputLightsPinList[EEPROM.read(currentLightSequence)], LOW); // Turn off current light
+            digitalWrite(_outputLightsPinList[EEPROM.read(EEPROM_START + currentLightSequence)], LOW); // Turn off current light
           }
   
         }else{
@@ -192,7 +150,7 @@ void sequencedetect::tick(void)
   
           currentLightSequence++;
     
-          int nextLight = EEPROM.read(currentLightSequence);
+          int nextLight = EEPROM.read(EEPROM_START + currentLightSequence);
     
           if (nextLight == 0xFF)
           {
@@ -203,12 +161,10 @@ void sequencedetect::tick(void)
           }else{
             // Next light
             
-            digitalWrite(_outputLightsPinList[EEPROM.read(currentLightSequence)], HIGH); // Turn on next light
+            digitalWrite(_outputLightsPinList[EEPROM.read(EEPROM_START + currentLightSequence)], HIGH); // Turn on next light
             
           }
-  
         }
-  
       }
     }
   }
@@ -226,6 +182,13 @@ void sequencedetect::loop(void)
 
   // Do generic loop actions
   Game::loop();
+
+    // Check for anything in the eeprom
+  if (EEPROM.read(EEPROM_START + 0) == 0xFF)
+  {
+    // value out of range, go right into record sequence mode
+    recordInputButtonSequence();
+  }
 
   // Detect programming mode
   if (analogRead(HALL) < HALL_NORTH_THRESH) // Detect a north pole of a magnet
@@ -267,7 +230,7 @@ void sequencedetect::loop(void)
   
       scanCurrentInputButton = scanInputsSteady();
 
-      if (0xFF == EEPROM.read(_inputSequencePosition))
+      if (0xFF == EEPROM.read(EEPROM_START + _inputSequencePosition))
       {
         // Sequence end detected
 
@@ -291,7 +254,7 @@ void sequencedetect::loop(void)
 
         if (_waitForNoInput == 0)
         {
-          if (scanCurrentInputButton == EEPROM.read(_inputSequencePosition))
+          if (scanCurrentInputButton == EEPROM.read(EEPROM_START + _inputSequencePosition))
           {
             // Current button read is the same as the recorded sequence
   
@@ -424,34 +387,12 @@ void sequencedetect::solved(void)
   Game::solved();
 
   //Do game specific solved state
-  digitalWrite(SOLVED, LOW);        // Turn Off maglock
-  digitalWrite(LED, HIGH);          // Mimick LED for solved 
-
-  // Turn all the lights on - Victory!
-  allLightsOnOff(HIGH);  //steve testing bullsh*t - because Steve helped so much in testing
-
-  // Call host call back
-  if (solvedCallback) solvedCallback();
-}
-
-void sequencedetect::forceSolved(void)
-{
-  Serial.println(F("sequencedetect forceSolved"));
-
-  //Call generic forceSolve function
-  Game::forceSolved();
-  
-  //Do game specific solved state
   _runLightSequence = 0;
-  
   digitalWrite(SOLVED, LOW);        // Turn Off maglock
   digitalWrite(LED, HIGH);          // Mimick LED for solved 
 
   // Turn all the lights on - Victory!
   allLightsOnOff(HIGH);  //steve testing bullsh*t - because Steve helped so much in testing
-
-  // Call host call back
-  if (solvedCallback) solvedCallback();
 }
 
 ///////////////////////////////////
@@ -506,7 +447,6 @@ void sequencedetect::recordInputButtonSequence(void)
 
   while(inputSequencePosition < GAME_MAX_SEQUENCE)
   {
-
     // Look for exit
     if (analogRead(HALL) > HALL_SOUTH_THRESH) // Detect a south pole of a magnet
     {
@@ -527,7 +467,7 @@ void sequencedetect::recordInputButtonSequence(void)
       digitalWrite(_outputLightsPinList[0], HIGH);
 
       // Save the input
-      EEPROM.write(inputSequencePosition, inputButton);
+      EEPROM.write(EEPROM_START + inputSequencePosition, inputButton);
 
       Serial.print(F("Input "));
       Serial.print(inputButton);
@@ -541,12 +481,11 @@ void sequencedetect::recordInputButtonSequence(void)
       // Use first light to acknolwege input, turn off
       digitalWrite(_outputLightsPinList[0], LOW);
     }
-    
   }
 
   
   // Programming mode ended
-  EEPROM.write(inputSequencePosition, 0xFF);    // End of the sequence
+  EEPROM.write(EEPROM_START + inputSequencePosition, 0xFF);    // End of the sequence
 
   if (exitLoopEarly)
   {
@@ -561,7 +500,7 @@ void sequencedetect::recordInputButtonSequence(void)
   
   Serial.println(F("Sequence "));
 
-  while((input = EEPROM.read(i)) != 0xFF)
+  while((input = EEPROM.read(EEPROM_START + i)) != 0xFF)
   {
     Serial.println(input, DEC);
     i++;

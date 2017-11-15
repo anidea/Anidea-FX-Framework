@@ -18,6 +18,7 @@
 #define network_h
 
 #include <Ethernet2.h>
+#include <EEPROM.h>
 
 #include "game.h"
 #include "arduino.h"
@@ -49,14 +50,8 @@ class Network
 
     EthernetServer server;
 
-    static bool INPUT_STATES[NUM_INPUTS];
-
-    static bool OUTPUT_STATES[NUM_OUTPUTS];
-
-    static bool RELAY_STATES[NUM_RELAYS];
-
   private:
-    
+    void getIP(int);
 };
 
 #endif

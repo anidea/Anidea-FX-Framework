@@ -22,8 +22,12 @@
 #include "arduino.h"
 #include "CCModBus.h"
 
-#define ACTIVATE    1   //modbus value received to activate the puzzle
-#define DEACTIVATE  2   //modbus value received to deactivate the puzzle
+static const int ACTIVATE = 1; //modbus value received to activate the puzzle
+static const int DEACTIVATE = 2; //modbus value received to deactivate the puzzle
+static const int ENABLE = 3; //modbus value received to enable the puzzle
+static const int DISABLE = 4; //modbus value received to disable the puzzle
+static const int RESET_ENABLE = 5; //modbus value received to reset and enable the puzzle
+static const int RESET_DISABLE = 6; //modbus value received to reset and disable the puzzle
 
 class Game;
 

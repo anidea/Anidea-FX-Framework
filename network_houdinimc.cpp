@@ -25,15 +25,15 @@ void houdinimc::sendChanges(void)
 
   for (int i = 0; i < NUM_INPUTS; i++)
   {
-    if (INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
+    if (pMyGame->INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
     {
       Serial.print(F("INPUT"));
       Serial.print(i);
       Serial.println(F(" status changed"));
-      sprintf(pageAdd, " /%d_INPUT%d_%s", MyIP[3], i, INPUT_STATES[i] ? "ON" : "OFF");
+      sprintf(pageAdd, " /%d_INPUT%d_%s", MyIP[3], i, pMyGame->INPUT_STATES[i] ? "ON" : "OFF");
       Serial.println(pageAdd);
       (!getPage(HostIP, serverPort, pageAdd));
-      INPUT_STATE_OLD[i] = INPUT_STATES[i];
+      INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
   }
 }
@@ -106,10 +106,19 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
 {
   Serial.println(requestStr);
 
-  if (requestStr.startsWith(F("GET /status")))
+  if (requestStr.startsWith(F("GET /reset_enable"))) 
   {
-    Serial.println(F("polled for status!"));
-    writeClientResponse(client, pMyGame->isSolved() ? F("triggered") : F("not triggered"));
+    Serial.println(F("Network prop reset_enable"));
+    writeClientResponse(client, F("ok"));
+    pMyGame->reset();
+    pMyGame->enable();
+  }
+  else if (requestStr.startsWith(F("GET /reset_disable"))) 
+  {
+    Serial.println(F("Network prop reset_disable"));
+    writeClientResponse(client, F("ok"));
+    pMyGame->reset();
+    pMyGame->disable();
   }
   else if (requestStr.startsWith(F("GET /reset"))) 
   {
@@ -123,38 +132,45 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
     writeClientResponse(client, F("ok"));
     pMyGame->forceSolved();
   }
-  else if (requestStr.startsWith(F("GET /INPUT")))
+  else if (requestStr.startsWith(F("GET /enable"))) 
   {
-    for (int i = 0; i < NUM_INPUTS; i++)
-    {
-      if (requestStr.startsWith("GET /INPUT" + String(i)) && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
-      {
-        Serial.print(F("polled for INPUT"));
-        Serial.print(i);
-        Serial.println(F(" status!"));
-        writeClientResponse(client, INPUT_STATES[i] ? F("triggered") : F("not triggered"));
-      }
-    }
+    Serial.println(F("Network prop enable"));
+    writeClientResponse(client, F("ok"));
+    pMyGame->enable();
+  }
+  else if (requestStr.startsWith(F("GET /disable"))) 
+  {
+    Serial.println(F("Network prop disable"));
+    writeClientResponse(client, F("ok"));
+    pMyGame->disable();
   }
   else if (requestStr.startsWith(F("GET /OUTPUT")))
   {
     for (int i = 0; i < NUM_OUTPUTS; i++)
     {
-      if (requestStr.startsWith("GET /OUTPUT" + String(i) + "_OFF") && pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == 1) 
+      if (requestStr.startsWith("GET /OUTPUT" + String(i) + "_OFF")) 
       {
-        Serial.print(F("OUTPUT"));
-        Serial.print(i);
-        Serial.println(F(" turned off"));
-        writeClientResponse(client, F("ok"));
-        OUTPUT_STATES[i] = 0;
+        if (pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == true)
+        {
+          Serial.print(F("OUTPUT"));
+          Serial.print(i);
+          Serial.println(F(" turned off"));
+          writeClientResponse(client, F("ok"));
+          pMyGame->OUTPUT_STATES[i] = false;
+          pMyGame->OUTPUT_STATES_FLAG[i] = true;
+        }
       }
-      else if (requestStr.startsWith("GET /OUTPUT" + String(i) + "_ON") && pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == 1) 
+      else if (requestStr.startsWith("GET /OUTPUT" + String(i) + "_ON")) 
       {
-        Serial.print(F("OUTPUT"));
-        Serial.print(i);
-        Serial.println(F(" turned on"));
-        writeClientResponse(client, F("ok"));
-        OUTPUT_STATES[i] = 1;
+        if (pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == true)
+        {
+          Serial.print(F("OUTPUT"));
+          Serial.print(i);
+          Serial.println(F(" turned on"));
+          writeClientResponse(client, F("ok"));
+          pMyGame->OUTPUT_STATES[i] = true;
+          pMyGame->OUTPUT_STATES_FLAG[i] = true;
+        }
       }
     }
   }
@@ -162,21 +178,29 @@ void houdinimc::processRequest(EthernetClient& client, String requestStr)
   {
     for (int i = 0; i < NUM_RELAYS; i++)
     {
-      if (requestStr.startsWith("GET /RELAY" + String(i) + "_OFF") && pMyGame->RELAY_OVERRIDE_ENABLE[i] == 1) 
+      if (requestStr.startsWith("GET /RELAY" + String(i) + "_OFF")) 
       {
-        Serial.print(F("RELAY"));
-        Serial.print(i);
-        Serial.println(F(" turned off"));
-        writeClientResponse(client, F("ok"));
-        RELAY_STATES[i] = 0;
+        if (pMyGame->RELAY_OVERRIDE_ENABLE[i] == true)
+        {
+          Serial.print(F("RELAY"));
+          Serial.print(i);
+          Serial.println(F(" turned off"));
+          writeClientResponse(client, F("ok"));
+          pMyGame->RELAY_STATES[i] = false;
+          pMyGame->RELAY_STATES_FLAG[i] = true;
+        }
       }
-      else if (requestStr.startsWith("GET /RELAY" + String(i) + "_ON") && pMyGame->RELAY_OVERRIDE_ENABLE[i] == 1) 
+      else if (requestStr.startsWith("GET /RELAY" + String(i) + "_ON")) 
       {
-        Serial.print(F("RELAY"));
-        Serial.print(i);
-        Serial.println(F(" turned off"));
-        writeClientResponse(client, F("ok"));
-        RELAY_STATES[i] = 1;
+        if (pMyGame->RELAY_OVERRIDE_ENABLE[i] == true)
+        {
+          Serial.print(F("RELAY"));
+          Serial.print(i);
+          Serial.println(F(" turned off"));
+          writeClientResponse(client, F("ok"));
+          pMyGame->RELAY_STATES[i] = true;
+          pMyGame->RELAY_STATES_FLAG[i] = true;
+        }
       }
     }
   }

@@ -1,5 +1,11 @@
 #include "game.h"
 
+bool Game::INPUT_STATES[NUM_INPUTS] = {false};
+bool Game::OUTPUT_STATES[NUM_OUTPUTS] = {false};
+bool Game::OUTPUT_STATES_FLAG[NUM_OUTPUTS] = {false};
+bool Game::RELAY_STATES[NUM_RELAYS] = {false};
+bool Game::RELAY_STATES_FLAG[NUM_OUTPUTS] = {false};
+
 ///////////////////////////////////
 // Constructor for the game
 //
@@ -15,12 +21,21 @@ Game::Game()
   pinMode(OUTPUT5, OUTPUT);
   pinMode(LED, OUTPUT);
 
-
   pinMode(INPUT0, INPUT);
   pinMode(INPUT1, INPUT);
   pinMode(INPUT2, INPUT);
   pinMode(INPUT3, INPUT);
+  pinMode(INPUT4, INPUT);
+  pinMode(INPUT5, INPUT);
 
+  // Set outputs to all low to start
+  for(int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
+      digitalWrite(OUTPUTS[i], LOW);
+
+  for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
+      digitalWrite(RELAYS[i], LOW);
+
+  // Turn all overrides on
   for(int i = 0; i < NUM_INPUTS; ++i) //Or loop the array and init them.
       INPUT_OVERRIDE_ENABLE[i] = true;
 
@@ -31,8 +46,6 @@ Game::Game()
       RELAY_OVERRIDE_ENABLE[i] = true;
 
   Serial.println(F("Game object initialized"));
-
-  reset();
 }
 
 ///////////////////////////////////
@@ -44,8 +57,6 @@ void Game::tick(void)
   static int freeRunningTimer;
 
   freeRunningTimer++;
-
-
 }
 
 ///////////////////////////////////
@@ -59,22 +70,29 @@ void Game::loop(void)
 
   delay(10); // Keep game running at a reasonable rate, not micro speed. 100x a second, ehternet adds significant delays
 
-  // If enabled at all, detect input state
-  if (GAME_INPUT_RESET)
+  // Read input states
+  for (int i = 0; i < NUM_INPUTS; i++)
   {
-    if (digitalRead(GAME_INPUT_RESET) == 1)   // Check for reset and kill game if active
+      INPUT_STATES[i] = digitalRead(INPUTS[i]);
+  }
+
+  // Write output states
+  for (int i = 0; i < NUM_OUTPUTS; i++)
+  {
+    if (OUTPUT_OVERRIDE_ENABLE[i] == true && OUTPUT_STATES_FLAG[i] == true)
     {
-      reset();
-      return;
+      digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
+      OUTPUT_STATES_FLAG[i] = false;
     }
   }
- 
-  // If enabled at all, detect input state
-  if (GAME_INPUT_ENABLE)
+
+  // Write relay states
+  for (int i = 0; i < NUM_RELAYS; i++)
   {
-    if (digitalRead(GAME_INPUT_ENABLE) == 1)   // Don't run the game if enable is high, must be low
+    if (RELAY_OVERRIDE_ENABLE[i] == true && RELAY_STATES_FLAG[i] == true)
     {
-      return;
+      digitalWrite(RELAYS[i], RELAY_STATES[i]);
+      RELAY_STATES_FLAG[i] = false;
     }
   }
 }
@@ -85,13 +103,8 @@ void Game::loop(void)
 //
 void Game::forceSolved(void)
 {
-  // Routine run when the puzzle is solved
   Serial.println(F("Puzzle Force Solved!"));
-  _puzzleSolved = 1;
-  _gameState = GAMESTATE_ENDLOOP;
-
-  // Call host call back
-  if (solvedCallback) solvedCallback();
+  solved();
 }
 
 ///////////////////////////////////
@@ -102,12 +115,8 @@ void Game::solved(void)
 {
   // Routine run when the puzzle is solved
   Serial.println(F("Puzzle Solved!"));
-
   _puzzleSolved = 1;
   _gameState = GAMESTATE_ENDLOOP;
-
-  // Call host call back
-  if (solvedCallback) solvedCallback();
 }
 
 ///////////////////////////////////
@@ -123,4 +132,28 @@ void Game::reset(void)
   // Reset game vars
   _puzzleSolved = 0;
   _gameState = GAMESTATE_START;
+}
+
+///////////////////////////////////
+// void enable(void)
+// Called to enable the game
+//
+void Game::enable(void)
+{
+  Serial.println(F("Game enabled"));
+  
+  // Set game vars
+  _enabled = true;
+}
+
+///////////////////////////////////
+// void disable(void)
+// Called to disable the game
+//
+void Game::disable(void)
+{
+  Serial.println(F("Game disabled"));
+  
+  // Set game vars
+  _enabled = false;
 }

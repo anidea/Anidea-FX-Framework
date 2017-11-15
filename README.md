@@ -17,6 +17,8 @@ To compile the program you must have the following libraries installed:
 * PubSubClient
 * ArduinoJson
 
+The PubSubClient library is only needed if you are using MQTT. The ArduinoJson library is only needed if you are using EscapeRoomMaster or MQTT. If you do not need to use either of these networks you can delete their files and remove their includes from the main file so you will not need to install these libraries.
+
 ## Includes
 At the top of the includes there are several boards included. Only one can be uncommented to tell the program which pin definitions and functions to use.
 

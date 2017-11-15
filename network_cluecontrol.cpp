@@ -20,14 +20,14 @@ void cluecontrol::setTriggers()
 
   for (int i = 0; i < NUM_INPUTS; i++)
   {
-    if (INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
+    if (pMyGame->INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) 
     {
       Serial.print(F("INPUT"));
       Serial.print(i);
       Serial.println(F(" status changed"));
       Serial.println(10 * MyIP[3] + i);
-      CCMod.SetTrigger(10 * MyIP[3] + i, INPUT_STATES[i]);
-      INPUT_STATE_OLD[i] = INPUT_STATES[i];
+      CCMod.SetTrigger(10 * MyIP[3] + i, pMyGame->INPUT_STATES[i]);
+      INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
   }
 }
@@ -38,13 +38,33 @@ void cluecontrol::listenForRequest()
   {
     Serial.println(F("Activate command received"));  //for troubleshooting-monitoring
     pMyGame->forceSolved();
-    CCMod.CCValue = 0;  //clear the value to prevent re-triggering
   }
   else if (CCMod.CCValue == DEACTIVATE)
   {
     Serial.println(F("deactivate command received"));
     pMyGame->reset();
-    CCMod.CCValue = 0;  //clear the value to prevent re-triggering
+  }
+  else if (CCMod.CCValue == ENABLE)
+  {
+    Serial.println(F("enable command received"));
+    pMyGame->enable();
+  }
+  else if (CCMod.CCValue == DISABLE)
+  {
+    Serial.println(F("disable command received"));
+    pMyGame->disable();
+  }
+  else if (CCMod.CCValue == RESET_ENABLE)
+  {
+    Serial.println(F("reset_enable command received"));
+    pMyGame->reset();
+    pMyGame->enable();
+  }
+  else if (CCMod.CCValue == RESET_DISABLE)
+  {
+    Serial.println(F("reset_disable command received"));
+    pMyGame->reset();
+    pMyGame->disable();
   }
   else
   {
@@ -55,16 +75,16 @@ void cluecontrol::listenForRequest()
         Serial.print(F("OUTPUT"));
         Serial.print(i);
         Serial.println(F(" turned off"));
-        OUTPUT_STATES[i] = 0;
-        CCMod.CCValue = 0;  //clear the value to prevent re-triggering
+        pMyGame->OUTPUT_STATES[i] = 0;
+        pMyGame->OUTPUT_STATES_FLAG[i] = true;
       }
       else if (CCMod.CCValue == 100 + (10 * i) + 1 && pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == 1) 
       {
         Serial.print(F("OUTPUT"));
         Serial.print(i);
         Serial.println(F(" turned on"));
-        OUTPUT_STATES[i] = 1;
-        CCMod.CCValue = 0;  //clear the value to prevent re-triggering
+        pMyGame->OUTPUT_STATES[i] = 1;
+        pMyGame->OUTPUT_STATES_FLAG[i] = true;
       }
     }
     for (int i = 0; i < NUM_RELAYS; i++)
@@ -74,18 +94,19 @@ void cluecontrol::listenForRequest()
         Serial.print(F("RELAY"));
         Serial.print(i);
         Serial.println(F(" turned off"));
-        RELAY_STATES[i] = 0;
-        CCMod.CCValue = 0;  //clear the value to prevent re-triggering
+        pMyGame->RELAY_STATES[i] = 0;
+        pMyGame->RELAY_STATES_FLAG[i] = true;
       }
       else if (CCMod.CCValue == 200 + (10 * i) + 1 && pMyGame->RELAY_OVERRIDE_ENABLE[i] == 1) 
       {
         Serial.print(F("RELAY"));
         Serial.print(i);
         Serial.println(F(" turned on"));
-        RELAY_STATES[i] = 1;
-        CCMod.CCValue = 0;  //clear the value to prevent re-triggering
+        pMyGame->RELAY_STATES[i] = 1;
+        pMyGame->RELAY_STATES_FLAG[i] = true;
       }
     }
   }
+  CCMod.CCValue = 0;  //clear the value to prevent re-triggering
 }
 
