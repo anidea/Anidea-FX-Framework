@@ -29,7 +29,7 @@ class Game;
 class network_empty : public Network
 {
   public:
-    network_empty() : Network(MyMac, MyIP, HostIP) {};
+    network_empty() : Network(MyMac, MyIP, HostIP, false) {};
 
   private:
     

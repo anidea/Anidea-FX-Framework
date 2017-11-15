@@ -30,6 +30,32 @@ void cluecontrol::setTriggers()
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
   }
+
+  for (int i = 0; i < NUM_OUTPUTS; i++)
+  {
+    if (pMyGame->OUTPUT_STATES[i] != OUTPUT_STATE_OLD[i]) 
+    {
+      Serial.print(F("OUTPUT"));
+      Serial.print(i);
+      Serial.println(F(" status changed"));
+      Serial.println(100 * MyIP[3] + 10 + i);
+      CCMod.SetTrigger(100 * MyIP[3] + 10 + i, pMyGame->OUTPUT_STATES[i]);
+      OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
+    }
+  }
+
+  for (int i = 0; i < NUM_RELAYS; i++)
+  {
+    if (pMyGame->RELAY_STATES[i] != RELAY_STATE_OLD[i]) 
+    {
+      Serial.print(F("RELAY"));
+      Serial.print(i);
+      Serial.println(F(" status changed"));
+      Serial.println(100 * MyIP[3] + 20 + i);
+      CCMod.SetTrigger(100 * MyIP[3] + 10 + i, pMyGame->RELAY_STATES[i]);
+      RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
+    }
+  }
 }
 
 void cluecontrol::listenForRequest()

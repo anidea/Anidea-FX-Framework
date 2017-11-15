@@ -55,10 +55,10 @@ void setup() {
 
   // Uncomment only one of these lines for the game you want
 //  myGame = new simplegame(); //Simple game provided as an example
-//  myGame = new sequencedetect(); //Sequencedetect
+  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
-//  myGame = new empty(); // Empty game to manually control inputs and outputs only
+//  myGame = new game_empty(); // Empty game to manually control inputs and outputs only
 //  myGame = new room(); // Used to control a whole room
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
@@ -68,7 +68,7 @@ void setup() {
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
-//  myNetwork = new mqtt(MyMac, MyIP, HostIP);
+  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 //  myNetwork = new network_empty(); //Empty network for use with FX300
 

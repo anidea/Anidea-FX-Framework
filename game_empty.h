@@ -8,7 +8,7 @@
 
 class Network;
 
-class empty : public Game
+class game_empty : public Game
 {
   public:
     

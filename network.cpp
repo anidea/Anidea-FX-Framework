@@ -18,89 +18,92 @@
 
 Game *Network::pMyGame = NULL;
 
-Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : server(80)
+Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connectNetwork) : server(80)
 {
-  MyMac = _MyMac;
-  
-  if (_MyIP[0] == 0) // MyIP is not set by program
+  if (connectNetwork)
   {
-//    Serial.println("MyIP not set");
-    if (EEPROM.read(0) == 1) // MyIP is saved in EEPROM
+    MyMac = _MyMac;
+  
+    if (_MyIP[0] == 0) // MyIP is not set by program
     {
-//      Serial.println("Reading MyIP from EEPROM");
-      for (int i = 1; i < 5; i++)
+  //    Serial.println("MyIP not set");
+      if (EEPROM.read(0) == 1) // MyIP is saved in EEPROM
       {
-        MyIP[i - 1] = EEPROM.read(i);
+  //      Serial.println("Reading MyIP from EEPROM");
+        for (int i = 1; i < 5; i++)
+        {
+          MyIP[i - 1] = EEPROM.read(i);
+        }
+      }
+      else // IP is not saved and needs to be provided by user
+      {
+        Serial.println();
+  //      Serial.println("Getting IP from user");
+        getIP(1);
       }
     }
-    else // IP is not saved and needs to be provided by user
+    else // MyIP is set by program
     {
-      Serial.println();
-//      Serial.println("Getting IP from user");
-      getIP(1);
+      MyIP = _MyIP;
     }
-  }
-  else // MyIP is set by program
-  {
-    MyIP = _MyIP;
-  }
-
-  if (_HostIP[0] == 0) // HostIP is not set by program
-  {
-//    Serial.println("HostIP not set");
-    if (EEPROM.read(5) == 1) // HostIP is saved in EEPROM
+  
+    if (_HostIP[0] == 0) // HostIP is not set by program
     {
-//      Serial.println("Reading HostIP from EEPROM");
-      for (int i = 6; i < 10; i++)
+  //    Serial.println("HostIP not set");
+      if (EEPROM.read(5) == 1) // HostIP is saved in EEPROM
       {
-        HostIP[i - 6] = EEPROM.read(i);
+  //      Serial.println("Reading HostIP from EEPROM");
+        for (int i = 6; i < 10; i++)
+        {
+          HostIP[i - 6] = EEPROM.read(i);
+        }
+      }
+      else // IP is not saved and needs to be provided by user
+      {
+        Serial.println();
+  //      Serial.println("Getting IP from user");
+        getIP(2);
       }
     }
-    else // IP is not saved and needs to be provided by user
+    else // HostIP is set by program
     {
-      Serial.println();
-//      Serial.println("Getting IP from user");
-      getIP(2);
+      HostIP = _HostIP;
     }
-  }
-  else // HostIP is set by program
-  {
-    HostIP = _HostIP;
-  }
-
-  unsigned long timeout = millis();
-  Serial.println();
-  Serial.println("Enter anything to configure IP...");
-  Serial.println();
-  Serial.setTimeout(3000);
-  while (millis() - timeout < 3000)
-  {
-    if (Serial.available() > 0)
+  
+    unsigned long timeout = millis();
+    Serial.println();
+    Serial.println("Enter anything to configure IP...");
+    Serial.println();
+    Serial.setTimeout(3000);
+    while (millis() - timeout < 3000)
     {
-      delay(10);
-      while (Serial.available() > 0)
+      if (Serial.available() > 0)
       {
-        Serial.read();
+        delay(10);
+        while (Serial.available() > 0)
+        {
+          Serial.read();
+        }
+        getIP(0);
+        Serial.println();
       }
-      getIP(0);
-      Serial.println();
     }
-  }
-
-  Ethernet.begin(MyMac, MyIP);
   
-  delay(500);
-  
-  Serial.println(F("Ethernet interface started"));
-   
-  // print the Host Address:
-  Serial.print(F("Host IP address: "));
-  Serial.println(HostIP);
+    Ethernet.begin(MyMac, MyIP);
     
-  // print your local IP address:
-  Serial.print(F("My IP address: "));
-  Serial.println(Ethernet.localIP());
-  Serial.println();
+    delay(500);
+    
+    Serial.println(F("Ethernet interface started"));
+     
+    // print the Host Address:
+    Serial.print(F("Host IP address: "));
+    Serial.println(HostIP);
+      
+    // print your local IP address:
+    Serial.print(F("My IP address: "));
+    Serial.println(Ethernet.localIP());
+    Serial.println();
+  }
 }
 
 void Network::loop(void)

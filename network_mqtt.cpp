@@ -1,7 +1,7 @@
 #include "network.h"
 #include "network_mqtt.h"
 
-mqtt::mqtt(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP)
+mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
   client.setClient(ethClient);
   client.setServer(HostIP, serverPort);
@@ -62,6 +62,40 @@ void mqtt::sendChanges(void)
       Serial.println(data);
       client.publish(propName, data);
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
+    }
+  }
+
+  for (int i = 0; i < NUM_OUTPUTS; i++)
+  {
+    if (pMyGame->OUTPUT_STATES[i] != OUTPUT_STATE_OLD[i]) 
+    {
+      StaticJsonBuffer<200> jsonBuffer;
+      JsonObject& root = jsonBuffer.createObject();
+      root["TYPE"] = "OUTPUT";
+      root["OUTPUT"] = i;
+      root["STATE"] = pMyGame->OUTPUT_STATES[i];
+      char data[64];
+      root.printTo(data);
+      Serial.println(data);
+      client.publish(propName, data);
+      OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
+    }
+  }
+
+  for (int i = 0; i < NUM_RELAYS; i++)
+  {
+    if (pMyGame->RELAY_STATES[i] != RELAY_STATE_OLD[i]) 
+    {
+      StaticJsonBuffer<200> jsonBuffer;
+      JsonObject& root = jsonBuffer.createObject();
+      root["TYPE"] = "RELAY";
+      root["RELAY"] = i;
+      root["STATE"] = pMyGame->RELAY_STATES[i];
+      char data[64];
+      root.printTo(data);
+      Serial.println(data);
+      client.publish(propName, data);
+      RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
   }
 }

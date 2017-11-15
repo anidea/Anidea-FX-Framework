@@ -31,11 +31,7 @@ class Network
   public:
     Network();
   
-    Network(byte [], IPAddress, IPAddress);
-
-    void sendGameSolved(void);
-
-    void receiveGameReset(void);
+    Network(byte [], IPAddress, IPAddress, bool);
 
     virtual void loop(void);
 

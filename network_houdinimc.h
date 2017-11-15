@@ -26,7 +26,7 @@ class Game;
 class houdinimc : public Network
 {
   public:
-    houdinimc(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP) {};
+    houdinimc(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP, true) {};
 
     virtual void loop(void);
 
@@ -54,6 +54,10 @@ class houdinimc : public Network
     char serverName[16];
 
     bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
+
+    bool OUTPUT_STATE_OLD[NUM_INPUTS] = {false};
+
+    bool RELAY_STATE_OLD[NUM_INPUTS] = {false};
 };
 
 #endif

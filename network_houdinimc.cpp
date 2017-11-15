@@ -36,6 +36,34 @@ void houdinimc::sendChanges(void)
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
   }
+
+  for (int i = 0; i < NUM_OUTPUTS; i++)
+  {
+    if (pMyGame->OUTPUT_STATES[i] != OUTPUT_STATE_OLD[i]) 
+    {
+      Serial.print(F("OUTPUT"));
+      Serial.print(i);
+      Serial.println(F(" status changed"));
+      sprintf(pageAdd, " /%d_OUTPUT%d_%s", MyIP[3], i, pMyGame->OUTPUT_STATES[i] ? "ON" : "OFF");
+      Serial.println(pageAdd);
+      (!getPage(HostIP, serverPort, pageAdd));
+      OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
+    }
+  }
+
+  for (int i = 0; i < NUM_RELAYS; i++)
+  {
+    if (pMyGame->RELAY_STATES[i] != RELAY_STATE_OLD[i]) 
+    {
+      Serial.print(F("RELAY"));
+      Serial.print(i);
+      Serial.println(F(" status changed"));
+      sprintf(pageAdd, " /%d_RELAY%d_%s", MyIP[3], i, pMyGame->RELAY_STATES[i] ? "ON" : "OFF");
+      Serial.println(pageAdd);
+      (!getPage(HostIP, serverPort, pageAdd));
+      RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
+    }
+  }
 }
 
 byte houdinimc::getPage(IPAddress ipBuf, int thisPort, char *page)

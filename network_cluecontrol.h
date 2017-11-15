@@ -34,7 +34,7 @@ class Game;
 class cluecontrol : public Network
 {
   public:
-    cluecontrol(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP)
+    cluecontrol(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
     {
       CCMod.ClueControlIP = HostIP;
     };
@@ -51,6 +51,10 @@ class cluecontrol : public Network
     CCModBus CCMod;
 
     bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
+
+    bool OUTPUT_STATE_OLD[NUM_INPUTS] = {false};
+
+    bool RELAY_STATE_OLD[NUM_INPUTS] = {false};
 };
 
 #endif

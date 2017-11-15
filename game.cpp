@@ -79,20 +79,34 @@ void Game::loop(void)
   // Write output states
   for (int i = 0; i < NUM_OUTPUTS; i++)
   {
-    if (OUTPUT_OVERRIDE_ENABLE[i] == true && OUTPUT_STATES_FLAG[i] == true)
+    if (OUTPUT_OVERRIDE_ENABLE[i] == true)
     {
-      digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
-      OUTPUT_STATES_FLAG[i] = false;
+      if (OUTPUT_STATES_FLAG[i] == true)
+      {
+        digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
+        OUTPUT_STATES_FLAG[i] = false;
+      }
+      else
+      {
+        OUTPUT_STATES[i] = digitalRead(OUTPUTS[i]);
+      }
     }
   }
 
   // Write relay states
   for (int i = 0; i < NUM_RELAYS; i++)
   {
-    if (RELAY_OVERRIDE_ENABLE[i] == true && RELAY_STATES_FLAG[i] == true)
+    if (RELAY_OVERRIDE_ENABLE[i] == true)
     {
-      digitalWrite(RELAYS[i], RELAY_STATES[i]);
-      RELAY_STATES_FLAG[i] = false;
+      if (RELAY_STATES_FLAG[i] == true)
+      {
+        digitalWrite(RELAYS[i], RELAY_STATES[i]);
+        RELAY_STATES_FLAG[i] = false;
+      }
+      else
+      {
+        RELAY_STATES[i] == digitalRead(RELAYS[i]);
+      }
     }
   }
 }

@@ -52,6 +52,10 @@ class mqtt : public Network
     char serverName[16];
 
     bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
+
+    bool OUTPUT_STATE_OLD[NUM_INPUTS] = {false};
+
+    bool RELAY_STATE_OLD[NUM_INPUTS] = {false};
 };
 
 #endif

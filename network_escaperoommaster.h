@@ -27,7 +27,7 @@ class Game;
 class escaperoommaster : public Network
 {
   public:
-    escaperoommaster(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP) {};
+    escaperoommaster(byte MyMac[], IPAddress MyIP, IPAddress HostIP) : Network(MyMac, MyIP, HostIP, true) {};
 
     virtual void loop(void);
 
