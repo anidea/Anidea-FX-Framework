@@ -105,7 +105,7 @@ void Game::loop(void)
       }
       else
       {
-        RELAY_STATES[i] == digitalRead(RELAYS[i]);
+        RELAY_STATES[i] = digitalRead(RELAYS[i]);
       }
     }
   }

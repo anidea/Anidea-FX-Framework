@@ -46,15 +46,16 @@ class cluecontrol : public Network
 
     void setTriggers();
 
-    bool sent;
+    bool _puzzleSolved_old = false;
+    bool _enabled_old = false;
     
     CCModBus CCMod;
 
     bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
 
-    bool OUTPUT_STATE_OLD[NUM_INPUTS] = {false};
+    bool OUTPUT_STATE_OLD[NUM_OUTPUTS] = {false};
 
-    bool RELAY_STATE_OLD[NUM_INPUTS] = {false};
+    bool RELAY_STATE_OLD[NUM_RELAYS] = {false};
 };
 
 #endif

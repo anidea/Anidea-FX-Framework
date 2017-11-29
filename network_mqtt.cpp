@@ -30,7 +30,7 @@ void mqtt::sendChanges(void)
     root["SOLVED"] = 1;
     char data[64];
     root.printTo(data);
-    Serial.println(data);
+//    Serial.println(data);
     client.publish(propName, data);
     sent = 1;
   }
@@ -43,7 +43,7 @@ void mqtt::sendChanges(void)
     root["SOLVED"] = 0;
     char data[64];
     root.printTo(data);
-    Serial.println(data);
+//    Serial.println(data);
     client.publish(propName, data);
     sent = 0;
   }
@@ -59,7 +59,7 @@ void mqtt::sendChanges(void)
       root["STATE"] = pMyGame->INPUT_STATES[i];
       char data[64];
       root.printTo(data);
-      Serial.println(data);
+//      Serial.println(data);
       client.publish(propName, data);
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
@@ -76,7 +76,7 @@ void mqtt::sendChanges(void)
       root["STATE"] = pMyGame->OUTPUT_STATES[i];
       char data[64];
       root.printTo(data);
-      Serial.println(data);
+//      Serial.println(data);
       client.publish(propName, data);
       OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
     }
@@ -93,7 +93,7 @@ void mqtt::sendChanges(void)
       root["STATE"] = pMyGame->RELAY_STATES[i];
       char data[64];
       root.printTo(data);
-      Serial.println(data);
+//      Serial.println(data);
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
@@ -103,13 +103,13 @@ void mqtt::sendChanges(void)
 void mqtt::callback(char* topic, byte* payload, unsigned int length) {
   StaticJsonBuffer<200> jsonBuffer;
   
-  Serial.print(F("Message arrived ["));
-  Serial.print(topic);
-  Serial.print("] ");
-  for (int i=0;i<length;i++) {
-    Serial.print((char)payload[i]);
-  }
-  Serial.println();
+//  Serial.print(F("Message arrived ["));
+//  Serial.print(topic);
+//  Serial.print("] ");
+//  for (int i=0;i<length;i++) {
+//    Serial.print((char)payload[i]);
+//  }
+//  Serial.println();
 
   JsonObject& root = jsonBuffer.parseObject(payload);
 
@@ -118,10 +118,10 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
   {
     int OUTPUTnum = root["OUTPUT"];
     bool OUTPUTstate = root["VALUE"];
-    Serial.print("Setting output ");
-    Serial.print(OUTPUTnum);
-    Serial.print(" to ");
-    Serial.println(OUTPUTstate);
+//    Serial.print("Setting output ");
+//    Serial.print(OUTPUTnum);
+//    Serial.print(" to ");
+//    Serial.println(OUTPUTstate);
     pMyGame->OUTPUT_STATES[OUTPUTnum] = OUTPUTstate;
     pMyGame->OUTPUT_STATES_FLAG[OUTPUTnum] = true;
   }
@@ -134,11 +134,11 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
   }
   else if (strcmp(type, "GAMESTATE") == 0) // Change gamestate
   {
-    Serial.println("GAMESTATE");
+//    Serial.println("GAMESTATE");
     const char* dir = root["DIRECTION"];
     if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
     {
-      Serial.println("GAMESTATE TO");
+//      Serial.println("GAMESTATE TO");
       bool state = root["VALUE"];
       if (state == 1)
       {
@@ -152,11 +152,11 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
   }
   else if (strcmp(type, "ENABLE") == 0) // Change enable
   {
-    Serial.println("ENABLE");
+//    Serial.println("ENABLE");
     const char* dir = root["DIRECTION"];
     if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
     {
-      Serial.println("ENABLE TO");
+//      Serial.println("ENABLE TO");
       bool state = root["VALUE"];
       if (state == 1)
       {

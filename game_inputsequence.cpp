@@ -270,7 +270,7 @@ void inputsequence::recordInputButtonSequence(void)
 
     if (inputButton == NO_INPUT_DETECTED)
     {
-      Serial.println(F("No input detected..."));
+//      Serial.println(F("No input detected..."));
       
     }
     else

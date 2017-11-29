@@ -8,7 +8,7 @@ You can purchase an FX350 at http://get.anidea-engineering.com/fx350_order_reque
 This is a generic framework for running different games on escape room props and connecting them with different management software.
 
 ## Downloading
-Please note that when you first download and unzip the software you must rename the containing folder to "Anidea-FX-Framework" or the Arduino software will not be able to open it.
+Please note that when you first download and unzip the software you must rename the containing folder to "Anidea-FX-Framework" or the Arduino software will not be able to open it correctly.
 
 ## Required Libraries
 To compile the program you must have the following libraries installed:
@@ -25,51 +25,54 @@ At the top of the includes there are several boards included. Only one can be un
 Each game and each network have both a header and .cpp file that define their operation. Any new game or network added must have its header (.h) file included in the main .ino file.
 
 ```
-  // Uncomment only one of these lines for the board you want
-  #include "fx300.h"
-  //#include fx###.h
+// Uncomment only one of these lines for the board you want
+#include "fx300.h"
+//#include fx###.h
 
-  #include "game.h"
-  #include "network.h"
+#include "game.h"
+#include "network.h"
 
-  // Networks
-  #include "escaperoommaster.h"
-  #include "cluecontrol.h"
-  #include "houdinimc.h"
+// Networks
+#include "network_empty.h"
+#include "network_escaperoommaster.h"
+#include "network_cluecontrol.h"
+#include "network_houdinimc.h"
+#include "network_mqtt.h"
 
-  // Include game headers here
-  #include "game_simplegame.h"
-  #include "game_lightsout.h"
-  #include "game_sequencedetect.h"
-  #include "game_sixwire.h"
-  #include "game_inputsequence.h"
-  #include "game_empty.h"
+// Include game headers here
+#include "game_empty.h"
+#include "game_room.h"
+#include "game_simplegame.h"
+#include "game_sequencedetect.h"
+#include "game_sixwire.h"
+#include "game_inputsequence.h"
 ```
 
 ## Game and Network
 There are several declarations of "myGame". Only one can be uncommented to tell the program which game to run.
 
-The next section is the network variables. These need to be configured for the specific device as well as for the management software. MyMac and MyIP are needed for any type of network. HostIP is needed by ClueControl and HoudiniMC but not EscapeRoomMaster.
+The next section is the network variables. These need to be configured for the specific device as well as for the management software. MyMac and MyIP are needed for any type of network. HostIP is needed by ClueControl, HoudiniMC, and MQTT but not EscapeRoomMaster.
 
 Lastly is the network section. Only one can be uncommented to tell the program which management software to communicate with.
 
 ```
   // Uncomment only one of these lines for the game you want
+//  myGame = new game_empty(); // Empty game to manually control inputs and outputs only
+//  myGame = new room(); // Used to control a whole room
 //  myGame = new simplegame(); //Simple game provided as an example
-//  myGame = new lightsout(); //Lights out game
 //  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
-//  myGame = new empty(); // Empty game to manually control inputs and outputs only
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
-  IPAddress MyIP(10, 0, 1, 210);                         // This must be unique for each device
-  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software
+  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
+//  myNetwork = new network_empty(); //Empty network for use with FX300
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
-//  myNetwork = new nodered(MyMac, MyIP, HostIP);
+//  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 ```
 
@@ -98,7 +101,7 @@ In the constructor of every game there is a section that enables or disables eve
   RELAY_OVERRIDE_ENABLE[1] = 1;
 ```
 
-There is also a game called "empty" that has nothing running and all inputs enabled that serves as a manual prop controller.
+There is also a game called "empty" that has nothing running and all inputs/outputs enabled that serves as a manual prop controller.
 
 ## Network Communication
 
@@ -106,10 +109,10 @@ In these examples 0.0.0.123 is used as MyIP. Remember to change that address to 
 
 ### EscapeRoomMaster
 
-#### Input
+#### Input (Manual Polling)
 Go to "Automation" -> Select your room -> Click "Add Event" -> Select "Network Polling (Listen for Prop)" at the top.
 
-The prop will respond with either "triggered" or "not triggered". Use "triggered" in the "Trigger Value" field.
+The prop will respond with either "triggered" or "not_triggered". Use "triggered" in the "Trigger Value" field.
 
 To get the status of the puzzle use the url:  
 http://0.0.0.123/status
@@ -118,8 +121,167 @@ To get the status of any specific input use the url format:
 http://0.0.0.123/INPUT0  
 Where 0 is the number of the input you are polling for.
 
+To find out if the prop is enabled use the url:  
+http://0.0.0.123/enable_status  
+This responds with "enabled" and "disabled" instead of "triggered" and "not_triggered".
+
+If you are using the room controller game there are specific urls for the statuses of the buttons:  
+http://0.0.0.123/button1  
+http://0.0.0.123/button2  
+http://0.0.0.123/button1hold  
+http://0.0.0.123/button2hold  
+http://0.0.0.123/buttons1and2  
+In order to prevent retriggering, the button state is reset when it is polled. When one of these urls is polled, it will reply with "on" if the corresponding button press has happened. It will then reply with "off" until it has happened again.
+
 Example:  
 ![erminputexample](https://user-images.githubusercontent.com/31215073/30436135-71b26c72-9939-11e7-9200-c41bf2f566e5.png)
+
+#### Input (JSON)
+In cases where there are a lot of things that need to be polled, it is better to use JSON. The controller only needs to be polled once and it will output all of the information needed by ERM.
+
+Go to "Automation" -> Select your room -> Click "Add Event" -> Select "Network Polling (Listen for Prop)" at the top.
+
+Enter for the url:  
+http://0.0.0.123/json
+
+Choose “Run Script” from the Actions drop down menu -> Enter “Receive JSON” for the name -> Paste in the following script:
+```
+//Parse JSON string to object
+var obj = JSON.parse(env.returnVal);
+
+//status
+if (obj.status == 1)
+    trigger("solved");
+else if (obj.status == 0)
+    trigger("reset");
+
+//buttonState
+if (obj.buttonState == 1)
+    trigger("button1");
+else if (obj.buttonState == 2)
+    trigger("button2");
+else if (obj.buttonState == 3)
+    trigger("button1hold");
+else if (obj.buttonState == 4)
+    trigger("button2hold");
+else if (obj.buttonState == 5)
+    trigger("buttons1and2");
+
+//enabled
+if (obj.enabled == 1)
+    trigger("enabled");
+else if (obj.enabled == 0)
+    trigger("disabled");
+
+//Inputs
+
+//INPUT0
+if (obj.INPUT0 == 1)
+    trigger("INPUT0_ON");
+else if (obj.INPUT0 == 0)
+    trigger("INPUT0_OFF");
+//INPUT1
+if (obj.INPUT1 == 1)
+    trigger("INPUT1_ON");
+else if (obj.INPUT1 == 0)
+    trigger("INPUT1_OFF");
+//INPUT2
+if (obj.INPUT2 == 1)
+    trigger("INPUT2_ON");
+else if (obj.INPUT2 == 0)
+    trigger("INPUT2_OFF");
+//INPUT3
+if (obj.INPUT3 == 1)
+    trigger("INPUT3_ON");
+else if (obj.INPUT3 == 0)
+    trigger("INPUT3_OFF");
+//INPUT4
+if (obj.INPUT4 == 1)
+    trigger("INPUT4_ON");
+else if (obj.INPUT4 == 0)
+    trigger("INPUT4_OFF");
+//INPUT5
+if (obj.INPUT5 == 1)
+    trigger("INPUT5_ON");
+else if (obj.INPUT5 == 0)
+    trigger("INPUT5_OFF");
+
+//Outputs
+
+//OUTPUT0
+if (obj.OUTPUT0 == 1)
+    trigger("OUTPUT0_ON");
+else if (obj.OUTPUT0 == 0)
+    trigger("OUPUT0_OFF");
+//OUTPUT1
+if (obj.OUTPUT1 == 1)
+    trigger("OUTPUT1_ON");
+else if (obj.OUTPUT1 == 0)
+    trigger("OUPUT1_OFF");
+//OUTPUT2
+if (obj.OUTPUT2 == 1)
+    trigger("OUTPUT2_ON");
+else if (obj.OUTPUT2 == 0)
+    trigger("OUPUT2_OFF");
+//OUTPUT3
+if (obj.OUTPUT3 == 1)
+    trigger("OUTPUT3_ON");
+else if (obj.OUTPUT3 == 0)
+    trigger("OUPUT3_OFF");
+//OUTPUT4
+if (obj.OUTPUT4 == 1)
+    trigger("OUTPUT4_ON");
+else if (obj.OUTPUT4 == 0)
+    trigger("OUPUT4_OFF");
+//OUTPUT5
+if (obj.OUTPUT5 == 1)
+    trigger("OUTPUT5_ON");
+else if (obj.OUTPUT5 == 0)
+    trigger("OUPUT5_OFF");
+```
+
+Click save. Now ERM will poll the controller for information and trigger custom events based on it.
+
+Example:  
+![json example](https://user-images.githubusercontent.com/31215073/33152335-18001cb8-cfaa-11e7-9d3d-385be72a5957.png)
+
+Here is the process to add an action based off a custom event:
+
+Click “Add Event” in the automation editor -> Choose “Custom Event” from the Event drop down menu -> Type in the name of the event you want to listen for -> Choose the action you want to occur.
+
+Here is a full list of the custom events:  
+* solved
+* reset
+* button1
+* button1hold  
+* button2hold  
+* buttons1and2  
+* enabled  
+* disabled  
+* INPUT0_ON
+* INPUT1_ON
+* INPUT2_ON  
+* INPUT3_ON  
+* INPUT4_ON  
+* INPUT5_ON  
+* INPUT0_OFF
+* INPUT1_OFF
+* INPUT2_OFF  
+* INPUT3_OFF  
+* INPUT4_OFF  
+* INPUT5_OFF
+* OUTPUT0_ON
+* OUTPUT1_ON
+* OUTPUT2_ON  
+* OUTPUT3_ON  
+* OUTPUT4_ON  
+* OUTPUT5_ON  
+* OUTPUT0_OFF
+* OUTPUT1_OFF
+* OUTPUT2_OFF  
+* OUTPUT3_OFF  
+* OUTPUT4_OFF  
+* OUTPUT5_OFF
 
 #### Output
 Go to "Automation" -> Select your room -> Click "Add Event" -> Select "Send Network Request (Trigger Prop)" at the bottom.
@@ -131,6 +293,14 @@ http://0.0.0.123/trigger
 
 To reset the puzzle use the url:  
 http://0.0.0.123/reset
+
+To enable or disable the puzzle use these urls:  
+http://0.0.0.123/enable  
+http://0.0.0.123/disable  
+
+You can reset into a specific enable state by using these urls:  
+http://0.0.0.123/reset_enable  
+http://0.0.0.123/reset_disable  
 
 To manually set a specific ouput use this url for on:  
 http://0.0.0.123/OUTPUT0_ON  
@@ -154,24 +324,35 @@ Go to "System Setup" -> "ModBus Setup" -> Select the "Triggers" tab.
 
 Since ClueControl does not distinguish between IP addresses it is receiving from, the last 3 digits of the IP are part of the register that the prop sends the update to.
 
-The register that tells you if the game has been solved or not is just the last 3 digits alone. So in this case the register "123" will be triggered when the puzzle is solved.
+The register that tells you if the game has been solved or not is the last 3 digits followed by a 0. So in this case the register "1230" will be triggered when the puzzle is solved.
 
-The register that will be updated when a specific input is changed is the last 3 digits of the IP followed by the number of the input. So the register "1230" will be updated when the status of input 0 on the prop with that IP address changes.
+The register that tells you if the game is enabled is the last 3 digits followed by a 1. So in this case the register "1231" will be triggered when the puzzle is solved.
+
+The register that will be updated when a specific input is changed is the last 3 digits of the IP + a 0 + the number of the input. So the register "12300" will be updated when the status of input 0 on the prop with that IP address changes.
+
+Outputs and relays are the same as inputs, except instead of a 0 it is a 1 for output and 2 for relay.
 
 Example:  
-![ccinputexample](https://user-images.githubusercontent.com/31215073/30436407-090fa5bc-993a-11e7-921b-7505cf4f4aba.png)
+![ccinputexample](https://user-images.githubusercontent.com/31215073/33387395-2215934e-d4fb-11e7-9eda-e61d8d5c74e5.png)
 
 #### Output
 Go to "System Setup" -> "ModBus Setup" -> Select the "Switches" tab.
 
 The IP Address field in ClueControl must be set to the IP of the prop.
 
-To trigger the prop set "# to Send" to 1. To reset the prop set it to 2.
+Here are a list of the commands for "# to send":
+* Solve - 1
+* Reset - 2
+* Enable - 3
+* Disable - 4
+* Reset and enable - 5
+* Reset and disable - 6
 
-To set the value of a specific output a 3 digit combination is used.  
-The first digit is the type of output. 1 for output and 2 for relay.  
-The second digit is the number of the output you are targeting.  
-The third digit is the status you want to update it to. 1 for on 0 for off.  
+To set the value of a specific output a 3 digit combination is used.
+* The first digit is the type of output. 1 for output and 2 for relay.
+* The second digit is the number of the output you are targeting.
+* The third digit is the status you want to update it to. 1 for on 0 for off.
+
 For example if you wanted to set output 3 to on you would use "131" as the "# to Send".
 
 Example:  

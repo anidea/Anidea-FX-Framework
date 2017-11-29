@@ -53,10 +53,10 @@ void room::loop(void)
   {
     if (millis() - button1Timer > 10 && button1Flag == true)
     {
-      Serial.println("Spot 1");
+//      Serial.println("Spot 1");
       if (millis() - button1Timer < 500)
       {
-        Serial.println("Spot 2");
+//        Serial.println("Spot 2");
         buttonState = 1;
       }
       else

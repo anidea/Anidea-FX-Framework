@@ -131,6 +131,8 @@ void Network::getIP(int type)
         Serial.println("Succesfuly configured with DHCP");
         MyIP = Ethernet.localIP();
         Serial.println(MyIP);
+        Serial.print("Host name: ");
+        Serial.println(Ethernet.hostName());
       }
     }
     else

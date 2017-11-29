@@ -9,7 +9,7 @@ void escaperoommaster::loop(void)
 
 void escaperoommaster::processRequest(EthernetClient& client, String requestStr) 
 {
-  Serial.println(requestStr);
+//  Serial.println(requestStr);
 
   if (requestStr.startsWith(F("GET /json")))
   {
@@ -138,7 +138,7 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
 //        Serial.print(F("polled for INPUT"));
 //        Serial.print(i);
 //        Serial.println(F(" status!"));
-        writeClientResponse(client, pMyGame->INPUT_STATES[i] ? F("triggered") : F("not triggered"));
+        writeClientResponse(client, pMyGame->INPUT_STATES[i] ? F("triggered") : F("not_triggered"));
       }
     }
   }
@@ -175,7 +175,7 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
 //        Serial.print(F("polled for OUTPUT"));
 //        Serial.print(i);
 //        Serial.println(F(" status!"));
-        writeClientResponse(client, digitalRead(OUTPUTS[i]) ? F("triggered") : F("not triggered"));
+        writeClientResponse(client, digitalRead(OUTPUTS[i]) ? F("triggered") : F("not_triggered"));
       }
     }
   }
@@ -212,7 +212,7 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
 //        Serial.print(F("polled for RELAY"));
 //        Serial.print(i);
 //        Serial.println(F(" status!"));
-        writeClientResponse(client, digitalRead(RELAYS[i]) ? F("triggered") : F("not triggered"));
+        writeClientResponse(client, digitalRead(RELAYS[i]) ? F("triggered") : F("not_triggered"));
       }
     }
   }
@@ -228,7 +228,7 @@ void escaperoommaster::listenForEthernetClients()
 
   if (client)
   {
-    Serial.println(F("Got a client"));
+//    Serial.println(F("Got a client"));
     
     String requestStr;
     boolean firstLine = true;
@@ -266,7 +266,7 @@ void escaperoommaster::listenForEthernetClients()
 
 void escaperoommaster::writeClientResponse(EthernetClient& client, String bodyStr) 
 {
-  Serial.println(F("HTTP 200"));
+//  Serial.println(F("HTTP 200"));
   
   // send a standard http response header
   client.println(F("HTTP/1.1 200 OK"));
@@ -278,7 +278,7 @@ void escaperoommaster::writeClientResponse(EthernetClient& client, String bodySt
 
 void escaperoommaster::writeClientResponseNotFound(EthernetClient& client) 
 {
-  Serial.println(F("HTTP 404"));
+//  Serial.println(F("HTTP 404"));
   
   // send a standard http response header
   client.println(F("HTTP/1.1 404 Not Found"));
@@ -306,7 +306,7 @@ void escaperoommaster::createJSON(EthernetClient& client)
     root[rootBuffer + i] = digitalRead(OUTPUTS[i]);
   }
   
-  Serial.println(F("HTTP 200"));
+//  Serial.println(F("HTTP 200"));
   
   // send a standard http response header
   client.println(F("HTTP/1.1 200 OK"));
