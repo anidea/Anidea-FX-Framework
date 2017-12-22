@@ -2,7 +2,6 @@
 #define game_simplegame__h
 
 #include "arduino.h"
-#include "fx300.h"
 #include "network.h"
 #include "game.h"
 

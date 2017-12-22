@@ -1,6 +1,5 @@
 #include <MsTimer2.h>
 
-#include "fx300.h"
 #include "game_sequencedetect.h"
 
 /*

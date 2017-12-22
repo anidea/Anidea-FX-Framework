@@ -20,7 +20,6 @@
 #include "arduino.h"
 
 #include <EEPROM.h>
-#include "fx300.h"
 #include "network.h"
 #include "game.h"
 

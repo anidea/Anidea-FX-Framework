@@ -37,6 +37,7 @@
 #include "game_sequencedetect.h"
 #include "game_sixwire.h"
 #include "game_inputsequence.h"
+#include "game_rfid.h"
 
 // Generic game and network objects
 Game *myGame;
@@ -60,10 +61,11 @@ void setup() {
 //  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
+//  myGame = new rfid();
 
-   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB5};   // This must be unique for each device
-   IPAddress MyIP(10, 0, 1, 211);                         // This must be unique for each device on the network. Leave blank to configure at run time.
-   IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
+  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB6};   // This must be unique for each device
+  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new network_empty(); //Empty network for use with FX300
@@ -76,7 +78,7 @@ void setup() {
 }
 
 void loop()
-{ 
+{
   myGame->loop();
 
   myNetwork->loop();

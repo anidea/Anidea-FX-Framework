@@ -1,4 +1,3 @@
-#include "fx300.h"
 #include "game_sixwire.h"
 
 /*
