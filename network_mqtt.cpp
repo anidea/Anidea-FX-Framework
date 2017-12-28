@@ -21,29 +21,16 @@ void mqtt::loop(void)
 
 void mqtt::sendChanges(void)
 {
+  char data[64];
   if (pMyGame->_puzzleSolved == 1 && sent == 0) // Send puzzle solved
   {
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject& root = jsonBuffer.createObject();
-    root["TYPE"] = "GAMESTATE";
-    root["DIRECTION"] = "FROM";
-    root["SOLVED"] = 1;
-    char data[64];
-    root.printTo(data);
-//    Serial.println(data);
+    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 1");
     client.publish(propName, data);
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1) // Send puzzle not solved
   {
-    StaticJsonBuffer<200> jsonBuffer;
-    JsonObject& root = jsonBuffer.createObject();
-    root["TYPE"] = "GAMESTATE";
-    root["DIRECTION"] = "FROM";
-    root["SOLVED"] = 0;
-    char data[64];
-    root.printTo(data);
-//    Serial.println(data);
+    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 0");
     client.publish(propName, data);
     sent = 0;
   }
@@ -52,14 +39,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) // Loop through inputs and send state if changed
     {
-      StaticJsonBuffer<200> jsonBuffer;
-      JsonObject& root = jsonBuffer.createObject();
-      root["TYPE"] = "INPUT";
-      root["INPUT"] = i;
-      root["STATE"] = pMyGame->INPUT_STATES[i];
-      char data[64];
-      root.printTo(data);
-//      Serial.println(data);
+      sprintf(data, "{\"TYPE\": \"INPUT\", \"INPUT\": %d, \"STATE\": %d", i, pMyGame->INPUT_STATES[i]);
       client.publish(propName, data);
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
@@ -69,14 +49,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->OUTPUT_STATES[i] != OUTPUT_STATE_OLD[i]) 
     {
-      StaticJsonBuffer<200> jsonBuffer;
-      JsonObject& root = jsonBuffer.createObject();
-      root["TYPE"] = "OUTPUT";
-      root["OUTPUT"] = i;
-      root["STATE"] = pMyGame->OUTPUT_STATES[i];
-      char data[64];
-      root.printTo(data);
-//      Serial.println(data);
+      sprintf(data, "{\"TYPE\": \"OUTPUT\", \"OUTPUT\": %d, \"STATE\": %d", i, pMyGame->OUTPUT_STATES[i]);
       client.publish(propName, data);
       OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
     }
@@ -86,14 +59,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->RELAY_STATES[i] != RELAY_STATE_OLD[i]) 
     {
-      StaticJsonBuffer<200> jsonBuffer;
-      JsonObject& root = jsonBuffer.createObject();
-      root["TYPE"] = "RELAY";
-      root["RELAY"] = i;
-      root["STATE"] = pMyGame->RELAY_STATES[i];
-      char data[64];
-      root.printTo(data);
-//      Serial.println(data);
+      sprintf(data, "{\"TYPE\": \"RELAY\", \"RELAY\": %d, \"STATE\": %d", i, pMyGame->RELAY_STATES[i]);
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }

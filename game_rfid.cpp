@@ -91,7 +91,7 @@ void rfid::loop(void)
         iAllTagsMatched = 1;
         iTagMatchCount = 0;
         // Do the rfid arrays match?
-        for (int i = 0; i < iTotalScanLength; i++)
+        for (byte i = 0; i < iTotalScanLength; i++)
         {
           if (tagFails[i] < 3)
           {
@@ -149,7 +149,7 @@ void rfid::reset(void)
   //Reset game specific variables
   iPuzzleSolved = 0;
   iEmergencyExit = 0;
-  for (int i = 0; i < iTotalScanLength; i++)
+  for (byte i = 0; i < iTotalScanLength; i++)
   {
     tagFails[i] = 3;
   }
@@ -162,7 +162,7 @@ void rfid::reset(void)
 void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength)
 {
   delay(10);
-  int pos = 0;
+  byte pos = 0;
   digitalWrite(RS485_ENABLE, HIGH);
 
   // Write data
@@ -174,7 +174,7 @@ void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength
   delay(10);  // Wait for receive to get here.
 
   // Spin while waiting for time out, and not signals
-  int timeout = 0;
+  byte timeout = 0;
   while(!Serial.available() && timeout < 50)
   {
     delay(1);
@@ -249,12 +249,12 @@ void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength
   Serial.println(pResponse);
 }
 
-int rfid::RfidSetGetTagIds(int iGet)
+byte rfid::RfidSetGetTagIds(byte iGet)
 {
-  int iRet = 0;
-  int iLoadReadCount;
+  byte iRet = 0;
+  byte iLoadReadCount;
   
-  for (int i = 0; i < iTotalScanLength; i++)
+  for (byte i = 0; i < iTotalScanLength; i++)
   {
     buttons();
     sprintf(cBufOut, "###255,%d,REQRFID###", i);
@@ -264,7 +264,7 @@ int rfid::RfidSetGetTagIds(int iGet)
     memset(cBufIn,0,32);
     RS485_SendMessage(cBufOut, cBufIn, &uReceiveLen);
 
-    int uSrc = iTotalScanLength + 1, uDest = 0;
+    byte uSrc = iTotalScanLength + 1, uDest = 0;
     char cMsg[RFID_STR_LEN_MAX + 1];
     memset(cMsg,0,RFID_STR_LEN_MAX + 1);
     sscanf(cBufIn, "%d,%d,%s", &uSrc, &uDest, cMsg);
@@ -362,7 +362,7 @@ void rfid::buttons()
       if (iCommFailure == 0)
       {
         bool iAllTagsFound = true;
-        for (int i = 0; i < iTotalScanLength; i++)
+        for (byte i = 0; i < iTotalScanLength; i++)
         {
           if (tagFound[i] == false)
           {
@@ -426,9 +426,9 @@ void rfid::buttons()
   }
 }
 
-void rfid::EEPROMReadString(int pos, int len, char* data)
+void rfid::EEPROMReadString(byte pos, byte len, char* data)
 {
-  int i;
+  byte i;
   for (i = 0; i < len; i++)
   {
     data[i] = EEPROM.read(pos + i);
@@ -436,9 +436,9 @@ void rfid::EEPROMReadString(int pos, int len, char* data)
   data[i] = 0;
 }
 
-void rfid::EEPROMWriteString(int pos, char* data)
+void rfid::EEPROMWriteString(byte pos, char* data)
 {
-  for (int i = 0; i < strlen(data); i++)
+  for (byte i = 0; i < strlen(data); i++)
   {
     EEPROM.write(pos + i, data[i]);
   }
