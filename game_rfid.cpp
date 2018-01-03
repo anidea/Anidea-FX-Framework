@@ -85,7 +85,7 @@ void rfid::loop(void)
         // Green light
         digitalWrite(ACTIVITY_LIGHT_2, HIGH);
       }
-    
+      
       if ((iCommFailure == 0) && (iEmergencyExit == 0)) //See how many are matched
       {
         iAllTagsMatched = 1;
@@ -264,7 +264,7 @@ byte rfid::RfidSetGetTagIds(byte iGet)
     memset(cBufIn,0,32);
     RS485_SendMessage(cBufOut, cBufIn, &uReceiveLen);
 
-    byte uSrc = iTotalScanLength + 1, uDest = 0;
+    int uSrc = iTotalScanLength + 1, uDest = 0;
     char cMsg[RFID_STR_LEN_MAX + 1];
     memset(cMsg,0,RFID_STR_LEN_MAX + 1);
     sscanf(cBufIn, "%d,%d,%s", &uSrc, &uDest, cMsg);

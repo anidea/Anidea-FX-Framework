@@ -24,13 +24,13 @@ void mqtt::sendChanges(void)
   char data[64];
   if (pMyGame->_puzzleSolved == 1 && sent == 0) // Send puzzle solved
   {
-    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 1");
+    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 1}");
     client.publish(propName, data);
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1) // Send puzzle not solved
   {
-    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 0");
+    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 0}");
     client.publish(propName, data);
     sent = 0;
   }
@@ -39,7 +39,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) // Loop through inputs and send state if changed
     {
-      sprintf(data, "{\"TYPE\": \"INPUT\", \"INPUT\": %d, \"STATE\": %d", i, pMyGame->INPUT_STATES[i]);
+      sprintf(data, "{\"TYPE\": \"INPUT\", \"INPUT\": %d, \"STATE\": %d}", i, pMyGame->INPUT_STATES[i]);
       client.publish(propName, data);
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
@@ -49,7 +49,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->OUTPUT_STATES[i] != OUTPUT_STATE_OLD[i]) 
     {
-      sprintf(data, "{\"TYPE\": \"OUTPUT\", \"OUTPUT\": %d, \"STATE\": %d", i, pMyGame->OUTPUT_STATES[i]);
+      sprintf(data, "{\"TYPE\": \"OUTPUT\", \"OUTPUT\": %d, \"STATE\": %d}", i, pMyGame->OUTPUT_STATES[i]);
       client.publish(propName, data);
       OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
     }
@@ -59,7 +59,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->RELAY_STATES[i] != RELAY_STATE_OLD[i]) 
     {
-      sprintf(data, "{\"TYPE\": \"RELAY\", \"RELAY\": %d, \"STATE\": %d", i, pMyGame->RELAY_STATES[i]);
+      sprintf(data, "{\"TYPE\": \"RELAY\", \"RELAY\": %d, \"STATE\": %d}", i, pMyGame->RELAY_STATES[i]);
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
@@ -67,7 +67,7 @@ void mqtt::sendChanges(void)
 }
 
 void mqtt::callback(char* topic, byte* payload, unsigned int length) {
-  StaticJsonBuffer<200> jsonBuffer;
+  StaticJsonBuffer<512> jsonBuffer;
   
 //  Serial.print(F("Message arrived ["));
 //  Serial.print(topic);
