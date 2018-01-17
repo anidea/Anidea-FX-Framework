@@ -21,16 +21,20 @@ void mqtt::loop(void)
 
 void mqtt::sendChanges(void)
 {
-  char data[64];
+  #define MQTT_BUF_SZ  80
+  char data[MQTT_BUF_SZ];
+
+  const char *c = "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": %c}";
+  
   if (pMyGame->_puzzleSolved == 1 && sent == 0) // Send puzzle solved
   {
-    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 1}");
+    snprintf(data, MQTT_BUF_SZ, c, '1');
     client.publish(propName, data);
     sent = 1;
   }
   else if (pMyGame->_puzzleSolved == 0 && sent == 1) // Send puzzle not solved
   {
-    sprintf(data, "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": 0}");
+    snprintf(data, MQTT_BUF_SZ, c, '0');
     client.publish(propName, data);
     sent = 0;
   }
@@ -39,7 +43,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->INPUT_STATES[i] != INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i] == 1) // Loop through inputs and send state if changed
     {
-      sprintf(data, "{\"TYPE\": \"INPUT\", \"INPUT\": %d, \"STATE\": %d}", i, pMyGame->INPUT_STATES[i]);
+      snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"INPUT\", \"INPUT\": %d, \"STATE\": %d}", i, pMyGame->INPUT_STATES[i]);
       client.publish(propName, data);
       INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
     }
@@ -49,7 +53,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->OUTPUT_STATES[i] != OUTPUT_STATE_OLD[i]) 
     {
-      sprintf(data, "{\"TYPE\": \"OUTPUT\", \"OUTPUT\": %d, \"STATE\": %d}", i, pMyGame->OUTPUT_STATES[i]);
+      snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"OUTPUT\", \"OUTPUT\": %d, \"STATE\": %d}", i, pMyGame->OUTPUT_STATES[i]);
       client.publish(propName, data);
       OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
     }
@@ -59,7 +63,7 @@ void mqtt::sendChanges(void)
   {
     if (pMyGame->RELAY_STATES[i] != RELAY_STATE_OLD[i]) 
     {
-      sprintf(data, "{\"TYPE\": \"RELAY\", \"RELAY\": %d, \"STATE\": %d}", i, pMyGame->RELAY_STATES[i]);
+      snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"RELAY\", \"RELAY\": %d, \"STATE\": %d}", i, pMyGame->RELAY_STATES[i]);
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
@@ -154,7 +158,7 @@ void mqtt::reconnect() {
     if (client.connect(propName)) {
       Serial.println(F("connected"));
       // Once connected, publish an announcement...
-      client.publish(propName,"hello world");
+//      client.publish(propName,"hello world");
       // ... and resubscribe
       client.subscribe(propName);
     } else {

@@ -2,8 +2,12 @@
 #define game__h
 
 #include "arduino.h"
-#include "fx300.h"
 #include "network.h"
+
+// Boards
+#ifdef ARDUINO_AEIFX_300
+#include "fx300.h"
+#endif
 
 class Network;
 

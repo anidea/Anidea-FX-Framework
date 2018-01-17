@@ -22,6 +22,10 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 {
   if (connectNetwork)
   {
+    #ifdef fx300_h
+    digitalWrite(OUTPUT5, HIGH);
+    #endif
+    
     MyMac = _MyMac;
   
     if (_MyIP[0] == 0) // MyIP is not set by program
@@ -88,6 +92,10 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
         Serial.println();
       }
     }
+
+    #ifdef fx300_h
+    digitalWrite(OUTPUT5, LOW);
+    #endif
   
     Ethernet.begin(MyMac, MyIP);
     

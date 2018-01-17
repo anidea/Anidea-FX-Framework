@@ -23,7 +23,7 @@ rfid::rfid() : Game()
   RELAY_OVERRIDE_ENABLE[0] = 0;
   RELAY_OVERRIDE_ENABLE[1] = 1;
 
-  Serial.print(F("!!!AEI FX1000 - "));
+  Serial.print(F("!!!Anidea FX - "));
   Serial.print(iTotalScanLength);
   Serial.println(F(" port RFID Scanner!!!"));
 
@@ -253,6 +253,7 @@ byte rfid::RfidSetGetTagIds(byte iGet)
 {
   byte iRet = 0;
   byte iLoadReadCount;
+  char cBufOut[32], cBufIn[32];
   
   for (byte i = 0; i < iTotalScanLength; i++)
   {

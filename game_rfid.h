@@ -67,7 +67,6 @@ class rfid : public Game
     uint32_t uReceiveLen;
     int iLoop = 0;
     bool iCommFailure = 0;
-    char cBufOut[32], cBufIn[32];
     bool iAllTagsMatched = 0;
     byte iTagMatchCount = 0;
     
