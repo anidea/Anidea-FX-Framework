@@ -17,7 +17,12 @@ class rfid : public Game
 
     void solved();
 
+    byte learn();
+
     virtual void reset(); // Call to reset game
+
+    byte getLen();
+    void getTagStates(byte tagStates[], bool&);
 
   private:
     // Presets
@@ -72,6 +77,7 @@ class rfid : public Game
     
     byte tagFails[iTotalScanLength];
     bool tagFound[iTotalScanLength];
+    byte tagStatesOld[iTotalScanLength];
 
     void RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength);
     byte RfidSetGetTagIds(byte iGet);

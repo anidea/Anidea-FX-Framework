@@ -43,6 +43,10 @@ class Game
 
     bool   isEnabled(void)  {return _enabled; }
 
+    virtual byte getLen() {};
+    virtual void getTagStates(byte tagStates[], bool&) {};
+    virtual byte learn() {};
+
     Network *_pMyNetwork = NULL;
 
     // Global Game Variables

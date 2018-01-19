@@ -21,7 +21,7 @@ void mqtt::loop(void)
 
 void mqtt::sendChanges(void)
 {
-  #define MQTT_BUF_SZ  80
+  #define MQTT_BUF_SZ 64
   char data[MQTT_BUF_SZ];
 
   const char *c = "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": %c}";
@@ -67,6 +67,30 @@ void mqtt::sendChanges(void)
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
+  }
+
+  byte len = pMyGame->getLen();
+  byte tagStates[len];
+  bool changedFlag = false;
+  pMyGame->getTagStates(tagStates, changedFlag);
+  if (changedFlag)
+  {
+    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"TAG\"");
+    for (int j = 0; j < len; j++)
+    {
+      snprintf(data + strlen(data), MQTT_BUF_SZ, ", %d: %d", j, tagStates[j]);
+    }
+    snprintf(data + strlen(data), MQTT_BUF_SZ, "}");
+    Serial.println(data);
+    client.publish(propName, data);
+    changedFlag = false;
+  }
+
+  if (learnResponse != learnResponseOld)
+  {
+    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"LEARN\", \"DIRECTION\": \"FROM\", \"STATUS\": %c}", learnResponse);
+    client.publish(propName, data);
+    learnResponseOld = learnResponse;
   }
 }
 
@@ -146,6 +170,15 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
         pMyGame->reset();
         pMyGame->disable();
       }
+    }
+  }
+  else if (strcmp(type, "LEARN") == 0) // Learn new sequence
+  {
+//    Serial.println("LEARN");
+    const char* dir = root["DIRECTION"];
+    if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
+    {
+      learnResponse = pMyGame->learn();
     }
   }
 }
