@@ -1,3 +1,4 @@
+
 /*
 
   FX300 general header file
@@ -14,10 +15,33 @@
    -------------------
 */
 
+// Select board type
+
+#define FEATHERM0
+//#define FX300
+//#define FX350
+//#define FX450
+
+
 #ifndef fx300_h
 #define fx300_h
 
-//FX300 Header
+// Includes for entire project
+#if defined(FX450) || defined(FEATHERM0)
+
+#include <FlashAsEEPROM.h>
+#include <FlashStorage.h>
+
+#endif
+
+#if defined(FX300) || defined(FX350)
+#include <EEPROM.h>
+#endif
+
+
+#if defined(FX300) || defined(FX350) || defined(FX450)
+
+//FX300/350 Header
 const int RELAY0 = 2;
 const int RELAY1 = 3;
 
@@ -50,5 +74,56 @@ const int INPUTS[NUM_INPUTS] = {INPUT0, INPUT1, INPUT2, INPUT3, INPUT4, INPUT5};
 const int OUTPUTS[NUM_OUTPUTS] = {OUTPUT0, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, OUTPUT5};
 
 const int RELAYS[NUM_RELAYS] = {RELAY0, RELAY1};
+
+const int WIZ_CS 10
+
+#endif
+
+
+
+#if defined(FEATHERM0)
+
+const int RELAY0 = 2;
+const int RELAY1 = 3;
+
+const int OUTPUT0 = 4;
+const int OUTPUT1 = 5;
+const int OUTPUT2 = 6;
+const int OUTPUT3 = 7;
+const int OUTPUT4 = 8;
+const int OUTPUT5 = 9;
+
+const int INPUT0 = 14;
+const int INPUT1 = 15;
+const int INPUT2 = 16;
+const int INPUT3 = 17;
+const int INPUT4 = 18;
+const int INPUT5 = 19;
+
+const int LED = 13;
+
+const int HALL = 6;
+
+const int NUM_INPUTS = 6;
+
+const int NUM_OUTPUTS = 6;
+
+const int NUM_RELAYS = 2;
+
+const int INPUTS[NUM_INPUTS] = {INPUT0, INPUT1, INPUT2, INPUT3, INPUT4, INPUT5};
+
+const int OUTPUTS[NUM_OUTPUTS] = {OUTPUT0, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, OUTPUT5};
+
+const int RELAYS[NUM_RELAYS] = {RELAY0, RELAY1};
+
+const int WIZ_CS = 10;
+
+#if defined(ARDUINO_SAMD_ZERO) && defined(SERIAL_PORT_USBVIRTUAL)
+  // Required for Serial on Zero based boards
+  #define Serial SERIAL_PORT_USBVIRTUAL
+#endif
+
+#endif
+
 
 #endif
