@@ -152,6 +152,7 @@ void rfid::reset(void)
   for (byte i = 0; i < iTotalScanLength; i++)
   {
     tagFails[i] = 3;
+    tagStatesOld[i] = 2;
   }
 
   // Reset outputs - maglocks are energized all the time
@@ -442,5 +443,34 @@ void rfid::EEPROMWriteString(byte pos, char* data)
   for (byte i = 0; i < strlen(data); i++)
   {
     EEPROM.write(pos + i, data[i]);
+  }
+}
+
+byte rfid::getLen()
+{
+  return iTotalScanLength;
+}
+
+void rfid::getTagStates(byte tagStates[], bool& changedFlag)
+{
+  for (int i = 0; i < iTotalScanLength; i++)
+  {
+    if (tagFound[i] == false)
+    {
+      tagStates[i] = 0;
+    }
+    else if (tagFails < 3)
+    {
+      tagStates[i] = 1;
+    }
+    else
+    {
+      tagStates[i] = -1;
+    }
+    if (tagStates[i] != tagStatesOld[i])
+    {
+      tagStatesOld[i] = tagStates[i];
+      changedFlag = true;
+    }
   }
 }

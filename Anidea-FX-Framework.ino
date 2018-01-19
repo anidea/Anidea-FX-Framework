@@ -57,7 +57,7 @@ void setup() {
 //  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
-  myGame = new rfid();
+//  myGame = new rfid();
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB6};   // This must be unique for each device
   IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
@@ -65,7 +65,7 @@ void setup() {
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new network_empty(); //Empty network for use with FX300
-  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
+//  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
 //  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);

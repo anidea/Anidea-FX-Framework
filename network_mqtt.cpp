@@ -21,7 +21,7 @@ void mqtt::loop(void)
 
 void mqtt::sendChanges(void)
 {
-  #define MQTT_BUF_SZ  80
+  #define MQTT_BUF_SZ 64
   char data[MQTT_BUF_SZ];
 
   const char *c = "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": %c}";
@@ -67,6 +67,23 @@ void mqtt::sendChanges(void)
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
+  }
+
+  byte len = pMyGame->getLen();
+  byte tagStates[len];
+  bool changedFlag = false;
+  pMyGame->getTagStates(tagStates, changedFlag);
+  if (changedFlag)
+  {
+    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"TAG\"");
+    for (int j = 0; j < len; j++)
+    {
+      snprintf(data + strlen(data), MQTT_BUF_SZ, ", %d: %d", j, tagStates[j]);
+    }
+    snprintf(data + strlen(data), MQTT_BUF_SZ, "}");
+    Serial.println(data);
+    client.publish(propName, data);
+    changedFlag = false;
   }
 }
 
