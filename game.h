@@ -45,6 +45,7 @@ class Game
 
     virtual byte getLen() {};
     virtual void getTagStates(byte tagStates[], bool&) {};
+    virtual byte learn() {};
 
     Network *_pMyNetwork = NULL;
 

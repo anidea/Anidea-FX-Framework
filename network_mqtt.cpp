@@ -85,6 +85,13 @@ void mqtt::sendChanges(void)
     client.publish(propName, data);
     changedFlag = false;
   }
+
+  if (learnResponse != learnResponseOld)
+  {
+    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"LEARN\", \"DIRECTION\": \"FROM\", \"STATUS\": %c}", learnResponse);
+    client.publish(propName, data);
+    learnResponseOld = learnResponse;
+  }
 }
 
 void mqtt::callback(char* topic, byte* payload, unsigned int length) {
@@ -163,6 +170,15 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
         pMyGame->reset();
         pMyGame->disable();
       }
+    }
+  }
+  else if (strcmp(type, "LEARN") == 0) // Learn new sequence
+  {
+//    Serial.println("LEARN");
+    const char* dir = root["DIRECTION"];
+    if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
+    {
+      learnResponse = pMyGame->learn();
     }
   }
 }

@@ -361,42 +361,7 @@ void rfid::buttons()
     if (learnPress == false)
     {
       learnPress = true;
-      if (iCommFailure == 0)
-      {
-        bool iAllTagsFound = true;
-        for (byte i = 0; i < iTotalScanLength; i++)
-        {
-          if (tagFound[i] == false)
-          {
-            iAllTagsFound = false;
-            break;
-          }
-        }
-    
-        if (iAllTagsFound || learnWithMissingTag)
-        {
-          // Turn on purple light
-          digitalWrite(LEARN_LIGHT, HIGH);
-          Serial.println(F("Learning"));
-          // Save tags
-          RfidSetGetTagIds(0);
-          delay(500);
-          digitalWrite(LEARN_LIGHT, LOW);
-        }
-        else
-        {
-          // turn on error light
-          digitalWrite(ERROR_LIGHT, HIGH);
-          Serial.println(F("A tag was not found, not learning"));
-          delay(500);
-          digitalWrite(ERROR_LIGHT, LOW);
-        }
-      }
-      else
-      {
-        Serial.println(F("Cannot learn due to communication error"));
-        delay(500);
-      }
+      learn();
     }
   }
   else
@@ -425,6 +390,49 @@ void rfid::buttons()
     Serial.println(F("Emergency exit pressed"));
     // turn off maglocks
     digitalWrite(MAG_LOCK, LOW);
+  }
+}
+
+byte rfid::learn()
+{
+  if (iCommFailure == 0)
+  {
+    bool iAllTagsFound = true;
+    for (byte i = 0; i < iTotalScanLength; i++)
+    {
+      if (tagFound[i] == false)
+      {
+        iAllTagsFound = false;
+        break;
+      }
+    }
+
+    if (iAllTagsFound || learnWithMissingTag)
+    {
+      // Turn on purple light
+      digitalWrite(LEARN_LIGHT, HIGH);
+      Serial.println(F("Learning"));
+      // Save tags
+      RfidSetGetTagIds(0);
+      delay(500);
+      digitalWrite(LEARN_LIGHT, LOW);
+      return 0;
+    }
+    else
+    {
+      // turn on error light
+      digitalWrite(ERROR_LIGHT, HIGH);
+      Serial.println(F("A tag was not found, not learning"));
+      delay(500);
+      digitalWrite(ERROR_LIGHT, LOW);
+      return 1;
+    }
+  }
+  else
+  {
+    Serial.println(F("Cannot learn due to communication error"));
+    delay(500);
+    return 2;
   }
 }
 

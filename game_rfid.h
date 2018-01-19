@@ -17,6 +17,8 @@ class rfid : public Game
 
     void solved();
 
+    byte learn();
+
     virtual void reset(); // Call to reset game
 
     byte getLen();
