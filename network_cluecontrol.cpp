@@ -81,7 +81,7 @@ void cluecontrol::listenForRequest()
 //    Serial.println(F("enable command received"));
     pMyGame->enable();
   }
-  else if (CCMod.CCValue == DISABLE)
+  else if (CCMod.CCValue == CC_DISABLE)
   {
 //    Serial.println(F("disable command received"));
     pMyGame->disable();

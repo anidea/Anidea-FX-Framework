@@ -19,7 +19,6 @@
 
 #include "arduino.h"
 
-#include <EEPROM.h>
 #include "network.h"
 #include "game.h"
 

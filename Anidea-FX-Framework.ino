@@ -14,39 +14,38 @@
    -------------------
 */
 
-
-// Uncomment only one of these lines for the board you want 
-
-// TODO:  OR do we want to have one include and configure it in there?  OR get the board selection in arduino to work right!
-
 #include "arduino.h"
-#include "fx300.h"
-//#include fx###.h
+#include "game.h"
+#include "network.h"
 
-
+#if defined(FX300) || defined(FX350)
+#include <MsTimer2.h>
+#endif
 
 #if defined(FX450) || defined(FEATHERM0)
-
 // Also add library (zip) https://github.com/adafruit/Adafruit_ZeroTimer.git
 // Also add library (zip) https://github.com/avandalen/avdweb_SAMDtimer.git
 // Also add library (zip) https://github.com/adafruit/Adafruit_ASFcore.git, maybe not needed anymore
 
-
-#include <Adafruit_ZeroTimer.h>
 #include <avdweb_SAMDtimer.h>
 void tenHzTimer(struct tc_module *const module_inst);
 SAMDtimer *timer3_10Hz;
-
-
 #endif
 
-#include "game.h"
-#include "network.h"
-
 // Networks
+#include "network_empty.h"
+#include "network_escaperoommaster.h"
+#include "network_cluecontrol.h"
+#include "network_houdinimc.h"
 #include "network_mqtt.h"
 
 // Include game headers here
+#include "game_empty.h"
+#include "game_room.h"
+#include "game_simplegame.h"
+#include "game_sequencedetect.h"
+#include "game_sixwire.h"
+#include "game_inputsequence.h"
 #include "game_rfid.h"
 
 // Generic game and network objects
@@ -76,8 +75,6 @@ void setup() {
 //  myGame = new rfid();
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB6};   // This must be unique for each device
-//  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
-//  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
   IPAddress MyIP(10, 0, 1, 205);                         // This must be unique for each device on the network. Leave blank to configure at run time.
   IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
 
@@ -85,23 +82,20 @@ void setup() {
 //  myNetwork = new network_empty(); //Empty network for use with FX300
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
-  myNetwork = new mqtt(MyMac, MyIP, HostIP);
+//  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
   myNetwork->setGame(myGame);
 
   // Setup timer for simon says, etc.
-#if defined(FX300) || defined(FX350)
-  MsTimer2::set(100, tenHzTimer);
-  MsTimer2::start();
-
-#endif
-
-#if defined(FX450) || defined(FEATHERM0)
-
-  timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
- 
-#endif
+  #if defined(FX300) || defined(FX350)
+    MsTimer2::set(100, tenHzTimer);
+    MsTimer2::start();
+  #endif
+  
+  #if defined(FX450) || defined(FEATHERM0)
+    timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
+  #endif
 
 }
 

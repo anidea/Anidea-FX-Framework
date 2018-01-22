@@ -1,6 +1,9 @@
 #include "network.h"
 #include "network_mqtt.h"
 
+byte mqtt::learnResponse = -1;
+byte mqtt::learnResponseOld = -1;
+
 mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
   client.setClient(ethClient);
