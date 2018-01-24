@@ -467,7 +467,7 @@ void rfid::getTagStates(byte tagStates[], bool& changedFlag)
     {
       tagStates[i] = 0;
     }
-    else if (tagFails < 3)
+    else if (tagFails[i] < 3)
     {
       tagStates[i] = 1;
     }

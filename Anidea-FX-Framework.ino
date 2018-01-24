@@ -23,30 +23,37 @@
 #include "fx300.h"
 //#include fx###.h
 
+#include "game.h"
+#include "network.h"
 
+#if defined(FX300) || defined(FX350)
+#include <MsTimer2.h>
+#endif
 
 #if defined(FX450) || defined(FEATHERM0)
-
 // Also add library (zip) https://github.com/adafruit/Adafruit_ZeroTimer.git
 // Also add library (zip) https://github.com/avandalen/avdweb_SAMDtimer.git
 // Also add library (zip) https://github.com/adafruit/Adafruit_ASFcore.git, maybe not needed anymore
 
-
-#include <Adafruit_ZeroTimer.h>
 #include <avdweb_SAMDtimer.h>
 void tenHzTimer(struct tc_module *const module_inst);
 SAMDtimer *timer3_10Hz;
-
-
 #endif
 
-#include "game.h"
-#include "network.h"
-
 // Networks
+#include "network_empty.h"
+#include "network_escaperoommaster.h"
+#include "network_cluecontrol.h"
+#include "network_houdinimc.h"
 #include "network_mqtt.h"
 
 // Include game headers here
+#include "game_empty.h"
+#include "game_room.h"
+#include "game_simplegame.h"
+#include "game_sequencedetect.h"
+#include "game_sixwire.h"
+#include "game_inputsequence.h"
 #include "game_rfid.h"
 
 // Generic game and network objects
@@ -94,17 +101,14 @@ void setup() {
   myNetwork->setGame(myGame);
 
   // Setup timer for simon says, etc.
-#if defined(FX300) || defined(FX350)
-  MsTimer2::set(100, tenHzTimer);
-  MsTimer2::start();
-
-#endif
-
-#if defined(FX450) || defined(FEATHERM0)
-
-  timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
- 
-#endif
+  #if defined(FX300) || defined(FX350)
+    MsTimer2::set(100, tenHzTimer);
+    MsTimer2::start();
+  #endif
+  
+  #if defined(FX450) || defined(FEATHERM0)
+    timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
+  #endif
 
 }
 

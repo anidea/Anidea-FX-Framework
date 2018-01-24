@@ -18,7 +18,6 @@
 #define network_h
 
 #include <Ethernet2.h>
-#include <EEPROM.h>
 
 #include "game.h"
 #include "arduino.h"

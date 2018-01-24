@@ -1,7 +1,6 @@
 #ifndef game_inputsequence__h
 #define game_inputsequence__h
 
-#include <EEPROM.h>
 #include "arduino.h"
 #include "network.h"
 #include "game.h"

@@ -4,7 +4,6 @@
 #include "arduino.h"
 #include "network.h"
 #include "game.h"
-#include <EEPROM.h>
 
 class Network;
 
@@ -59,7 +58,6 @@ class rfid : public Game
     static const byte ERROR_LIGHT = OUTPUT2;
     static const byte LEARN_LIGHT = OUTPUT3;
     static const byte SOUND_CUE = OUTPUT4;
-    static const byte RS485_ENABLE = OUTPUT5;
     
     static const byte MAG_LOCK = RELAY0;
     

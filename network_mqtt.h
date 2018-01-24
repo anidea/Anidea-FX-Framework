@@ -58,7 +58,7 @@ class mqtt : public Network
     bool RELAY_STATE_OLD[NUM_INPUTS] = {false};
 
     static byte learnResponse;
-    byte learnResponseOld;
+    static byte learnResponseOld;
 };
 
 #endif
