@@ -58,9 +58,12 @@ Network *myNetwork;
 void setup() {
   Serial.begin(115200); // Setup serial
 
-  while (!Serial) {
+  #if 0 // make 1 if you want the code to wait for the serial monitor to come up
+  while (!Serial)
+  {
   ; // wait for serial port to connect. Needed for native USB port only
   }
+  #endif
 
   Serial.println("Welcome to the FX-Framework");
 
@@ -69,23 +72,23 @@ void setup() {
   // Uncomment only one of these lines for the game you want
 //  myGame = new game_empty(); // Empty game to manually control inputs and outputs only
 //  myGame = new room(); // Used to control a whole room
-//  myGame = new simplegame(); //Simple game provided as an example
+  myGame = new simplegame(); //Simple game provided as an example
 //  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
 //  myGame = new rfid();
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB6};   // This must be unique for each device
-//  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
-//  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
-  IPAddress MyIP(10, 0, 1, 205);                         // This must be unique for each device on the network. Leave blank to configure at run time.
-  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
+  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
+//  IPAddress MyIP(10, 0, 1, 205);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+//  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new network_empty(); //Empty network for use with FX300
-//  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
+  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
-  myNetwork = new mqtt(MyMac, MyIP, HostIP);
+//  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
   myNetwork->setGame(myGame);

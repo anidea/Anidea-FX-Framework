@@ -59,7 +59,7 @@ const int INPUT3 = 17;
 const int INPUT4 = 18;
 const int INPUT5 = 19;
 
-const int LED = -1;
+const int LED = -1; // 10
 
 const int HALL = 6;
 
