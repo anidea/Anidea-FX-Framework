@@ -14,10 +14,23 @@
    -------------------
 */
 
-#include <MsTimer2.h>
-
+#include "arduino.h"
 #include "game.h"
 #include "network.h"
+
+#if defined(FX300) || defined(FX350)
+#include <MsTimer2.h>
+#endif
+
+#if defined(FX450) || defined(FEATHERM0)
+// Also add library (zip) https://github.com/adafruit/Adafruit_ZeroTimer.git
+// Also add library (zip) https://github.com/avandalen/avdweb_SAMDtimer.git
+// Also add library (zip) https://github.com/adafruit/Adafruit_ASFcore.git, maybe not needed anymore
+
+#include <avdweb_SAMDtimer.h>
+void tenHzTimer(struct tc_module *const module_inst);
+SAMDtimer *timer3_10Hz;
+#endif
 
 // Networks
 #include "network_empty.h"
@@ -43,10 +56,12 @@ Network *myNetwork;
 
 void setup() {
   Serial.begin(115200); // Setup serial
-  
-  // Setup timer for simon says, etc.
-  MsTimer2::set(100, tenHzTimer);
-  MsTimer2::start();
+
+  while (!Serial) {
+  ; // wait for serial port to connect. Needed for native USB port only
+  }
+
+  Serial.println("Welcome to the FX-Framework");
 
   // Start game last after hardware is setup
 
@@ -57,20 +72,31 @@ void setup() {
 //  myGame = new sequencedetect(); //Sequencedetect
 //  myGame = new sixwire(); //Sixwire
 //  myGame = new inputsequence(); //Detects a sequence of inputs
-  myGame = new rfid();
+//  myGame = new rfid();
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB6};   // This must be unique for each device
-  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
-  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
+  IPAddress MyIP(10, 0, 1, 205);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
 //  myNetwork = new network_empty(); //Empty network for use with FX300
-  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
+//  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
 //  myNetwork = new mqtt(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
   myNetwork->setGame(myGame);
+
+  // Setup timer for simon says, etc.
+  #if defined(FX300) || defined(FX350)
+    MsTimer2::set(100, tenHzTimer);
+    MsTimer2::start();
+  #endif
+  
+  #if defined(FX450) || defined(FEATHERM0)
+    timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
+  #endif
+
 }
 
 void loop()
@@ -80,7 +106,19 @@ void loop()
   myNetwork->loop();
 }
 
+#if defined(FX300) || defined(FX350)
 void tenHzTimer()
 {
   myGame->tick();
 }
+#endif
+
+#if defined(FX450) || defined(FEATHERM0)
+void tenHzTimer(struct tc_module *const module_inst) 
+{
+  myGame->tick();
+
+  //Serial.println("Tick");
+}
+#endif
+

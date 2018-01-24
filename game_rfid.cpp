@@ -152,6 +152,7 @@ void rfid::reset(void)
   for (byte i = 0; i < iTotalScanLength; i++)
   {
     tagFails[i] = 3;
+    tagStatesOld[i] = 2;
   }
 
   // Reset outputs - maglocks are energized all the time
@@ -360,42 +361,7 @@ void rfid::buttons()
     if (learnPress == false)
     {
       learnPress = true;
-      if (iCommFailure == 0)
-      {
-        bool iAllTagsFound = true;
-        for (byte i = 0; i < iTotalScanLength; i++)
-        {
-          if (tagFound[i] == false)
-          {
-            iAllTagsFound = false;
-            break;
-          }
-        }
-    
-        if (iAllTagsFound || learnWithMissingTag)
-        {
-          // Turn on purple light
-          digitalWrite(LEARN_LIGHT, HIGH);
-          Serial.println(F("Learning"));
-          // Save tags
-          RfidSetGetTagIds(0);
-          delay(500);
-          digitalWrite(LEARN_LIGHT, LOW);
-        }
-        else
-        {
-          // turn on error light
-          digitalWrite(ERROR_LIGHT, HIGH);
-          Serial.println(F("A tag was not found, not learning"));
-          delay(500);
-          digitalWrite(ERROR_LIGHT, LOW);
-        }
-      }
-      else
-      {
-        Serial.println(F("Cannot learn due to communication error"));
-        delay(500);
-      }
+      learn();
     }
   }
   else
@@ -427,6 +393,49 @@ void rfid::buttons()
   }
 }
 
+byte rfid::learn()
+{
+  if (iCommFailure == 0)
+  {
+    bool iAllTagsFound = true;
+    for (byte i = 0; i < iTotalScanLength; i++)
+    {
+      if (tagFound[i] == false)
+      {
+        iAllTagsFound = false;
+        break;
+      }
+    }
+
+    if (iAllTagsFound || learnWithMissingTag)
+    {
+      // Turn on purple light
+      digitalWrite(LEARN_LIGHT, HIGH);
+      Serial.println(F("Learning"));
+      // Save tags
+      RfidSetGetTagIds(0);
+      delay(500);
+      digitalWrite(LEARN_LIGHT, LOW);
+      return 0;
+    }
+    else
+    {
+      // turn on error light
+      digitalWrite(ERROR_LIGHT, HIGH);
+      Serial.println(F("A tag was not found, not learning"));
+      delay(500);
+      digitalWrite(ERROR_LIGHT, LOW);
+      return 1;
+    }
+  }
+  else
+  {
+    Serial.println(F("Cannot learn due to communication error"));
+    delay(500);
+    return 2;
+  }
+}
+
 void rfid::EEPROMReadString(byte pos, byte len, char* data)
 {
   byte i;
@@ -442,5 +451,34 @@ void rfid::EEPROMWriteString(byte pos, char* data)
   for (byte i = 0; i < strlen(data); i++)
   {
     EEPROM.write(pos + i, data[i]);
+  }
+}
+
+byte rfid::getLen()
+{
+  return iTotalScanLength;
+}
+
+void rfid::getTagStates(byte tagStates[], bool& changedFlag)
+{
+  for (int i = 0; i < iTotalScanLength; i++)
+  {
+    if (tagFound[i] == false)
+    {
+      tagStates[i] = 0;
+    }
+    else if (tagFails[i] < 3)
+    {
+      tagStates[i] = 1;
+    }
+    else
+    {
+      tagStates[i] = -1;
+    }
+    if (tagStates[i] != tagStatesOld[i])
+    {
+      tagStatesOld[i] = tagStates[i];
+      changedFlag = true;
+    }
   }
 }

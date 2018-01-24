@@ -5,8 +5,12 @@
 #include "network.h"
 
 // Boards
-#ifdef ARDUINO_AEIFX_300
+#if defined(ARDUINO_AEIFX_300) || defined(ARDUINO_AVR_UNO)
 #include "fx300.h"
+#endif
+
+#if defined(ARDUINO_AEIFX_450) || defined(ARDUINO_SAMD_ZERO)
+#include "fx450.h"
 #endif
 
 class Network;
@@ -42,6 +46,10 @@ class Game
     bool   isSolved(void)  {return _puzzleSolved; }
 
     bool   isEnabled(void)  {return _enabled; }
+
+    virtual byte getLen() {};
+    virtual void getTagStates(byte tagStates[], bool&) {};
+    virtual byte learn() {};
 
     Network *_pMyNetwork = NULL;
 
