@@ -23,7 +23,6 @@ class rfid : public Game
     byte getLen();
     void getTagStates(byte tagStates[], bool&);
 
-  private:
     // Presets
     #define RFID_GAME_DEFAULT 1
     #define RFID_GAME_SMALL4 2
@@ -48,10 +47,17 @@ class rfid : public Game
       static const byte iTagOffset = 2;
       static const bool require_enable = false;
     #endif
-    
+
+    byte tagValues[iTotalScanLength];
+    bool changedFlag = true;
+    bool buttonState = 0;
+    bool buttonStateOld = 0;
+
+  private:
     static const byte LEARN_BUTTON = INPUT0;
     static const byte RESET_BUTTON = INPUT1;
     static const byte EMERGENCY_BUTTON = INPUT2;
+    static const byte REPLAY_BUTTON = INPUT3;
     
     static const byte ACTIVITY_LIGHT_1 = OUTPUT0;
     static const byte ACTIVITY_LIGHT_2 = OUTPUT1;
@@ -75,6 +81,7 @@ class rfid : public Game
     
     byte tagFails[iTotalScanLength];
     bool tagFound[iTotalScanLength];
+    
     byte tagStatesOld[iTotalScanLength];
 
     void RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength);

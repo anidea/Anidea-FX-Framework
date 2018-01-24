@@ -32,6 +32,8 @@ class Network
   
     Network(byte [], IPAddress, IPAddress, bool);
 
+    virtual void tick() {};  // Called periodically to run hard timing
+
     virtual void loop(void);
 
     virtual void setGame(Game *pg) { pMyGame = pg; };

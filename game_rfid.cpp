@@ -391,6 +391,15 @@ void rfid::buttons()
     // turn off maglocks
     digitalWrite(MAG_LOCK, LOW);
   }
+
+  if (digitalRead(REPLAY_BUTTON) == HIGH)
+  {
+    buttonState = 1;
+  }
+  else
+  {
+    buttonState = 0;
+  }
 }
 
 byte rfid::learn()
@@ -459,7 +468,7 @@ byte rfid::getLen()
   return iTotalScanLength;
 }
 
-void rfid::getTagStates(byte tagStates[], bool& changedFlag)
+void rfid::getTagStates(byte tagStates[], bool& stateFlag)
 {
   for (int i = 0; i < iTotalScanLength; i++)
   {
@@ -478,7 +487,7 @@ void rfid::getTagStates(byte tagStates[], bool& changedFlag)
     if (tagStates[i] != tagStatesOld[i])
     {
       tagStatesOld[i] = tagStates[i];
-      changedFlag = true;
+      stateFlag = true;
     }
   }
 }

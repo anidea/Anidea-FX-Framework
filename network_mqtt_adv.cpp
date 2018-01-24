@@ -1,18 +1,20 @@
 #include "network.h"
-#include "network_mqtt.h"
+#include "network_mqtt_adv.h"
 
-byte mqtt::learnResponse = -1;
-byte mqtt::learnResponseOld = -1;
+char mqtt_adv::propName[] = "bottleCap1";
+char mqtt_adv::channelName[] = "OTC";
 
-mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
+byte mqtt_adv::learnResponse = -1;
+byte mqtt_adv::learnResponseOld = -1;
+
+mqtt_adv::mqtt_adv(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
   client.setClient(ethClient);
   client.setServer(HostIP, serverPort);
-  client.setCallback(mqtt::callback);
-  sprintf(propName, "Prop%d", MyIP[3]);
+  client.setCallback(mqtt_adv::callback);
 }
 
-void mqtt::loop(void)
+void mqtt_adv::loop(void)
 {
   Network::loop();
   if (!client.connected()) {
@@ -22,10 +24,18 @@ void mqtt::loop(void)
   client.loop();
 }
 
-void mqtt::sendChanges(void)
+void mqtt_adv::tick(void)
 {
+  tagTimer++;
+  heartbeatTimer++;
+}
+
+void mqtt_adv::sendChanges(void)
+{
+  rfid *rfidGame = static_cast<rfid*>(pMyGame);
   #define MQTT_BUF_SZ 64
   char data[MQTT_BUF_SZ];
+  char channel[MQTT_BUF_SZ];
 
   const char *c = "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": %c}";
   
@@ -96,24 +106,46 @@ void mqtt::sendChanges(void)
     learnResponseOld = learnResponse;
   }
 
-  #include "game_rfid.h"
-  rfid *rfidGame = static_cast<rfid*>(pMyGame);
-
-  if (rfidGame->changedFlag == true)
+  if (tagTimer >= 10)
   {
-    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"TAG_VALUES\"");
     for (int i = 0; i < len; i++)
     {
-      snprintf(data + strlen(data), MQTT_BUF_SZ, ", %d: %d", i, rfidGame->tagValues[i]);
+      snprintf(channel, MQTT_BUF_SZ, "/%s/%s/RFID/%d", channelName, propName, i);
+      snprintf(data, MQTT_BUF_SZ, "%d", rfidGame->tagValues[i]);
+      Serial.print("Channel: ");
+      Serial.print(channel);
+      Serial.print(" - Data: ");
+      Serial.println(data);
+      client.publish(channel, data);
     }
-    snprintf(data + strlen(data), MQTT_BUF_SZ, "}");
+  }
+
+  // Broadcast heartbeat every 10 seconds to indicate that it is running
+  if (heartbeatTimer >= 100)
+  {
+    snprintf(channel, MQTT_BUF_SZ, "/%s/heartbeat", channelName);
+    Serial.print("Channel: ");
+    Serial.print(channel);
+    Serial.print(" - Data: ");
+    Serial.println(propName);
+    client.publish(channel, propName);
+    heartbeatTimer = 0;
+  }
+
+  if (rfidGame->buttonState != rfidGame->buttonStateOld)
+  {
+    snprintf(channel, MQTT_BUF_SZ, "/%s/%s/buttons/state", channelName, propName);
+    snprintf(data, MQTT_BUF_SZ, "%d", rfidGame->buttonState);
+    Serial.print("Channel: ");
+    Serial.print(channel);
+    Serial.print(" - Data: ");
     Serial.println(data);
-    client.publish(propName, data);
-    rfidGame->changedFlag = false;
+    client.publish(channel, data);
+    rfidGame->buttonStateOld = rfidGame->buttonState;
   }
 }
 
-void mqtt::callback(char* topic, byte* payload, unsigned int length) {
+void mqtt_adv::callback(char* topic, byte* payload, unsigned int length) {
   StaticJsonBuffer<512> jsonBuffer;
   
 //  Serial.print(F("Message arrived ["));
@@ -202,7 +234,7 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
   }
 }
 
-void mqtt::reconnect() {
+void mqtt_adv::reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print(F("Attempting MQTT connection..."));

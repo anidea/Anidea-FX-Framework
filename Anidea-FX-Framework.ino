@@ -38,6 +38,7 @@ SAMDtimer *timer3_10Hz;
 #include "network_cluecontrol.h"
 #include "network_houdinimc.h"
 #include "network_mqtt.h"
+#include "network_mqtt_adv.h"
 
 // Include game headers here
 #include "game_empty.h"
@@ -83,6 +84,7 @@ void setup() {
 //  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
 //  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
 //  myNetwork = new mqtt(MyMac, MyIP, HostIP);
+//  myNetwork = new mqtt_adv(MyMac, MyIP, HostIP);
 //  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
   myNetwork->setGame(myGame);
@@ -110,6 +112,7 @@ void loop()
 void tenHzTimer()
 {
   myGame->tick();
+  myNetwork->tick();
 }
 #endif
 
@@ -117,7 +120,7 @@ void tenHzTimer()
 void tenHzTimer(struct tc_module *const module_inst) 
 {
   myGame->tick();
-
+  myNetwork->tick();
   //Serial.println("Tick");
 }
 #endif
