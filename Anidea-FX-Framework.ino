@@ -15,13 +15,8 @@
 */
 
 
-// Uncomment only one of these lines for the board you want 
-
-// TODO:  OR do we want to have one include and configure it in there?  OR get the board selection in arduino to work right!
-
 #include "arduino.h"
 #include "fx300.h"
-//#include fx###.h
 
 #include "game.h"
 #include "network.h"

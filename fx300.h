@@ -1,10 +1,10 @@
-
 /*
 
   FX300 general header file
 
   This application is targeted for the FX300, an Arduino compatible controller from Anidea Engineering.  
   While this program is free, (MIT LECENSE) please consider purchasing and FX300 to support me making more free code.
+  While this program is free, (MIT LECENSE) please consider purchasing an FX300 to support us making more free code.
 
   2017 Gabriel Goldstein
   Anidea Engineering
@@ -15,31 +15,10 @@
    -------------------
 */
 
-// Select board type
-
-#define FEATHERM0
-//#define FX300
-//#define FX350
-//#define FX450
-
-
 #ifndef fx300_h
 #define fx300_h
 
-// Includes for entire project
-#if defined(FX450) || defined(FEATHERM0)
-
-#include <FlashAsEEPROM.h>
-#include <FlashStorage.h>
-
-#endif
-
-#if defined(FX300) || defined(FX350)
 #include <EEPROM.h>
-#endif
-
-
-#if defined(FX300) || defined(FX350) || defined(FX450)
 
 //FX300 Header
 const int RELAY0 = 2;
