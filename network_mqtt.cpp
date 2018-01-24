@@ -95,22 +95,6 @@ void mqtt::sendChanges(void)
     client.publish(propName, data);
     learnResponseOld = learnResponse;
   }
-
-  #include "game_rfid.h"
-  rfid *rfidGame = static_cast<rfid*>(pMyGame);
-
-  if (rfidGame->changedFlag == true)
-  {
-    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"TAG_VALUES\"");
-    for (int i = 0; i < len; i++)
-    {
-      snprintf(data + strlen(data), MQTT_BUF_SZ, ", %d: %d", i, rfidGame->tagValues[i]);
-    }
-    snprintf(data + strlen(data), MQTT_BUF_SZ, "}");
-    Serial.println(data);
-    client.publish(propName, data);
-    rfidGame->changedFlag = false;
-  }
 }
 
 void mqtt::callback(char* topic, byte* payload, unsigned int length) {

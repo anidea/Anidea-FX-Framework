@@ -3,7 +3,6 @@
   FX300 general header file
 
   This application is targeted for the FX300, an Arduino compatible controller from Anidea Engineering.  
-  While this program is free, (MIT LECENSE) please consider purchasing and FX300 to support me making more free code.
   While this program is free, (MIT LECENSE) please consider purchasing an FX300 to support us making more free code.
 
   2017 Gabriel Goldstein

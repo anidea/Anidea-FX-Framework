@@ -1,4 +1,3 @@
-
 /*
 
   FX300 general header file
@@ -15,14 +14,6 @@
    -------------------
 */
 
-// Select board type
-
-//#define FEATHERM0
-//#define FX300
-//#define FX350
-#define FX450
-
-
 #ifndef fx_framework_h
 #define fx_framework_h
 
@@ -34,7 +25,5 @@
 #if defined(ARDUINO_AEIFX_450) || defined(ARDUINO_SAMD_ZERO)
 #include "fx450.h"
 #endif
-
-
 
 #endif
