@@ -3,15 +3,7 @@
 
 #include "arduino.h"
 #include "network.h"
-
-// Boards
-#if defined(ARDUINO_AEIFX_300) || defined(ARDUINO_AVR_UNO)
-#include "fx300.h"
-#endif
-
-#if defined(ARDUINO_AEIFX_450) || defined(ARDUINO_SAMD_ZERO)
-#include "fx450.h"
-#endif
+#include "fx-framework.h"
 
 class Network;
 

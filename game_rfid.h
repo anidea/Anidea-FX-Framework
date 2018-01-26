@@ -49,9 +49,21 @@ class rfid : public Game
     #endif
 
     byte tagValues[iTotalScanLength];
+    static const byte keypadCodeLength = 6;
+    bool keypadCodeFlag;
+    byte keypadCode[keypadCodeLength];
+    byte keypadCodeOld[keypadCodeLength];
     bool changedFlag = true;
     bool buttonState = 0;
     bool buttonStateOld = 0;
+    byte videoSelect = 0;
+    bool ledStates[];
+    byte audioSelect = 0;
+    bool lockState = 0;
+    bool lightState = 0;
+    bool scrollingLightState = 0;
+    bool displayState = 0;
+    char displayText[];
 
   private:
     static const byte LEARN_BUTTON = INPUT0;

@@ -22,7 +22,7 @@
 #include "fx300.h"
 #endif
 
-#if defined(ARDUINO_AEIFX_450) || defined(ARDUINO_SAMD_ZERO)
+#if defined(ARDUINO_AEIFX_450) || defined(ARDUINO_SAMD_ZERO) || defined(ARDUINO_SAM_ZERO)
 #include "fx450.h"
 #endif
 

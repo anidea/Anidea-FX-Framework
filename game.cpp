@@ -19,6 +19,7 @@ Game::Game()
   pinMode(OUTPUT3, OUTPUT);
   pinMode(OUTPUT4, OUTPUT);
   pinMode(OUTPUT5, OUTPUT);
+  pinMode(RS485_ENABLE, OUTPUT);
   pinMode(LED, OUTPUT);
 
   pinMode(INPUT0, INPUT);

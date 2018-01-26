@@ -22,7 +22,7 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 {
   if (connectNetwork)
   {
-    #ifdef fx300_h
+    #ifdef FX300
     digitalWrite(OUTPUT5, HIGH);
     #endif
     
@@ -93,7 +93,7 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
       }
     }
 
-    #ifdef fx300_h
+    #ifdef FX300
     digitalWrite(OUTPUT5, LOW);
     #endif
   

@@ -1,4 +1,5 @@
 #include "game_rfid.h"
+#include "wiring_private.h"
 
 rfid::rfid() : Game()
 {
@@ -38,6 +39,7 @@ void rfid::loop(void)
   Game::loop();
 
   buttons();
+  keypadCodeFlag = true;
 
   switch (_gameState)
   {
@@ -162,6 +164,12 @@ void rfid::reset(void)
 
 void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength)
 {
+//  Uart mySerial (&sercom5, 38, 37, SERCOM_RX_PAD_3, UART_TX_PAD_2);
+//  mySerial.begin(115200);
+//  pinPeripheral(37, PIO_SERCOM);
+//  pinPeripheral(38, PIO_SERCOM);
+//  delay(100);
+  
   delay(10);
   byte pos = 0;
   digitalWrite(RS485_ENABLE, HIGH);

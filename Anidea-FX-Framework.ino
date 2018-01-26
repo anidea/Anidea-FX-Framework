@@ -59,7 +59,7 @@ Network *myNetwork;
 void setup() {
   Serial.begin(115200); // Setup serial
 
-  #if 0 // make 1 if you want the code to wait for the serial monitor to come up
+  #if 1 // make 1 if you want the code to wait for the serial monitor to come up
   while (!Serial)
   {
   ; // wait for serial port to connect. Needed for native USB port only
