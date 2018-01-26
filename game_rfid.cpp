@@ -133,6 +133,57 @@ void rfid::loop(void)
   }
 }
 
+void rfid::playVideo(byte videoNum)
+{
+  Serial.print("Playing Video ");
+  Serial.println(videoNum);
+}
+
+void rfid::playAudio(byte audioNum)
+{
+  Serial.print("Playing Audio ");
+  Serial.println(audioNum);
+}
+
+void rfid::setLedState(byte index, bool value)
+{
+  Serial.print("Setting led ");
+  Serial.print(index);
+  Serial.print(" to ");
+  Serial.println(value);
+}
+
+void rfid::setLock(bool state)
+{
+  Serial.print("Setting Lock to ");
+  Serial.println(state);
+}
+
+void rfid::setLight(bool state)
+{
+  Serial.print("Setting Light to ");
+  Serial.println(state);
+}
+
+void rfid::setScrollingLight(bool state)
+{
+  Serial.print("Setting Scrolling Light to ");
+  Serial.println(state);
+}
+
+void rfid::setDisplay(bool state, const char text[])
+{
+  if (state)
+  {
+    Serial.print("Display turned on and set to ");
+    Serial.println(text);
+  }
+  else
+  {
+    Serial.println("Display turned off");
+  }
+}
+
 void rfid::solved(void)
 {
   Serial.println(F("rfid solved"));

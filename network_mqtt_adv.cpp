@@ -2,8 +2,8 @@
 #include "network_mqtt_adv.h"
 
 // Configuration
-char mqtt_adv::propName[] = "bottleCap1";
-char mqtt_adv::channelName[] = "OTC";
+char mqtt_adv::propName[] = "testName";
+char mqtt_adv::channelName[] = "testChannel";
 
 // Send options
 //#define MQTT_TAGSTATES_SEND
@@ -315,56 +315,65 @@ void mqtt_adv::callback(char* topic, byte* payload, unsigned int length) {
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/video/play", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    rfidGame->videoSelect = payload[0];
+    payload[length] = '\0';
+    rfidGame->playVideo(atoi((const char *)payload));
   }
   #endif
   #if defined(MQTT_LED_RECEIVE)
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/buttons/led", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    rfidGame->ledStates[payload[0]] = payload[2];
+    payload[length] = '\0';
+    byte index = 0;
+    bool value = 0;
+    sscanf((const char *)payload, "%d:%d", &index, &value);
+    rfidGame->setLedState(index, value);
   }
   #endif
   #if defined(MQTT_AUDIO_RECEIVE)
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/audio/play", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    rfidGame->audioSelect = payload[0];
+    payload[length] = '\0';
+    rfidGame->playAudio(atoi((const char *)payload));
   }
   #endif
   #if defined(MQTT_LOCK_RECEIVE)
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/lock", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    rfidGame->lockState = payload[0];
+    payload[length] = '\0';
+    rfidGame->setLock(atoi((const char *)payload));
   }
   #endif
   #if defined(MQTT_LIGHT_RECEIVE)
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/light", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    rfidGame->lightState = payload[0];
+    payload[length] = '\0';
+    rfidGame->setLight(atoi((const char *)payload));
   }
   #endif
   #if defined(MQTT_SCROLLINGLIGHT_RECEIVE)
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/scrollingLight", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    rfidGame->scrollingLightState = payload[0];
+    payload[length] = '\0';
+    rfidGame->setScrollingLight(atoi((const char *)payload));
   }
   #endif
   #if defined(MQTT_TEXT_RECEIVE)
   snprintf(channel, MQTT_BUF_SZ, "/%s/%s/text", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
-    if (strcmp(payload, "NULL"))
+    payload[length] = '\0';
+    if (strcmp((const char *)payload, "NULL") == 0)
     {
-      rfidGame->displayState = 0;
+      rfidGame->setDisplay(0, "");
     }
     else
     {
-      rfidGame->displayState = 1;
-      strcpy(rfidGame->displayText, payload);
+      rfidGame->setDisplay(1, (const char *)payload);
     }
   }
   #endif

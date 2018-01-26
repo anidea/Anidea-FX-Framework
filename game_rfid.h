@@ -48,6 +48,14 @@ class rfid : public Game
       static const bool require_enable = false;
     #endif
 
+    void playVideo(byte);
+    void playAudio(byte);
+    void setLedState(byte, bool);
+    void setLock(bool);
+    void setLight(bool);
+    void setScrollingLight(bool);
+    void setDisplay(bool, const char[]);
+
     byte tagValues[iTotalScanLength];
     static const byte keypadCodeLength = 6;
     bool keypadCodeFlag;
@@ -56,14 +64,6 @@ class rfid : public Game
     bool changedFlag = true;
     bool buttonState = 0;
     bool buttonStateOld = 0;
-    byte videoSelect = 0;
-    bool ledStates[];
-    byte audioSelect = 0;
-    bool lockState = 0;
-    bool lightState = 0;
-    bool scrollingLightState = 0;
-    bool displayState = 0;
-    char displayText[];
 
   private:
     static const byte LEARN_BUTTON = INPUT0;
@@ -101,6 +101,8 @@ class rfid : public Game
     void buttons();
     void EEPROMReadString(byte, byte, char*);
     void EEPROMWriteString(byte, char*);
+
+    Uart *mySerialRfid;
 };
 
 #endif
