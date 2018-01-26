@@ -4,7 +4,13 @@
 rfid::rfid() : Game()
 {
   // Things that need to be set up when the game is first created
+  pinMode(RS485_ENABLE, OUTPUT);
   digitalWrite(RS485_ENABLE, LOW);
+
+  // Setup serial port
+  mySerialRfid = &Serial5;
+
+  mySerialRfid->begin(115200);
 
   // Only enable the inputs/outputs that are not going to be used by this game
   INPUT_OVERRIDE_ENABLE[0] = 0;
@@ -164,18 +170,12 @@ void rfid::reset(void)
 
 void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength)
 {
-//  Uart mySerial (&sercom5, 38, 37, SERCOM_RX_PAD_3, UART_TX_PAD_2);
-//  mySerial.begin(115200);
-//  pinPeripheral(37, PIO_SERCOM);
-//  pinPeripheral(38, PIO_SERCOM);
-//  delay(100);
-  
   delay(10);
   byte pos = 0;
   digitalWrite(RS485_ENABLE, HIGH);
 
   // Write data
-  Serial.println(pMessage);
+  mySerialRfid->println(pMessage);
   delay(2);
 
   digitalWrite(RS485_ENABLE, LOW);
@@ -184,7 +184,7 @@ void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength
 
   // Spin while waiting for time out, and not signals
   byte timeout = 0;
-  while(!Serial.available() && timeout < 50)
+  while(!mySerialRfid->available() && timeout < 50)
   {
     delay(1);
     timeout++;
@@ -192,9 +192,9 @@ void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength
 
   delay(10);
   
-  while(Serial.available())
+  while(mySerialRfid->available())
   {
-    pResponse[pos] = (char)Serial.read();
+    pResponse[pos] = (char)mySerialRfid->read();
     pos++; // Increment where to write next
   }
 
