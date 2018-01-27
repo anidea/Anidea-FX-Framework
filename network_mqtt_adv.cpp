@@ -10,7 +10,6 @@ char mqtt_adv::channelName[] = "testChannel";
 //#define MQTT_TAGS_SEND
 //#define MQTT_HEARTBEAT_SEND
 //#define MQTT_BUTTONS_SEND
-//#define MQTT_KEYPAD_SEND
 
 // Receive options
 //#define MQTT_VIDEO_RECEIVE
@@ -43,7 +42,6 @@ void mqtt_adv::loop(void)
 
 void mqtt_adv::tick(void)
 {
-  tagTimer++;
   heartbeatTimer++;
 }
 
@@ -157,18 +155,23 @@ void mqtt_adv::sendChanges(void)
   }
 
   #if defined(MQTT_TAGS_SEND)
-  if (tagTimer >= 10)
+  if (rfidGame->tagValuesFlag == true)
   {
+    #define MQTT_TAG_BUF_SZ 512
+    char tagData[MQTT_TAG_BUF_SZ];
+    snprintf(tagData, MQTT_TAG_BUF_SZ, "{");
     for (int i = 0; i < len; i++)
     {
-      snprintf(channel, MQTT_BUF_SZ, "/%s/%s/RFID/%d", channelName, propName, i);
-      snprintf(data, MQTT_BUF_SZ, "%d", rfidGame->tagValues[i]);
-      Serial.print("Channel: ");
-      Serial.print(channel);
-      Serial.print(" - Data: ");
-      Serial.println(data);
-      client.publish(channel, data);
+      snprintf(tagData + strlen(tagData), MQTT_TAG_BUF_SZ, "'%d':'%s', ", i, rfidGame->tagValues[i]);
     }
+    snprintf(tagData + strlen(tagData) - 2, MQTT_TAG_BUF_SZ, "}");
+    snprintf(channel, MQTT_BUF_SZ, "/%s/%s/RFID", channelName, propName);
+    Serial.print("Channel: ");
+    Serial.print(channel);
+    Serial.print(" - Data: ");
+    Serial.println(tagData);
+    client.publish(channel, tagData);
+    rfidGame->tagValuesFlag = false;
   }
   #endif
 
@@ -187,34 +190,21 @@ void mqtt_adv::sendChanges(void)
   #endif
 
   #if defined(MQTT_BUTTONS_SEND)
-  if (rfidGame->buttonState != rfidGame->buttonStateOld)
+  if (rfidGame->buttonFlag == true)
   {
     snprintf(channel, MQTT_BUF_SZ, "/%s/%s/buttons/state", channelName, propName);
-    snprintf(data, MQTT_BUF_SZ, "%d", rfidGame->buttonState);
-    Serial.print("Channel: ");
-    Serial.print(channel);
-    Serial.print(" - Data: ");
-    Serial.println(data);
-    client.publish(channel, data);
-    rfidGame->buttonStateOld = rfidGame->buttonState;
-  }
-  #endif
-
-  #if defined(MQTT_KEYPAD_SEND)
-  if (rfidGame->keypadCodeFlag == true)
-  {
-    snprintf(channel, MQTT_BUF_SZ, "/%s/%s/code", channelName, propName);
-    snprintf(data, MQTT_BUF_SZ, "");
-    for (int i = 0; i < rfidGame->keypadCodeLength; i++)
+    snprintf(data, MQTT_BUF_SZ, "[");
+    for (int i = 0; i < rfidGame->numButtons; i++)
     {
-      snprintf(data + strlen(data), MQTT_BUF_SZ, "%d", rfidGame->keypadCode[i]);
+      snprintf(data + strlen(data), MQTT_BUF_SZ, "%d,", rfidGame->buttonStates[i]);
     }
+    snprintf(data + strlen(data) - 1, MQTT_BUF_SZ, "]");
     Serial.print("Channel: ");
     Serial.print(channel);
     Serial.print(" - Data: ");
     Serial.println(data);
     client.publish(channel, data);
-    rfidGame->keypadCodeFlag = false;
+    rfidGame->buttonFlag = false;
   }
   #endif
 }

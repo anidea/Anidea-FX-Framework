@@ -63,7 +63,6 @@ class mqtt_adv : public Network
     static byte learnResponseOld;
 
     int heartbeatTimer = 0;
-    int tagTimer = 0;
 };
 
 #endif

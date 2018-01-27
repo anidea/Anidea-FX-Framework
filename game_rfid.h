@@ -48,6 +48,8 @@ class rfid : public Game
       static const bool require_enable = false;
     #endif
 
+    static const byte RFID_STR_LEN_MAX = 20;
+
     void playVideo(byte);
     void playAudio(byte);
     void setLedState(byte, bool);
@@ -56,14 +58,11 @@ class rfid : public Game
     void setScrollingLight(bool);
     void setDisplay(bool, const char[]);
 
-    byte tagValues[iTotalScanLength];
-    static const byte keypadCodeLength = 6;
-    bool keypadCodeFlag;
-    byte keypadCode[keypadCodeLength];
-    byte keypadCodeOld[keypadCodeLength];
-    bool changedFlag = true;
-    bool buttonState = 0;
-    bool buttonStateOld = 0;
+    char tagValues[iTotalScanLength][RFID_STR_LEN_MAX + 1];
+    bool tagValuesFlag = true;
+    static const byte numButtons = 6;
+    bool buttonStates[numButtons];
+    bool buttonFlag = false;
 
   private:
     static const byte LEARN_BUTTON = INPUT0;
@@ -78,8 +77,6 @@ class rfid : public Game
     static const byte SOUND_CUE = OUTPUT4;
     
     static const byte MAG_LOCK = RELAY0;
-    
-    static const byte RFID_STR_LEN_MAX = 20;
 
     bool iPuzzleSolved = false;
     bool learnPress = false;

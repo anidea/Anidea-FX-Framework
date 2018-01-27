@@ -45,7 +45,6 @@ void rfid::loop(void)
   Game::loop();
 
   buttons();
-  keypadCodeFlag = true;
 
   switch (_gameState)
   {
@@ -329,6 +328,11 @@ byte rfid::RfidSetGetTagIds(byte iGet)
     char cMsg[RFID_STR_LEN_MAX + 1];
     memset(cMsg,0,RFID_STR_LEN_MAX + 1);
     sscanf(cBufIn, "%d,%d,%s", &uSrc, &uDest, cMsg);
+    if (strcmp(tagValues[i], cMsg) != 0)
+    {
+      tagValuesFlag = true;
+      strcpy(tagValues[i], cMsg);
+    }
     
     if (uReceiveLen == 0)
     {
