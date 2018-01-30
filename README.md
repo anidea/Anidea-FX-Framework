@@ -3,6 +3,7 @@
 This application is targeted for the AEI FX series of boards, an Arduino compatible series of controllers from Anidea Engineering.  While this program is free (MIT LECENSE), please consider purchasing an FX300 or FX350 to support us making more free code. While this framework will run on an FX300 you will need the FX350 to use any of the management software connectivity.
 
 You can purchase an FX300 at https://www.escaperoomtechs.com/arduino-compatible-prop-controller-FX300-p/fx300ardpropctrl.htm
+
 You can purchase an FX350 at https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx350-p/fx350.htm
 
 Our entire store can be viewed at https://www.escaperoomtechs.com/shop-s/143.htm
