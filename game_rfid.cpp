@@ -7,10 +7,11 @@ rfid::rfid() : Game()
   pinMode(RS485_ENABLE, OUTPUT);
   digitalWrite(RS485_ENABLE, LOW);
 
-  // Setup serial port
+  #if defined(FX450)
+  // Setup serial port for FX450
   mySerialRfid = &Serial5;
-
   mySerialRfid->begin(115200);
+  #endif
 
   // Only enable the inputs/outputs that are not going to be used by this game
   INPUT_OVERRIDE_ENABLE[0] = 0;
@@ -144,7 +145,7 @@ void rfid::playAudio(byte audioNum)
   Serial.println(audioNum);
 }
 
-void rfid::setLedState(byte index, bool value)
+void rfid::setLightState(byte index, bool value)
 {
   Serial.print("Setting led ");
   Serial.print(index);
@@ -155,18 +156,6 @@ void rfid::setLedState(byte index, bool value)
 void rfid::setLock(bool state)
 {
   Serial.print("Setting Lock to ");
-  Serial.println(state);
-}
-
-void rfid::setLight(bool state)
-{
-  Serial.print("Setting Light to ");
-  Serial.println(state);
-}
-
-void rfid::setScrollingLight(bool state)
-{
-  Serial.print("Setting Scrolling Light to ");
   Serial.println(state);
 }
 
@@ -225,7 +214,12 @@ void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength
   digitalWrite(RS485_ENABLE, HIGH);
 
   // Write data
+  #if defined(FX300)
+  Serial.println(pMessage);
+  #endif
+  #if defined(FX450)
   mySerialRfid->println(pMessage);
+  #endif
   delay(2);
 
   digitalWrite(RS485_ENABLE, LOW);
@@ -234,17 +228,32 @@ void rfid::RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength
 
   // Spin while waiting for time out, and not signals
   byte timeout = 0;
+  #if defined(FX300)
+  while(!Serial.available() && timeout < 50)
+  #endif
+  #if defined(FX450)
   while(!mySerialRfid->available() && timeout < 50)
+  #endif
   {
     delay(1);
     timeout++;
   }
 
   delay(10);
-  
+
+  #if defined(FX300)
+  while(Serial.available())
+  #endif
+  #if defined(FX450)
   while(mySerialRfid->available())
+  #endif
   {
+    #if defined(FX300)
+    pResponse[pos] = (char)Serial.read();
+    #endif
+    #if defined(FX450)
     pResponse[pos] = (char)mySerialRfid->read();
+    #endif
     pos++; // Increment where to write next
   }
 

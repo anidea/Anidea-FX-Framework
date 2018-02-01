@@ -52,10 +52,8 @@ class rfid : public Game
 
     void playVideo(byte);
     void playAudio(byte);
-    void setLedState(byte, bool);
+    void setLightState(byte, bool);
     void setLock(bool);
-    void setLight(bool);
-    void setScrollingLight(bool);
     void setDisplay(bool, const char[]);
 
     char tagValues[iTotalScanLength][RFID_STR_LEN_MAX + 1];
@@ -99,7 +97,9 @@ class rfid : public Game
     void EEPROMReadString(byte, byte, char*);
     void EEPROMWriteString(byte, char*);
 
+    #if defined(FX450)
     Uart *mySerialRfid;
+    #endif
 };
 
 #endif

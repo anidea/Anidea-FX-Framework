@@ -1,9 +1,6 @@
 #include "network.h"
 #include "network_mqtt.h"
 
-byte mqtt::learnResponse = -1;
-byte mqtt::learnResponseOld = -1;
-
 mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
   client.setClient(ethClient);
@@ -70,30 +67,6 @@ void mqtt::sendChanges(void)
       client.publish(propName, data);
       RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
     }
-  }
-
-  byte len = pMyGame->getLen();
-  byte tagStates[len];
-  bool stateFlag = false;
-  pMyGame->getTagStates(tagStates, stateFlag);
-  if (stateFlag)
-  {
-    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"TAG_STATES\"");
-    for (int j = 0; j < len; j++)
-    {
-      snprintf(data + strlen(data), MQTT_BUF_SZ, ", %d: %d", j, tagStates[j]);
-    }
-    snprintf(data + strlen(data), MQTT_BUF_SZ, "}");
-    Serial.println(data);
-    client.publish(propName, data);
-    stateFlag = false;
-  }
-
-  if (learnResponse != learnResponseOld)
-  {
-    snprintf(data, MQTT_BUF_SZ, "{\"TYPE\": \"LEARN\", \"DIRECTION\": \"FROM\", \"STATUS\": %c}", learnResponse);
-    client.publish(propName, data);
-    learnResponseOld = learnResponse;
   }
 }
 
@@ -173,15 +146,6 @@ void mqtt::callback(char* topic, byte* payload, unsigned int length) {
         pMyGame->reset();
         pMyGame->disable();
       }
-    }
-  }
-  else if (strcmp(type, "LEARN") == 0) // Learn new sequence
-  {
-//    Serial.println("LEARN");
-    const char* dir = root["DIRECTION"];
-    if (strcmp(dir, "TO") == 0) // If it is not coming from the same prop
-    {
-      learnResponse = pMyGame->learn();
     }
   }
 }

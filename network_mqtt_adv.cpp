@@ -16,8 +16,6 @@ char mqtt_adv::channelName[] = "testChannel";
 //#define MQTT_LED_RECEIVE
 //#define MQTT_AUDIO_RECEIVE
 //#define MQTT_LOCK_RECEIVE
-//#define MQTT_LIGHT_RECEIVE
-//#define MQTT_SCROLLINGLIGHT_RECEIVE
 //#define MQTT_TEXT_RECEIVE
 
 byte mqtt_adv::learnResponse = -1;
@@ -309,15 +307,15 @@ void mqtt_adv::callback(char* topic, byte* payload, unsigned int length) {
     rfidGame->playVideo(atoi((const char *)payload));
   }
   #endif
-  #if defined(MQTT_LED_RECEIVE)
-  snprintf(channel, MQTT_BUF_SZ, "/%s/%s/buttons/led", channelName, propName);
+  #if defined(MQTT_LIGHT_RECEIVE)
+  snprintf(channel, MQTT_BUF_SZ, "/%s/%s/light", channelName, propName);
   if (strcmp(topic, channel) == 0)
   {
     payload[length] = '\0';
     byte index = 0;
     bool value = 0;
     sscanf((const char *)payload, "%d:%d", &index, &value);
-    rfidGame->setLedState(index, value);
+    rfidGame->setLightState(index, value);
   }
   #endif
   #if defined(MQTT_AUDIO_RECEIVE)
@@ -334,22 +332,6 @@ void mqtt_adv::callback(char* topic, byte* payload, unsigned int length) {
   {
     payload[length] = '\0';
     rfidGame->setLock(atoi((const char *)payload));
-  }
-  #endif
-  #if defined(MQTT_LIGHT_RECEIVE)
-  snprintf(channel, MQTT_BUF_SZ, "/%s/%s/light", channelName, propName);
-  if (strcmp(topic, channel) == 0)
-  {
-    payload[length] = '\0';
-    rfidGame->setLight(atoi((const char *)payload));
-  }
-  #endif
-  #if defined(MQTT_SCROLLINGLIGHT_RECEIVE)
-  snprintf(channel, MQTT_BUF_SZ, "/%s/%s/scrollingLight", channelName, propName);
-  if (strcmp(topic, channel) == 0)
-  {
-    payload[length] = '\0';
-    rfidGame->setScrollingLight(atoi((const char *)payload));
   }
   #endif
   #if defined(MQTT_TEXT_RECEIVE)
@@ -386,8 +368,8 @@ void mqtt_adv::reconnect() {
       snprintf(channel, MQTT_BUF_SZ, "/%s/%s/video/play", channelName, propName);
       client.subscribe(channel);
       #endif
-      #if defined(MQTT_LED_RECEIVE)
-      snprintf(channel, MQTT_BUF_SZ, "/%s/%s/buttons/led", channelName, propName);
+      #if defined(MQTT_LIGHT_RECEIVE)
+      snprintf(channel, MQTT_BUF_SZ, "/%s/%s/light", channelName, propName);
       client.subscribe(channel);
       #endif
       #if defined(MQTT_AUDIO_RECEIVE)
@@ -396,14 +378,6 @@ void mqtt_adv::reconnect() {
       #endif
       #if defined(MQTT_LOCK_RECEIVE)
       snprintf(channel, MQTT_BUF_SZ, "/%s/%s/lock", channelName, propName);
-      client.subscribe(channel);
-      #endif
-      #if defined(MQTT_LIGHT_RECEIVE)
-      snprintf(channel, MQTT_BUF_SZ, "/%s/%s/light", channelName, propName);
-      client.subscribe(channel);
-      #endif
-      #if defined(MQTT_SCROLLINGLIGHT_RECEIVE)
-      snprintf(channel, MQTT_BUF_SZ, "/%s/%s/scrollingLight", channelName, propName);
       client.subscribe(channel);
       #endif
       #if defined(MQTT_TEXT_RECEIVE)
