@@ -19,8 +19,6 @@ class room : public Game
     virtual void reset(); // Call to reset game
 
   private:
-    bool solvedFlag;
-
     unsigned long button1Timer = 0;
     bool button1Flag = false;
 

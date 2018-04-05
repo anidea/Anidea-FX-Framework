@@ -78,20 +78,9 @@ void room::loop(void)
     }
   }
 
-  if (digitalRead(OUTPUT4) == HIGH)
-  {
-    digitalWrite(RELAY0, HIGH);
-  }
-  if (digitalRead(OUTPUT5) == HIGH)
-  {
-    digitalWrite(RELAY1, HIGH);
-  }
-
   switch (_gameState)
   {
     case GAMESTATE_START:
-      digitalWrite(OUTPUT0, LOW);
-      digitalWrite(OUTPUT1, LOW);
       if (_enabled)
       {
         _gameState = GAMESTATE_RUN;
@@ -99,34 +88,12 @@ void room::loop(void)
       break;
 
     case GAMESTATE_RUN:
-      digitalWrite(OUTPUT0, HIGH);
-      digitalWrite(OUTPUT1, LOW);
-      for (int i = 2; i < 6; i++)
-      {
-        if (digitalRead(INPUTS[i]) == HIGH)
-        {
-          digitalWrite(OUTPUTS[i], HIGH);
-        }
-      }
-    
-      solvedFlag = true;
-      for (int i = 2; i < 6; i++)
-      {
-        if (digitalRead(OUTPUTS[i]) == LOW)
-        {
-          solvedFlag = false;
-        }
-      }
-      if (solvedFlag == true && _puzzleSolved == 0)
-      {
-        _gameState = GAMESTATE_SOLVED;
-      }
+	 // Puzzle logic here
+      
       break;
 
     case GAMESTATE_SOLVED:
       // Run solved and any other one time routine
-      digitalWrite(OUTPUT0, HIGH);
-      digitalWrite(OUTPUT1, HIGH);
       solved();
       _gameState = GAMESTATE_ENDLOOP;
 
@@ -146,16 +113,6 @@ void room::solved(void)
 
   //Call generic solve function
   Game::solved();
-
-  //Do game specific solved state
-  for (int i = 0; i < 6; i++)
-  {
-    digitalWrite(OUTPUTS[i], HIGH);
-  }
-  for (int i = 0; i < 2; i++)
-  {
-    digitalWrite(RELAYS[i], LOW);
-  }
 }
 
 void room::reset(void)
@@ -164,14 +121,4 @@ void room::reset(void)
 
   //Reset global game variables
   Game::reset();
-
-  //Reset game specific variables
-  for (int i = 0; i < 6; i++)
-  {
-    digitalWrite(OUTPUTS[i], LOW);
-  }
-  for (int i = 0; i < 2; i++)
-  {
-    digitalWrite(RELAYS[i], LOW);
-  }
 }
