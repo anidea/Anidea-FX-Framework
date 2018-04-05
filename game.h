@@ -5,11 +5,11 @@
 #include "network.h"
 
 // Boards
-#if defined(ARDUINO_AEIFX_300) || defined(ARDUINO_AVR_UNO)
+#if defined(FX300) || defined(FX350)
 #include "fx300.h"
 #endif
 
-#if defined(ARDUINO_AEIFX_450) || defined(ARDUINO_SAMD_ZERO)
+#if defined(FX450)
 #include "fx450.h"
 #endif
 
