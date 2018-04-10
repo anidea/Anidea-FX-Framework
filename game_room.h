@@ -17,10 +17,7 @@ class room : public Game
     room();
 
     virtual void loop();
-
-    void solved();
-
-    virtual void reset(); // Call to reset game
+    virtual void reset();
 };
 
 #endif

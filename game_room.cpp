@@ -49,45 +49,32 @@ void room::loop(void)
 		#elif defined(TWOBUTTON)
 		int startIndex = 2;
 		#endif
+		
+		// Turn on respective OUTPUTS for each detected INPUT.
 		for (uint8_t i = startIndex; i < NUM_INPUTS; i++)
 		{
-			if (digitalRead(INPUTS[i]) == HIGH) // If Solved
+			if (digitalRead(INPUTS[i]) == HIGH)
 			{
-				// Signal Solved
+				if (!OUTPUT_STATES[i]) OUTPUT_STATES_FLAG[i] = true;
 				OUTPUT_STATES[i] = true;
-				OUTPUT_STATES_FLAG[i] = true;
-
-				if (i == 4 || i == 5)
-				{
-					RELAY_STATES[i] = false;
-					RELAY_STATES_FLAG[i] = true;
-				}
 			}
+		}
+		
+		// Tie RELAY0 to OUTPUT4
+		if (OUTPUT_STATES[4])
+		{
+			if (RELAY_STATES[4]) RELAY_STATES_FLAG[4] = true;
+			RELAY_STATES[4] = false;
+		}
+		
+		//Tie RELAY1 to OUTPUT5
+		if (OUTPUT_STATES[5])
+		{
+			if (RELAY_STATES[5]) RELAY_STATES_FLAG[5] = true;
+			RELAY_STATES[5] = false;
 		}
 	  }
       break;
-
-    case GAMESTATE_SOLVED:
-      // Run solved and any other one time routine
-      solved();
-      _gameState = GAMESTATE_ENDLOOP;
-
-      break;
- 
-    default:
-    case GAMESTATE_ENDLOOP:
-      // Wait for reset
-      
-      break;
-  }
-}
-
-void room::solved(void)
-{
-  Serial.println(F("room solved"));
-
-  //Call generic solve function
-  Game::solved();
 }
 
 void room::reset(void)
