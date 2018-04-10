@@ -80,11 +80,11 @@ void room::loop(void)
 
 void room::reset(void)
 {
+  //Reset global game variables
+  Game::reset();
+  
   Serial.println(F("room reset"));
   
   digitalWrite(RELAY0, HIGH);
   digitalWrite(RELAY1, HIGH);
-
-  //Reset global game variables
-  Game::reset();
 }
