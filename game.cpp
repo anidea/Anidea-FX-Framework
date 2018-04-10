@@ -28,13 +28,6 @@ Game::Game()
   pinMode(INPUT4, INPUT);
   pinMode(INPUT5, INPUT);
 
-  // Set outputs to all low to start
-  for(int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
-      digitalWrite(OUTPUTS[i], LOW);
-
-  for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
-      digitalWrite(RELAYS[i], LOW);
-
   // Turn all overrides on
   for(int i = 0; i < NUM_INPUTS; ++i) //Or loop the array and init them.
       INPUT_OVERRIDE_ENABLE[i] = true;
@@ -140,7 +133,13 @@ void Game::solved(void)
 void Game::reset(void)
 {
   // Routine run to reset the puzzle.  Run at start or by other means
-  
+    // Set outputs to all low to start
+  for(int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
+      digitalWrite(OUTPUTS[i], LOW);
+
+  for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
+      digitalWrite(RELAYS[i], LOW);
+	  
   Serial.println(F("Game Reset"));
   
   // Reset game vars
