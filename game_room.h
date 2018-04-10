@@ -5,6 +5,10 @@
 #include "network.h"
 #include "game.h"
 
+// Select which version of the room controller you have
+#define ONEBUTTON
+//#define TWOBUTTON
+
 class Network;
 
 class room : public Game
@@ -17,13 +21,6 @@ class room : public Game
     void solved();
 
     virtual void reset(); // Call to reset game
-
-  private:
-    unsigned long button1Timer = 0;
-    bool button1Flag = false;
-
-    unsigned long button2Timer = 0;
-    bool button2Flag = false;
 };
 
 #endif

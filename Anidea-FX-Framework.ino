@@ -1,6 +1,6 @@
 /*
 
-  Anidea Controller System
+  Escape Room Techs Controller System
 
   This application is targeted for the line of FX boards from Anidea Engineering.  
   While this program is free, (MIT LECENSE) please consider purchasing a board to support me making more free code.
@@ -18,20 +18,6 @@
 #include "game.h"
 #include "network.h"
 
-#if defined(FX300) || defined(FX350)
-#include <MsTimer2.h>
-#endif
-
-#if defined(FX450) || defined(FEATHERM0)
-// Also add library (zip) https://github.com/adafruit/Adafruit_ZeroTimer.git
-// Also add library (zip) https://github.com/avandalen/avdweb_SAMDtimer.git
-// Also add library (zip) https://github.com/adafruit/Adafruit_ASFcore.git, maybe not needed anymore
-
-#include <avdweb_SAMDtimer.h>
-void tenHzTimer(struct tc_module *const module_inst);
-SAMDtimer *timer3_10Hz;
-#endif
-
 // Networks
 #include "network_empty.h"
 #include "network_escaperoommaster.h"
@@ -39,7 +25,7 @@ SAMDtimer *timer3_10Hz;
 #include "network_houdinimc.h"
 #include "network_mqtt.h"
 
-// Include game headers here
+// Games
 #include "game_empty.h"
 #include "game_room.h"
 #include "game_simplegame.h"
@@ -52,13 +38,26 @@ SAMDtimer *timer3_10Hz;
 Game *myGame;
 Network *myNetwork;
 
+#if defined(FX300) || defined(FX350)
+#include <MsTimer2.h>
+#endif
+
+#if defined(FX450)
+#include <avdweb_SAMDtimer.h>
+void tenHzTimer(struct tc_module *const module_inst);
+SAMDtimer *timer3_10Hz;
+#endif
+
 //-------------------------------------------------------------------
 
 void setup() {
   Serial.begin(115200); // Setup serial
 
-  while (!Serial) {
-  ; // wait for serial port to connect. Needed for native USB port only
+  int timeout = 0;
+  while (!Serial)
+  {
+	delay(50);
+	if (++timeout > 20) break; // wait for serial port to connect. Needed for native USB port only
   }
 
   Serial.println("Welcome to the FX-Framework");
@@ -93,7 +92,7 @@ void setup() {
     MsTimer2::start();
   #endif
   
-  #if defined(FX450) || defined(FEATHERM0)
+  #if defined(FX450)
     timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
   #endif
 
@@ -113,7 +112,7 @@ void tenHzTimer()
 }
 #endif
 
-#if defined(FX450) || defined(FEATHERM0)
+#if defined(FX450)
 void tenHzTimer(struct tc_module *const module_inst) 
 {
   myGame->tick();

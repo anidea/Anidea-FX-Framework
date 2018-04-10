@@ -32,52 +32,6 @@ void room::loop(void)
   // Do generic loop actions
   Game::loop();
 
-  if (digitalRead(INPUT0) == HIGH && digitalRead(INPUT1) == LOW && button1Flag == false && buttonState == 0)
-  {
-    button1Flag = true;
-    button1Timer = millis();
-  }
-  if (digitalRead(INPUT0) == LOW && digitalRead(INPUT1) == HIGH && button2Flag == false && buttonState == 0)
-  {
-    button2Flag = true;
-    button2Timer = millis();
-  }
-  if (digitalRead(INPUT0) == HIGH && digitalRead(INPUT1) == HIGH)
-  {
-    buttonState = 5;
-    button1Flag = false;
-    button2Flag = false;
-  }
-  if (digitalRead(INPUT0) == LOW && digitalRead(INPUT1) == LOW && buttonState == 0)
-  {
-    if (millis() - button1Timer > 10 && button1Flag == true)
-    {
-//      Serial.println("Spot 1");
-      if (millis() - button1Timer < 500)
-      {
-//        Serial.println("Spot 2");
-        buttonState = 1;
-      }
-      else
-      {
-        buttonState = 3;
-      }
-      button1Flag = false;
-    }
-    if (millis() - button2Timer > 10 && button2Flag == true)
-    {
-      if (millis() - button2Timer < 500)
-      {
-        buttonState = 2;
-      }
-      else
-      {
-        buttonState = 4;
-      }
-      button2Flag = false;
-    }
-  }
-
   switch (_gameState)
   {
     case GAMESTATE_START:
@@ -90,6 +44,27 @@ void room::loop(void)
     case GAMESTATE_RUN:
 	 // Puzzle logic here
       
+		#ifdef ONEBUTTON
+		int startIndex = 1;
+		#elif defined(TWOBUTTON)
+		int startIndex = 2;
+		#endif
+		for (uint8_t i = startIndex; i < NUM_INPUTS; i++)
+		{
+			if (digitalRead(INPUTS[i]) == HIGH) // If Solved
+			{
+				// Signal Solved
+				OUTPUT_STATES[i] = true;
+				OUTPUT_STATES_FLAG[i] = true;
+
+				if (i == 4 || i == 5)
+				{
+					RELAY_STATES[i] = false;
+					RELAY_STATES_FLAG[i] = true;
+				}
+			}
+		}
+		
       break;
 
     case GAMESTATE_SOLVED:
@@ -118,6 +93,9 @@ void room::solved(void)
 void room::reset(void)
 {
   Serial.println(F("room reset"));
+  
+  digitalWrite(RELAY0, HIGH);
+  digitalWrite(RELAY1, HIGH);
 
   //Reset global game variables
   Game::reset();

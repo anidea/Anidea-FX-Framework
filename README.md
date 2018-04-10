@@ -1,34 +1,19 @@
-# Anidea FX Controller
+# Escape Room Techs FX Controller
 
-This application is targeted for the AEI FX series of boards, an Arduino compatible series of controllers from Anidea Engineering.  While this program is free (MIT LECENSE), please consider purchasing an FX300 or FX350 to support us making more free code. While this framework will run on an FX300 you will need the FX350 to use any of the management software connectivity.
+This application is targeted for the FX 300 and 400 series of boards, an Arduino compatible series of controllers from Escape Room Techs.  While this program is free (MIT LECENSE), please consider purchasing an FX350 or FX450 to support us making more free code. While this framework will run on an FX300 you will need the FX350 or FX450 to use any of the networking.
 
-You can purchase an FX300 at http://get.anidea-engineering.com/fx300_order_request  
-You can purchase an FX350 at http://get.anidea-engineering.com/fx350_order_request
+You can purchase an FX300 at https://www.escaperoomtechs.com/arduino-compatible-prop-controller-FX300-p/fx300ardpropctrl.htm
+You can purchase an FX350 at https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx350-p/fx350.htm
 
 This is a generic framework for running different games on escape room props and connecting them with different management software.
 
 ## Downloading
-Please note that when you first download and unzip the software you must rename the containing folder to "Anidea-FX-Framework" or the Arduino software will not be able to open it correctly.
-
-## Required Libraries
-To compile the program you must have the following libraries installed:
-* MsTimer2
-* Ethernet2
-* PubSubClient
-* ArduinoJson
-
-The PubSubClient library is only needed if you are using MQTT. The ArduinoJson library is only needed if you are using EscapeRoomMaster or MQTT. If you do not need to use either of these networks you can delete their files and remove their includes from the main file so you will not need to install these libraries.
+Please note that when you first download and unzip the software you should rename the containing folder to "Anidea-FX-Framework". The IDE will prompt to do this automatically if you do not and if you so choose will relocate the folder to your Arduino sketchbook folder (typically under My Documents/Arduino). 
 
 ## Includes
-At the top of the includes there are several boards included. Only one can be uncommented to tell the program which pin definitions and functions to use.
-
 Each game and each network have both a header and .cpp file that define their operation. Any new game or network added must have its header (.h) file included in the main .ino file.
 
 ```
-// Uncomment only one of these lines for the board you want
-#include "fx300.h"
-//#include fx###.h
-
 #include "game.h"
 #include "network.h"
 
@@ -46,6 +31,7 @@ Each game and each network have both a header and .cpp file that define their op
 #include "game_sequencedetect.h"
 #include "game_sixwire.h"
 #include "game_inputsequence.h"
+#include "game_rfid.h"
 ```
 
 ## Game and Network
