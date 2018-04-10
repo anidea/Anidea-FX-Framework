@@ -21,11 +21,7 @@ Game *Network::pMyGame = NULL;
 Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connectNetwork) : server(80)
 {
   if (connectNetwork)
-  {
-    #ifdef fx300_h
-    digitalWrite(OUTPUT5, HIGH);
-    #endif
-    
+  {    
     MyMac = _MyMac;
   
     if (_MyIP[0] == 0) // MyIP is not set by program
