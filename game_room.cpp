@@ -43,7 +43,7 @@ void room::loop(void)
 
     case GAMESTATE_RUN:
 	 // Puzzle logic here
-      
+	  {
 		#ifdef ONEBUTTON
 		int startIndex = 1;
 		#elif defined(TWOBUTTON)
@@ -64,7 +64,7 @@ void room::loop(void)
 				}
 			}
 		}
-		
+	  }
       break;
 
     case GAMESTATE_SOLVED:
