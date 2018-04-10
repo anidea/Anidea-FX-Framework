@@ -75,6 +75,7 @@ void room::loop(void)
 		}
 	  }
       break;
+  }
 }
 
 void room::reset(void)
