@@ -21,71 +21,6 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
 //    Serial.println(F("polled for status!"));
     writeClientResponse(client, pMyGame->isSolved() ? F("triggered") : F("not_triggered"));
   }
-  else if (requestStr.startsWith(F("GET /button1hold"))) 
-  {
-//    Serial.println(F("polled for button1hold!"));
-    if (pMyGame->buttonState == 3)
-    {
-      writeClientResponse(client, F("on"));
-      pMyGame->buttonState = 0;
-    }
-    else
-    {
-      writeClientResponse(client, F("off"));
-    }
-  }
-  else if (requestStr.startsWith(F("GET /button2hold"))) 
-  {
-//    Serial.println(F("polled for button2hold!"));
-    if (pMyGame->buttonState == 4)
-    {
-      writeClientResponse(client, F("on"));
-      pMyGame->buttonState = 0;
-    }
-    else
-    {
-      writeClientResponse(client, F("off"));
-    }
-  }
-  else if (requestStr.startsWith(F("GET /button1"))) 
-  {
-//    Serial.println(F("polled for button1!"));
-    if (pMyGame->buttonState == 1)
-    {
-      writeClientResponse(client, F("on"));
-      pMyGame->buttonState = 0;
-    }
-    else
-    {
-      writeClientResponse(client, F("off"));
-    }
-  }
-  else if (requestStr.startsWith(F("GET /button2"))) 
-  {
-//    Serial.println(F("polled for button2!"));
-    if (pMyGame->buttonState == 2)
-    {
-      writeClientResponse(client, F("on"));
-      pMyGame->buttonState = 0;
-    }
-    else
-    {
-      writeClientResponse(client, F("off"));
-    }
-  }
-  else if (requestStr.startsWith(F("GET /buttons1and2"))) 
-  {
-//    Serial.println(F("polled for buttons1and2!"));
-    if (pMyGame->buttonState == 5)
-    {
-      writeClientResponse(client, F("on"));
-      pMyGame->buttonState = 0;
-    }
-    else
-    {
-      writeClientResponse(client, F("off"));
-    }
-  }
   else if (requestStr.startsWith(F("GET /enable_status"))) 
   {
 //    Serial.println(F("polled for enable_status!"));
@@ -162,9 +97,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       {
         if (pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == true)
         {
-//          Serial.print(F("OUTPUT"));
-//          Serial.print(i);
-//          Serial.println(F(" turned on"));
+          Serial.print(F("OUTPUT"));
+          Serial.print(i);
+          Serial.println(F(" turned on"));
           writeClientResponse(client, F("ok"));
           pMyGame->OUTPUT_STATES[i] = true;
           pMyGame->OUTPUT_STATES_FLAG[i] = true;
@@ -292,8 +227,6 @@ void escaperoommaster::createJSON(EthernetClient& client)
   String rootBuffer;
   JsonObject& root = jsonBuffer.createObject();
   root[F("status")] = pMyGame->isSolved();
-  root[F("buttonState")] = pMyGame->buttonState;
-  pMyGame->buttonState = 0;
   root[F("enabled")] = pMyGame->isEnabled();
   rootBuffer = "INPUT";
   for (int i = 0; i < NUM_INPUTS; i++)

@@ -32,59 +32,47 @@ void room::loop(void)
   // Do generic loop actions
   Game::loop();
 
-  switch (_gameState)
-  {
-    case GAMESTATE_START:
-      if (_enabled)
-      {
-        _gameState = GAMESTATE_RUN;
-      }
-      break;
+#ifdef ONEBUTTON
+	  int startIndex = 1;
+#elif defined(TWOBUTTON)
+	  int startIndex = 2;
+#endif
 
-    case GAMESTATE_RUN:
-	 // Puzzle logic here
-	  {
-		#ifdef ONEBUTTON
-		int startIndex = 1;
-		#elif defined(TWOBUTTON)
-		int startIndex = 2;
-		#endif
-		
-		// Turn on respective OUTPUTS for each detected INPUT.
-		for (uint8_t i = startIndex; i < NUM_INPUTS; i++)
-		{
-			if (digitalRead(INPUTS[i]) == HIGH)
-			{
-				if (!OUTPUT_STATES[i]) OUTPUT_STATES_FLAG[i] = true;
-				OUTPUT_STATES[i] = true;
-			}
-		}
-		
-		// Tie RELAY0 to OUTPUT4
-		if (OUTPUT_STATES[4])
-		{
-			if (RELAY_STATES[4]) RELAY_STATES_FLAG[4] = true;
-			RELAY_STATES[4] = false;
-		}
-		
-		//Tie RELAY1 to OUTPUT5
-		if (OUTPUT_STATES[5])
-		{
-			if (RELAY_STATES[5]) RELAY_STATES_FLAG[5] = true;
-			RELAY_STATES[5] = false;
-		}
-	  }
-      break;
+  // Turn on respective OUTPUTS for each detected INPUT.
+  for (uint8_t i = startIndex; i < NUM_INPUTS; i++)
+  {
+	if (digitalRead(INPUTS[i]) == HIGH)
+	{
+		if (!OUTPUT_STATES[i]) OUTPUT_STATES_FLAG[i] = true;
+		OUTPUT_STATES[i] = true;
+	}
+  }
+
+  // Tie RELAY0 to OUTPUT4
+  if (OUTPUT_STATES[4] == HIGH)
+  {
+	if (RELAY_STATES[0]) RELAY_STATES_FLAG[0] = true;
+	RELAY_STATES[0] = false;
+  }
+
+  //Tie RELAY1 to OUTPUT5
+  if (OUTPUT_STATES[5] == HIGH)
+  {
+	if (RELAY_STATES[1]) RELAY_STATES_FLAG[1] = true;
+	RELAY_STATES[1] = false;
   }
 }
 
 void room::reset(void)
 {
-  //Reset global game variables
-  Game::reset();
-  
+	//Reset global game variables
+	Game::reset();
+
   Serial.println(F("room reset"));
   
-  digitalWrite(RELAY0, HIGH);
-  digitalWrite(RELAY1, HIGH);
+  RELAY_STATES[0] = 1;
+  RELAY_STATES[1] = 1;
+
+  RELAY_STATES_FLAG[0] = 1;
+  RELAY_STATES_FLAG[1] = 1;
 }

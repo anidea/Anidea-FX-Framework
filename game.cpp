@@ -79,10 +79,6 @@ void Game::loop(void)
         digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
         OUTPUT_STATES_FLAG[i] = false;
       }
-      else
-      {
-        OUTPUT_STATES[i] = digitalRead(OUTPUTS[i]);
-      }
     }
   }
 
@@ -95,10 +91,6 @@ void Game::loop(void)
       {
         digitalWrite(RELAYS[i], RELAY_STATES[i]);
         RELAY_STATES_FLAG[i] = false;
-      }
-      else
-      {
-        RELAY_STATES[i] = digitalRead(RELAYS[i]);
       }
     }
   }
@@ -134,11 +126,19 @@ void Game::reset(void)
 {
   // Routine run to reset the puzzle.  Run at start or by other means
     // Set outputs to all low to start
-  for(int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
-      digitalWrite(OUTPUTS[i], LOW);
+	for (int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
+	{
+		OUTPUT_STATES[i] = 0;
+		OUTPUT_STATES_FLAG[i] = false;
+		digitalWrite(OUTPUTS[i], LOW);
+	}
 
-  for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
-      digitalWrite(RELAYS[i], LOW);
+	for (int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
+	{
+		RELAY_STATES[i] = 0;
+		RELAY_STATES_FLAG[i] = false;
+		digitalWrite(RELAYS[i], LOW);
+	}
 	  
   Serial.println(F("Game Reset"));
   
