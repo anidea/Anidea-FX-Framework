@@ -16,10 +16,6 @@
 
 #ifndef fx450_h
 #define fx450_h
-#define FX450
-
-#include <FlashAsEEPROM.h>
-#include <FlashStorage.h>
 
 //FX450 Header
 const int RELAY0 = 2;
@@ -61,8 +57,7 @@ const int RELAYS[NUM_RELAYS] = {RELAY0, RELAY1};
 
 const int WIZ_CS = 10;
 
-#if defined(ARDUINO_SAMD_ZERO) && defined(SERIAL_PORT_USBVIRTUAL)
-  // Required for Serial on Zero based boards
+#if defined(SERIAL_PORT_USBVIRTUAL)
   #define Serial SERIAL_PORT_USBVIRTUAL
 #endif
 

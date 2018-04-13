@@ -16,7 +16,6 @@
 
 #ifndef fx300_h
 #define fx300_h
-#define FX300
 
 #include <EEPROM.h>
 
