@@ -17,6 +17,8 @@
 #ifndef fx450_h
 #define fx450_h
 
+#include <EEPROM.h>
+
 //FX450 Header
 const int RELAY0 = 2;
 const int RELAY1 = 3;
