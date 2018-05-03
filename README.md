@@ -3,8 +3,11 @@
 This application is targeted for the FX 300 and 400 series of boards, an Arduino compatible series of controllers from Escape Room Techs.  While this program is free (MIT LECENSE), please consider purchasing an FX350 or FX450 to support us making more free code. While this framework will run on an FX300 you will need the FX350 or FX450 to use any of the networking.
 
 [Purchase an FX300](https://www.escaperoomtechs.com/arduino-compatible-prop-controller-FX300-p/fx300ardpropctrl.htm)
+
 [Purchase an FX350](https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx350-p/fx350.htm)
+
 [Purchase an FX450](https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx450-p/fx450.htm)
+
 
 This is a generic framework for running different games on escape room props and connecting them with different management software.
 
@@ -131,7 +134,7 @@ Go to "Automation" -> Select your room -> Click "Add Event" -> Select "Network P
 Enter for the url:  
 http://0.0.0.123/json
 
-Choose “Run Script” from the Actions drop down menu -> Enter “Receive JSON” for the name -> Paste in the following script:
+Choose "Run Script" from the Actions drop down menu -> Enter "Receive JSON" for the name -> Paste in the following script:
 ```
 //Parse JSON string to object
 var obj = JSON.parse(env.returnVal);
@@ -234,7 +237,7 @@ Example:
 
 Here is the process to add an action based off a custom event:
 
-Click “Add Event” in the automation editor -> Choose “Custom Event” from the Event drop down menu -> Type in the name of the event you want to listen for -> Choose the action you want to occur.
+Click "Add Event" in the automation editor -> Choose "Custom Event" from the Event drop down menu -> Type in the name of the event you want to listen for -> Choose the action you want to occur.
 
 Here is a full list of the custom events:  
 * solved
@@ -392,7 +395,7 @@ Example:
 
 ### MQTT
 
-All communication with the prop is done in the MQTT topic "/myChannel/myProp" where myChannel is the specified channel name and myProp is the specified prop name. As a naming convention you can append the last three digits of the IP address to the prop name to help with identification. I.e. if your prop has a static IP of 192.168.1.123, name your prop “prop123”.
+All communication with the prop is done in the MQTT topic "/myChannel/myProp" where myChannel is the specified channel name and myProp is the specified prop name. As a naming convention you can append the last three digits of the IP address to the prop name to help with identification. I.e. if your prop has a static IP of 192.168.1.123, name your prop "prop123".
  
 Inputs and outputs are sent through the topic as JSON objects.  
 
@@ -406,7 +409,7 @@ When the prop detects a state change of an input, it sends the following json ob
     "VALUE":[value]
 }
 ```
-“FROM” indicates that this is a message from the prop to the MQTT server. The [index] will be the input index (i.e. 0 is INPUT0, 1 is INPUT1…). The value will be the digital read of the pin (either 0 for LOW or 1 for HIGH).
+"FROM" indicates that this is a message from the prop to the MQTT server. The [index] will be the input index (i.e. 0 is INPUT0, 1 is INPUT1…). The value will be the digital read of the pin (either 0 for LOW or 1 for HIGH).
 
 Example
 ```json
@@ -424,13 +427,13 @@ This is a state change from the prop indicating INPUT0 is now HIGH.
 To set an output, send a json object as follows:
 ```json
 {
-    "DIRECTION”:”TO”,
+    "DIRECTION":"TO",
     "TYPE":"OUTPUT",
     "INDEX":[index],
     "VALUE":[value]
 }
 ```
-“TO” indicates that this is a message to the prop from the MQTT server. [value] should be 1 to turn an output on or 0 to turn an output off.
+"TO" indicates that this is a message to the prop from the MQTT server. [value] should be 1 to turn an output on or 0 to turn an output off.
 
 Example
 ```json
@@ -446,4 +449,4 @@ This is a command to the prop that will set OUTPUT0 to HIGH.
 [Here is a comprehensive list of all commands and further documentation]( https://github.com/anidea/Support-Documentation/tree/master/FX%20Controller%20Networking/MQTT%20and%20Node%20Red)
 
 #### Node-RED
-An easy way to work with the MQTT interface is using Node-RED. To get started with our example, copy the contents of [this json file]( https://github.com/anidea/Support-Documentation/blob/master/FX%20Controller%20Networking/MQTT%20and%20Node%20Red/NodeRED%20Example.json). Then in Node-RED, go to the menu, select Import -> Clipboard. Paste the file contents into the window, select “new flow” and click Ok. Click to position the nodes. In the From MQTT and To MQTT nodes, change the topic to match your prop settings. Finally press Deploy and you should be connected!
+An easy way to work with the MQTT interface is using Node-RED. To get started with our example, copy the contents of [this json file]( https://github.com/anidea/Support-Documentation/blob/master/FX%20Controller%20Networking/MQTT%20and%20Node%20Red/NodeRED%20Example.json). Then in Node-RED, go to the menu, select Import -> Clipboard. Paste the file contents into the window, select "new flow" and click Ok. Click to position the nodes. In the From MQTT and To MQTT nodes, change the topic to match your prop settings. Finally press Deploy and you should be connected!
