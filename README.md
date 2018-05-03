@@ -1,9 +1,10 @@
-# Escape Room Techs FX Controller
+﻿# Escape Room Techs FX Controller
 
 This application is targeted for the FX 300 and 400 series of boards, an Arduino compatible series of controllers from Escape Room Techs.  While this program is free (MIT LECENSE), please consider purchasing an FX350 or FX450 to support us making more free code. While this framework will run on an FX300 you will need the FX350 or FX450 to use any of the networking.
 
-You can purchase an FX300 at https://www.escaperoomtechs.com/arduino-compatible-prop-controller-FX300-p/fx300ardpropctrl.htm
-You can purchase an FX350 at https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx350-p/fx350.htm
+[Purchase an FX300](https://www.escaperoomtechs.com/arduino-compatible-prop-controller-FX300-p/fx300ardpropctrl.htm)
+[Purchase an FX350](https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx350-p/fx350.htm)
+[Purchase an FX450](https://www.escaperoomtechs.com/escape-room-prop-controller-ethernet-arduino-fx450-p/fx450.htm)
 
 This is a generic framework for running different games on escape room props and connecting them with different management software.
 
@@ -391,51 +392,58 @@ Example:
 
 ### MQTT
 
-All communication with the prop is done on the mqtt topic "Prop" followed by the last 3 digits of the IP. So in thise case the topic is "Prop123".  
+All communication with the prop is done in the MQTT topic "/myChannel/myProp" where myChannel is the specified channel name and myProp is the specified prop name. As a naming convention you can append the last three digits of the IP address to the prop name to help with identification. I.e. if your prop has a static IP of 192.168.1.123, name your prop “prop123”.
+ 
 Inputs and outputs are sent through the topic as JSON objects.  
 
 #### Input
-When the prop sends out the game state the object is formatted as follows:
-```
+When the prop detects a state change of an input, it sends the following json object:
+```json
 {
-    "TYPE": "GAMESTATE",
-    "DIRECTION": "FROM",
-    "VALUE": 1
+    "DIRECTION":"FROM",
+    "TYPE":"INPUT",
+    "INDEX":[index],
+    "VALUE":[value]
 }
 ```
-This indicates that this is a message from the prop about the gamestate. The "VALUE" will be 1 if the prop has been solved or 0 if it has been reset.
+“FROM” indicates that this is a message from the prop to the MQTT server. The [index] will be the input index (i.e. 0 is INPUT0, 1 is INPUT1…). The value will be the digital read of the pin (either 0 for LOW or 1 for HIGH).
 
-For specific inputs the object is formatted as follows:  
-```
+Example
+```json
 {
-    "TYPE": "INPUT",
-    "INPUT": 0,
-    "VALUE": 1
+    "DIRECTION":"FROM",
+    "TYPE":"INPUT",
+    "INDEX":0,
+    "VALUE":1
 }
 ```
-This indicates that the message is for an input and the input is number 0. The "VALUE" is the value of the input.
+This is a state change from the prop indicating INPUT0 is now HIGH. 
+
 
 #### Output
-To set the game state the object is formatted as follows:
-```
+To set an output, send a json object as follows:
+```json
 {
-    "TYPE": "GAMESTATE",
-    "DIRECTION": "TO",
-    "VALUE": 1
+    "DIRECTION”:”TO”,
+    "TYPE":"OUTPUT",
+    "INDEX":[index],
+    "VALUE":[value]
 }
 ```
-This indicates that this is a message to the prop about the gamestate. The "VALUE" should be 1 to solve the prop or 0 to reset the prop.
+“TO” indicates that this is a message to the prop from the MQTT server. [value] should be 1 to turn an output on or 0 to turn an output off.
 
-To set a specific output the object is formatted as follows:
-```
+Example
+```json
 {
     "TYPE": "OUTPUT",
     "OUTPUT": 0,
     "VALUE": 1
 }
 ```
-This indicates that the nessage is for an output and the output is number 0. The "VALUE" is the value you are setting the output to.
+This is a command to the prop that will set OUTPUT0 to HIGH.
+
+#### All Commands
+[Here is a comprehensive list of all commands and further documentation]( https://github.com/anidea/Support-Documentation/tree/master/FX%20Controller%20Networking/MQTT%20and%20Node%20Red)
 
 #### Node-RED
-An easy way to work with the mqtt interface is using Node-RED. Here is an example layout:
-![node-redexample](https://user-images.githubusercontent.com/31215073/31030159-53be35c6-a522-11e7-8afa-d47c1a696a16.png)
+An easy way to work with the MQTT interface is using Node-RED. To get started with our example, copy the contents of [this json file]( https://github.com/anidea/Support-Documentation/blob/master/FX%20Controller%20Networking/MQTT%20and%20Node%20Red/NodeRED%20Example.json). Then in Node-RED, go to the menu, select Import -> Clipboard. Paste the file contents into the window, select “new flow” and click Ok. Click to position the nodes. In the From MQTT and To MQTT nodes, change the topic to match your prop settings. Finally press Deploy and you should be connected!
