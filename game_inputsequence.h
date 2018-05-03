@@ -19,8 +19,6 @@ class inputsequence : public Game
     virtual void reset(); // Call to reset game
 
   private:
-    static const int HALL_NORTH_THRESH = (.4 * 0x3FF);
-    static const int HALL_SOUTH_THRESH = (.6 * 0x3FF);
 
     // Configure the steady state input filter
     // Inputs must be steady for COUNT * TIME before being accepted

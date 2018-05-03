@@ -48,9 +48,6 @@ class sequencedetect : public Game
     void recordInputButtonSequence(void);
     int scanInputsSteady(void);
     void allLightsOnOff(int state);
-
-    static const int HALL_NORTH_THRESH = (.4 * 0x3FF);
-    static const int HALL_SOUTH_THRESH = (.6 * 0x3FF);
     
     // Software configuration defines - used for simple debounce
     static const int DEBOUNCE_COUNT = 6;   // Try to keep even

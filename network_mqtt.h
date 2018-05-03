@@ -17,48 +17,49 @@
 #ifndef network_mqtt_h
 #define network_mqtt_h
 
-#include <Ethernet2.h>
-#include <PubSubClient.h>
-#include <ArduinoJson.h>
 #include "game.h"
 #include "arduino.h"
+#include "game_rfid.h"
+#include "network.h"
 
 class Game;
-
+class PubSubClient;
 class mqtt : public Network
 {
-  public:
-    mqtt(byte[], IPAddress, IPAddress);
+public:
+	mqtt(byte[], IPAddress, IPAddress);
 
-    virtual void loop(void);
+	virtual void loop(void);
 
-  private:
-    void sendChanges();
+	virtual void tick();
 
-    void reconnect();
+private:
+	void sendChanges();
 
-    static void callback(char*, byte*, unsigned int);
+	void reconnect();
 
-    EthernetClient ethClient = server.available();
-    
-    PubSubClient client;
+	static void callback(char*, uint8_t*, unsigned int);
 
-    int serverPort = 1883;
+	void printData(char* data, char* channel);
 
-    char propName[16];
+	EthernetClient ethClient = server.available();
 
-    bool sent;
+	PubSubClient* client = nullptr;
 
-    char serverName[16];
+	int serverPort = 1883;
 
-    bool INPUT_STATE_OLD[NUM_INPUTS] = {false};
+	static char propName[];
+	static char channelName[];
 
-    bool OUTPUT_STATE_OLD[NUM_INPUTS] = {false};
+	bool sent;
 
-    bool RELAY_STATE_OLD[NUM_INPUTS] = {false};
+	static const uint16_t HEARTBEAT_INTERVAL = 10000; // 10 second interval
+	uint16_t heartbeat_timer = HEARTBEAT_INTERVAL;
 
-    static byte learnResponse;
-    static byte learnResponseOld;
+	static const uint16_t RETRY_INTERVAL = 5000; // 5 second interval
+	uint16_t retry_timer = 0;
+
+	bool connected = false;
 };
 
 #endif

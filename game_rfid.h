@@ -1,87 +1,63 @@
 #ifndef game_rfid__h
 #define game_rfid__h
 
-#include "arduino.h"
+#include <Arduino.h>
 #include "network.h"
 #include "game.h"
+
+#define RFID_TAG_COUNT 4		// Number of FX200s
+#define RFID_INTERVAL 300		// Scanning interval in ms
+#define RFID_TIMEOUT 50			// Timeout time in ms
+#define RFID_STR_LEN_MAX 20		// Max length of RFID tag ID strings
+
+#define NONE "NONE"
+#define NODATA "NODATA"
+#define SAVEDDATA "SAVEDDATA"
+
+//#define USE_GROUPS
+#ifdef USE_GROUPS
+#define RFID_GROUPS { {0}, {1}, {2}, {3} }// Make sure each group is padded with -1 if less than max
+#define RFID_INNER_COUNT 1 // Number of elements in inner braces
+#define RFID_OUTER_COUNT 4 // Number of arrays in outer braces
+#define RFID_TIMING {RFID_INTERVAL*0, RFID_INTERVAL*1, RFID_INTERVAL*2 ,RFID_INTERVAL*3}
+#endif
 
 class Network;
 
 class rfid : public Game
 {
-  public:
-    rfid();
+public:
+	rfid();
 
-    virtual void loop();
+	virtual void reset(); // Call to reset game
+	virtual void tick();
+	virtual byte learn();
+	virtual void solved();
+	
+	virtual bool isRFIDChanged();
+	virtual void getTagData(char * data, size_t size);
 
-    void solved();
+private:
+	uint32_t uReceiveLen;
 
-    byte learn();
+	void RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength);
 
-    virtual void reset(); // Call to reset game
+	virtual void loop();
 
-    byte getLen();
-    void getTagStates(byte tagStates[], bool&);
+	void scanRFID();
 
-  private:
-    // Presets
-    #define RFID_GAME_DEFAULT 1
-    #define RFID_GAME_SMALL4 2
-    #define RFID_GAME_LARGE24 3
+	uint16_t readDelay = 0;
 
-    // Configuration
-    #define RFID_iGame RFID_GAME_DEFAULT
+	char tag_data[RFID_TAG_COUNT][RFID_STR_LEN_MAX + 1]{}; //Currently read tag IDs
+	char solved_data[RFID_TAG_COUNT][RFID_STR_LEN_MAX + 1]{}; //Stored ids
 
-    #if RFID_iGame == RFID_GAME_DEFAULT
-      static const bool learnWithMissingTag = true;
-      static const byte iTotalScanLength = 4;
-      static const byte iTagOffset = 1;
-      static const bool require_enable = false;
-    #elif RFID_iGame == RFID_GAME_SMALL4
-      static const bool learnWithMissingTag = false;
-      static const byte iTotalScanLength = 4;
-      static const byte iTagOffset = 0;
-      static const bool require_enable = false;
-    #elif RFID_iGame == RFID_GAME_LARGE24
-      static const bool learnWithMissingTag = true;
-      static const byte iTotalScanLength = 24;
-      static const byte iTagOffset = 2;
-      static const bool require_enable = false;
-    #endif
-    
-    static const byte LEARN_BUTTON = INPUT0;
-    static const byte RESET_BUTTON = INPUT1;
-    static const byte EMERGENCY_BUTTON = INPUT2;
-    
-    static const byte ACTIVITY_LIGHT_1 = OUTPUT0;
-    static const byte ACTIVITY_LIGHT_2 = OUTPUT1;
-    static const byte ERROR_LIGHT = OUTPUT2;
-    static const byte LEARN_LIGHT = OUTPUT3;
-    static const byte SOUND_CUE = OUTPUT4;
-    
-    static const byte MAG_LOCK = RELAY0;
-    
-    static const byte RFID_STR_LEN_MAX = 20;
+#ifdef USE_GROUPS
+	int timings[4] = RFID_TIMING;
+#endif
 
-    bool iPuzzleSolved = false;
-    bool learnPress = false;
-    bool resetPress = false;
-    bool iEmergencyExit;
-    uint32_t uReceiveLen;
-    int iLoop = 0;
-    bool iCommFailure = 0;
-    bool iAllTagsMatched = 0;
-    byte iTagMatchCount = 0;
-    
-    byte tagFails[iTotalScanLength];
-    bool tagFound[iTotalScanLength];
-    byte tagStatesOld[iTotalScanLength];
+	bool data_flag = false;
 
-    void RS485_SendMessage(char *pMessage, char *pResponse, uint32_t *puLength);
-    byte RfidSetGetTagIds(byte iGet);
-    void buttons();
-    void EEPROMReadString(byte, byte, char*);
-    void EEPROMWriteString(byte, char*);
+	HardwareSerial* mySerialRfid;
 };
 
 #endif

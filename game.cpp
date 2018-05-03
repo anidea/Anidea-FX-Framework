@@ -13,13 +13,13 @@ Game::Game()
 {
   pinMode(RELAY0, OUTPUT);
   pinMode(RELAY1, OUTPUT);
+
   pinMode(OUTPUT0, OUTPUT);
   pinMode(OUTPUT1, OUTPUT);
   pinMode(OUTPUT2, OUTPUT);
   pinMode(OUTPUT3, OUTPUT);
   pinMode(OUTPUT4, OUTPUT);
   pinMode(OUTPUT5, OUTPUT);
-  pinMode(LED, OUTPUT);
 
   pinMode(INPUT0, INPUT);
   pinMode(INPUT1, INPUT);
@@ -27,6 +27,9 @@ Game::Game()
   pinMode(INPUT3, INPUT);
   pinMode(INPUT4, INPUT);
   pinMode(INPUT5, INPUT);
+
+  pinMode(RS485_ENABLE, OUTPUT);
+  pinMode(LED, OUTPUT);
 
   // Turn all overrides on
   for(int i = 0; i < NUM_INPUTS; ++i) //Or loop the array and init them.
@@ -38,6 +41,26 @@ Game::Game()
   for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
       RELAY_OVERRIDE_ENABLE[i] = true;
 
+	#if defined(FX60_0_ENABLE) || defined(FX60_1_ENABLE)
+	  Wire.begin();   // I2C
+	#endif
+
+	#if defined(FX60_0_ENABLE)
+	  FX60_0_I2C.writeAll(0, 0, 0); // Clear all
+	  FX60_0_I2C.setAllDirection(0xFF, 0, 0); // Input, output, output
+
+	  Serial.print("FX60_0 Connection: ");
+	  Serial.println(FX60_0_I2C.testConnection());
+	#endif
+
+	#if defined(FX60_1_ENABLE)
+	  FX60_1_I2C.writeAll(0, 0, 0); // Clear all
+	  FX60_1_I2C.setAllDirection(0xFF, 0, 0); // Input, output, output
+
+	  Serial.print("FX60_1 Connection: ");
+	  Serial.println(FX60_1_I2C.testConnection());
+	#endif
+
   Serial.println(F("Game object initialized"));
 }
 
@@ -47,9 +70,7 @@ Game::Game()
 //
 void Game::tick(void)
 {
-  static int freeRunningTimer;
-
-  freeRunningTimer++;
+	freeRunningTimer += TIMER_INTERVAL;
 }
 
 ///////////////////////////////////
@@ -63,37 +84,153 @@ void Game::loop(void)
 
   delay(10); // Keep game running at a reasonable rate, not micro speed. 100x a second, ehternet adds significant delays
 
-  // Read input states
+			 // Read input states
   for (int i = 0; i < NUM_INPUTS; i++)
   {
-      INPUT_STATES[i] = digitalRead(INPUTS[i]);
+	  if (INPUT_OVERRIDE_ENABLE[i])
+	  {
+		  INPUT_STATES[i] = digitalRead(INPUTS[i]);
+	  }
   }
 
   // Write output states
   for (int i = 0; i < NUM_OUTPUTS; i++)
   {
-    if (OUTPUT_OVERRIDE_ENABLE[i] == true)
-    {
-      if (OUTPUT_STATES_FLAG[i] == true)
-      {
-        digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
-        OUTPUT_STATES_FLAG[i] = false;
-      }
-    }
+	  if (OUTPUT_OVERRIDE_ENABLE[i])
+	  {
+		  if (OUTPUT_STATES_FLAG[i] == true)
+		  {
+			  digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
+			  OUTPUT_STATES_FLAG[i] = false;
+		  }
+		  else
+		  {
+			  OUTPUT_STATES[i] = digitalRead(OUTPUTS[i]);
+		  }
+	  }
   }
 
   // Write relay states
   for (int i = 0; i < NUM_RELAYS; i++)
   {
-    if (RELAY_OVERRIDE_ENABLE[i] == true)
-    {
-      if (RELAY_STATES_FLAG[i] == true)
-      {
-        digitalWrite(RELAYS[i], RELAY_STATES[i]);
-        RELAY_STATES_FLAG[i] = false;
-      }
-    }
+	  uint8_t bitIndex = 1 << i;
+
+	  if (RELAY_OVERRIDE_ENABLE[i])
+	  {
+		  if (RELAY_STATES_FLAG[i] == true)
+		  {
+			  digitalWrite(RELAYS[i], RELAY_STATES[i]);
+
+			  RELAY_STATES_FLAG[i] = false;
+		  }
+		  else
+		  {
+			  RELAY_STATES[i] = digitalRead(RELAYS[i]);
+		  }
+	  }
   }
+#if defined(FX60_0_ENABLE)
+  for (int i = 0; i < FX60_NUM_INPUTS; i++)
+  {
+	  bool read = FX60_0_I2C.readPin(FX60_INPUTS[i]);
+	  uint8_t bitIndex = 1 << i;
+	  FX60_0_INPUT_STATES &= ~bitIndex;
+	  FX60_0_INPUT_STATES |= bitIndex * read;
+  }
+
+  // Write output states
+  for (int i = 0; i < FX60_NUM_OUTPUTS; i++)
+  {
+	  uint8_t bitIndex = 1 << i;
+
+	  if (FX60_0_OUTPUT_OVERRIDES & bitIndex) //If override enabled
+	  {
+		  if (FX60_0_OUTPUT_STATES_FLAG & bitIndex) //If state changed
+		  {
+			  FX60_0_I2C.writePin(FX60_OUTPUTS[i], (FX60_0_OUTPUT_STATES & bitIndex) ? HIGH : LOW); //write change
+			  FX60_0_OUTPUT_STATES_FLAG &= ~bitIndex; //zero out flag
+		  }
+		  /*else
+		  {
+		  bool read = FX60_0_I2C.readPin(FX60_OUTPUTS[i]);
+		  FX60_0_OUTPUT_STATES &= ~bitIndex;
+		  FX60_0_OUTPUT_STATES |= bitIndex * read;
+		  }*/
+	  }
+  }
+
+  // Write relay states
+  for (int i = 0; i < FX60_NUM_RELAYS; i++)
+  {
+	  uint8_t bitIndex = 1 << i;
+
+	  if (FX60_0_RELAY_OVERRIDES & bitIndex)
+	  {
+		  if (FX60_0_RELAY_STATES_FLAG & bitIndex) //If state changed
+		  {
+			  FX60_0_I2C.writePin(FX60_RELAYS[i], (FX60_0_RELAY_STATES & bitIndex) ? HIGH : LOW); //write change
+			  FX60_0_RELAY_STATES_FLAG &= ~bitIndex; //zero out flag
+		  }
+		  /*else
+		  {
+		  bool read = FX60_0_I2C.readPin(FX60_RELAYS[i]);
+		  FX60_0_RELAY_STATES &= ~bitIndex;
+		  FX60_0_RELAY_STATES |= bitIndex * read;
+		  }*/
+	  }
+  }
+#endif
+#if defined(FX60_1_ENABLE)
+  for (int i = 0; i < FX60_NUM_INPUTS; i++)
+  {
+	  bool read = FX60_1_I2C.readPin(FX60_INPUTS[i]);
+	  uint8_t bitIndex = 1 << i;
+	  FX60_1_INPUT_STATES &= ~bitIndex;
+	  FX60_1_INPUT_STATES |= bitIndex * read;
+  }
+
+  // Write output states
+  for (int i = 0; i < FX60_NUM_OUTPUTS; i++)
+  {
+	  uint8_t bitIndex = 1 << i;
+
+	  if (FX60_1_OUTPUT_OVERRIDES & bitIndex) //If override enabled
+	  {
+		  if (FX60_1_OUTPUT_STATES_FLAG & bitIndex) //If state changed
+		  {
+			  FX60_1_I2C.writePin(FX60_OUTPUTS[i], (FX60_1_OUTPUT_STATES & bitIndex) ? HIGH : LOW); //write change
+			  FX60_1_OUTPUT_STATES_FLAG &= ~bitIndex; //zero out flag
+		  }
+		  /*else
+		  {
+		  bool read = FX60_1_I2C.readPin(FX60_OUTPUTS[i]);
+		  FX60_1_OUTPUT_STATES &= ~bitIndex;
+		  FX60_1_OUTPUT_STATES |= bitIndex * read;
+		  }*/
+	  }
+  }
+
+  // Write relay states
+  for (int i = 0; i < FX60_NUM_RELAYS; i++)
+  {
+	  uint8_t bitIndex = 1 << i;
+
+	  if (FX60_1_RELAY_OVERRIDES & bitIndex)
+	  {
+		  if (FX60_1_RELAY_STATES_FLAG & bitIndex) //If state changed
+		  {
+			  FX60_1_I2C.writePin(FX60_RELAYS[i], (FX60_1_RELAY_STATES & bitIndex) ? HIGH : LOW); //write change
+			  FX60_1_RELAY_STATES_FLAG &= ~bitIndex; //zero out flag
+		  }
+		  /*else
+		  {
+		  bool read = FX60_1_I2C.readPin(FX60_RELAYS[i]);
+		  FX60_1_RELAY_STATES &= ~bitIndex;
+		  FX60_1_RELAY_STATES |= bitIndex * read;
+		  }*/
+	  }
+  }
+#endif
 }
 
 ///////////////////////////////////
@@ -169,4 +306,32 @@ void Game::disable(void)
   
   // Set game vars
   _enabled = false;
+}
+
+void Game::EEPROMReadString(byte pos, byte len, char* data)
+{
+	byte i;
+	for (i = 0; i < len; i++)
+	{
+		data[i] = EEPROM.read(pos + i);
+	}
+	data[i] = 0;
+
+	Serial.print("Read: ");
+	Serial.println(data);
+}
+
+void Game::EEPROMWriteString(byte pos, char* data)
+{
+	byte i;
+	for (i = 0; i < strlen(data); i++)
+	{
+		EEPROM.write(pos + i, data[i]);
+		Serial.println(data[i]);
+	}
+
+	EEPROM.write(pos + i, 0);
+
+	Serial.print("Wrote: ");
+	Serial.println(data);
 }

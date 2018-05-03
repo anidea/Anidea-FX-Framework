@@ -88,12 +88,12 @@ void setup() {
 
   // Setup timer for simon says, etc.
   #if defined(FX300) || defined(FX350)
-    MsTimer2::set(100, tenHzTimer);
+    MsTimer2::set(TIMER_INTERVAL, tenHzTimer);
     MsTimer2::start();
   #endif
   
   #if defined(FX450)
-    timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e5); // 10Hz Timer
+    timer3_10Hz = new SAMDtimer(3, tenHzTimer, 1e3 * TIMER_INTERVAL); // 10Hz Timer
   #endif
 
 }
