@@ -64,6 +64,8 @@ class Game
     bool _puzzleSolved = 0;
     byte _gameState = 0;
     bool _enabled = 0;
+
+	bool solvedFlag = false;
     
     // Input override enables
     bool INPUT_OVERRIDE_ENABLE[NUM_INPUTS] = {};

@@ -282,6 +282,8 @@ void Game::reset(void)
   // Reset game vars
   _puzzleSolved = 0;
   _gameState = GAMESTATE_START;
+  
+  solvedFlag = false;
 }
 
 ///////////////////////////////////

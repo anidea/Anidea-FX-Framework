@@ -67,8 +67,16 @@ void mqtt::sendChanges(void)
 	char data[MQTT_BUF_SZ];
 	char channel[MQTT_BUF_SZ];
 
-	const char *c = "{\"TYPE\": \"GAMESTATE\", \"DIRECTION\": \"FROM\", \"SOLVED\": %c}";
 	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
+
+	if (!pMyGame->solvedFlag && pMyGame->isSolved())
+	{
+		snprintf(data, MQTT_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"GAMESTATE\", \"VALUE\": %c}",pMyGame->_puzzleSolved);
+		client->publish(channel, data);
+		printData(data, channel);
+
+		pMyGame->solvedFlag = true;
+	}
 
 	for (int i = 0; i < NUM_INPUTS; i++)
 	{
@@ -292,6 +300,12 @@ void mqtt::callback(char* topic, uint8_t* payload, unsigned int length)
 		else if (strcmp(type, "RESET") == 0)
 		{
 			pMyGame->reset();
+		}
+		else if (strcmp(type, "GAMESTATE") == 0)
+		{
+			bool solved = root["VALUE"];
+			if (solved) pMyGame->forceSolved();
+			else pMyGame->reset();
 		}
 	}
 }
