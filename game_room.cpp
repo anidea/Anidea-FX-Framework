@@ -1,7 +1,14 @@
 #include "game_room.h"
 
-// Select which version of the room controller you have
-#define NUM_BUTTONS 0 //0, 1, or 2
+/////////////////////////////////////////////////////////
+// Select which version of the room controller you have//
+/////////////////////////////////////////////////////////
+
+#define NUM_BUTTONS 0 // 0, 1, or 2
+
+/////////////////////////////////////////////////////////
+//                                                     //
+/////////////////////////////////////////////////////////
 
 room::room() : Game()
 {
@@ -35,10 +42,8 @@ void room::loop(void)
   // Do generic loop actions
   Game::loop();
 
-  int startIndex = NUM_BUTTONS;
-  
   // Turn on respective OUTPUTS for each detected INPUT.
-  for (uint8_t i = startIndex; i < NUM_INPUTS; i++)
+  for (uint8_t i = NUM_BUTTONS; i < NUM_INPUTS; i++)
   {
 	if (digitalRead(INPUTS[i]) == HIGH)
 	{
