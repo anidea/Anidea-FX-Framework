@@ -5,10 +5,6 @@
 #include "network.h"
 #include "game.h"
 
-// Select which version of the room controller you have
-#define ONEBUTTON
-//#define TWOBUTTON
-
 class Network;
 
 class room : public Game

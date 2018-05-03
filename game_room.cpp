@@ -1,5 +1,8 @@
 #include "game_room.h"
 
+// Select which version of the room controller you have
+#define NUM_BUTTONS 0 //0, 1, or 2
+
 room::room() : Game()
 {
   // Only enable the inputs/outputs that are not going to be used by this game
@@ -32,12 +35,8 @@ void room::loop(void)
   // Do generic loop actions
   Game::loop();
 
-#ifdef ONEBUTTON
-	  int startIndex = 1;
-#elif defined(TWOBUTTON)
-	  int startIndex = 2;
-#endif
-
+  int startIndex = NUM_BUTTONS;
+  
   // Turn on respective OUTPUTS for each detected INPUT.
   for (uint8_t i = startIndex; i < NUM_INPUTS; i++)
   {
