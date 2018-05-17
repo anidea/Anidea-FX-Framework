@@ -201,13 +201,24 @@ void mqtt::sendChanges(void)
 
 	if (pMyGame->isRFIDChanged())
 	{
-		#define MQTT_TAG_BUF_SZ 50+RFID_TAG_COUNT*RFID_STR_LEN_MAX
+		byte count = pMyGame->getTagCount();
+		size_t MQTT_TAG_BUF_SZ = 50 + count * 32;
+
 		snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 
-		char tag_data[MQTT_TAG_BUF_SZ];
-		pMyGame->getTagData(tag_data, MQTT_TAG_BUF_SZ);
+		char* tag_data = new char[MQTT_TAG_BUF_SZ];	
+		snprintf(tag_data, MQTT_TAG_BUF_SZ, "{\"DIRECTION\":\"FROM\", \"TYPE\":\"RFID\", \"VALUE\":[");
+		for (int i = 0; i < count; i++)
+		{
+			snprintf(tag_data + strlen(tag_data), MQTT_TAG_BUF_SZ, "\"%s\"", pMyGame->getTag(i).c_str());
+			if (i != count - 1) snprintf(tag_data + strlen(tag_data), MQTT_TAG_BUF_SZ, ", ");
+		}
+		snprintf(tag_data + strlen(tag_data), MQTT_TAG_BUF_SZ, "] }");
+
 		printData(tag_data, channel);
 		client->publish(channel, tag_data);
+
+		delete[] tag_data;
 	}
 
 	// Broadcast heartbeat every 10 seconds to indicate that it is running

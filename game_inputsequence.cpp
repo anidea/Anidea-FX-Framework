@@ -101,11 +101,7 @@ void inputsequence::loop(void)
   }
 
   // Detect programming mode
-  if (analogRead(HALL) < HALL_NORTH_THRESH) // Detect a north pole of a magnet
-  {
-    // Programming mode entered
-    recordInputButtonSequence();
-  }
+  if (hallLearnCommand()) recordInputButtonSequence();
 
   int scanCurrentInputButton;
 
@@ -260,7 +256,7 @@ void inputsequence::recordInputButtonSequence(void)
   {
 
     // Look for exit
-    if (analogRead(HALL) > HALL_SOUTH_THRESH) // Detect a south pole of a magnet
+    if (hallLearnCommand()) // Detect a south pole of a magnet
     {
       break;
     }

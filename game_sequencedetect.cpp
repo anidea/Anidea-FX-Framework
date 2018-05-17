@@ -188,7 +188,7 @@ void sequencedetect::loop(void)
   }
 
   // Detect programming mode
-  if (analogRead(HALL) < HALL_NORTH_THRESH) // Detect a north pole of a magnet
+  if (hallLearnCommand()) // Detect a north pole of a magnet
   {
     // Programming mode entered
     recordInputButtonSequence();
@@ -445,7 +445,7 @@ void sequencedetect::recordInputButtonSequence(void)
   while(inputSequencePosition < GAME_MAX_SEQUENCE)
   {
     // Look for exit
-    if (analogRead(HALL) > HALL_SOUTH_THRESH) // Detect a south pole of a magnet
+    if (hallLearnCommand())
     {
       exitLoopEarly = 1;
       
@@ -471,6 +471,7 @@ void sequencedetect::recordInputButtonSequence(void)
       Serial.println(F(" recorded."));
 
       inputSequencePosition++;  //Record next button
+	  if (inputSequencePosition == GAME_MAX_SEQUENCE) hallLearnCommand(true);
 
       // Wait for no input before continuing
       while(scanInputsSteady() != NO_INPUT_DETECTED){};

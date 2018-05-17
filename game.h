@@ -15,9 +15,6 @@
 
 #define TIMER_INTERVAL 100
 
-#define HALL_NORTH_THRESH 410
-#define HALL_SOUTH_THRESH 614
-
 class Network;
 
 class Game
@@ -48,15 +45,18 @@ class Game
 
     virtual void disable(); // Call to disable game
 
+	bool hallLearnCommand(bool exit = false);
+
     void setNetwork(Network *pn) { this->_pMyNetwork = pn; };
 
     bool   isSolved(void)  {return _puzzleSolved; }
 
     bool   isEnabled(void)  {return _enabled; }
 
-	virtual void getTagData(char * data, size_t size) {}
+	virtual String getTag(byte index) { return ""; }
+	virtual byte getTagCount() { return 0; }
 	virtual bool isRFIDChanged() { return false; }
-    virtual byte learn() {}
+    virtual bool learn() {}
 
     Network *_pMyNetwork = NULL;
 
@@ -128,7 +128,7 @@ class Game
 	void EEPROMWriteString(byte pos, char* data);
 
   private:
-
+	  
 };
 
 #endif

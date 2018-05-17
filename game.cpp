@@ -337,3 +337,66 @@ void Game::EEPROMWriteString(byte pos, char* data)
 	Serial.print("Wrote: ");
 	Serial.println(data);
 }
+
+bool Game::hallLearnCommand(bool exit)
+{
+	static const int HALL_NORTH_THRESH = (.4 * 0x3FF);
+	static const int HALL_SOUTH_THRESH = (.6 * 0x3FF);
+
+	static bool releaseNorth;
+	static bool learning = false;
+	static bool released = true;
+
+	if (exit)
+	{
+		learning = false;
+		released = true;
+		return true;
+	}
+
+	int read = analogRead(HALL);
+
+	bool inNorth = read < HALL_NORTH_THRESH;
+	bool inSouth = read > HALL_SOUTH_THRESH;
+
+	if (!inNorth && !inSouth) released = true;
+
+	if (!released) return false;
+
+	if (learning)
+	{
+		if (inNorth && releaseNorth)
+		{
+			released = false;
+			learning = false;
+			return true;
+		}
+		else if (inSouth && !releaseNorth)
+		{
+			released = false;
+			learning = false;
+			return true;
+		}
+	}
+	else
+	{
+		if (inNorth)
+		{
+			releaseNorth = false;
+			learning = true;
+			released = false;
+
+			return true;
+		}
+		else if (inSouth)
+		{
+			releaseNorth = true;
+			learning = true;
+			released = false;
+
+			return true;
+		}
+	}
+
+	return false;
+}
