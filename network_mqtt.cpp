@@ -1,21 +1,37 @@
-#include <PubSubClient.h>
 #include "network_mqtt.h"
 #include "fx60.h"
-#include <ArduinoJson.h>
 
 // Configuration
 char mqtt::propName[] = "myProp";
 char mqtt::channelName[] = "myChannel";
 
-//#define DEBUG_MQTT
+#ifdef AUTO_FIND_MQTT_SERVER
+EthernetUDP udp;
+MDNS mdns(udp);
+#endif
 
 mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
+	#ifdef AUTO_FIND_MQTT_SERVER
+	// Get HostIP from mDNS
+	mdns.begin(Ethernet.localIP(), "arduino");
+	mdns.setServiceFoundCallback(serviceFound);
+	mdns.startDiscoveringService("_mqtt._tcp", MDNSServiceTCP, 5000);
+	#endif
+
 	client = new PubSubClient();
 	client->setClient(ethClient);
 	client->setServer(HostIP, serverPort);
 	client->setCallback(mqtt::callback);
 }
+
+#ifdef AUTO_FIND_MQTT_SERVER
+void mqtt::serviceFound(const char* type, MDNSServiceProtocol /*proto*/, const char* name, IPAddress ip, unsigned short port, const char* txtContent)
+{
+	//HostIP = ip;
+	mdns.stopDiscoveringService();
+}
+#endif
 
 void mqtt::loop(void)
 {
@@ -35,6 +51,9 @@ void mqtt::loop(void)
 		sendChanges();
 		client->loop();
 	}
+	#ifdef AUTO_FIND_MQTT_SERVER
+	mdns.run();
+	#endif
 }
 
 void mqtt::tick()
@@ -63,7 +82,7 @@ void mqtt::printData(char* data, char* channel)
 
 void mqtt::sendChanges(void)
 {
-#define MQTT_BUF_SZ 128
+	#define MQTT_BUF_SZ 128
 	char data[MQTT_BUF_SZ];
 	char channel[MQTT_BUF_SZ];
 
@@ -222,7 +241,6 @@ void mqtt::sendChanges(void)
 
 void mqtt::callback(char* topic, uint8_t* payload, unsigned int length)
 {
-	rfid *rfidGame = static_cast<rfid*>(pMyGame);
 	char channel[MQTT_BUF_SZ];
 	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 	if (strcmp(topic, channel) == 0)
@@ -246,6 +264,7 @@ void mqtt::callback(char* topic, uint8_t* payload, unsigned int length)
 		{
 			int RELAYnum = root["INDEX"];
 			bool RELAYstate = root["VALUE"];
+
 			pMyGame->RELAY_STATES[RELAYnum] = RELAYstate;
 			pMyGame->RELAY_STATES_FLAG[RELAYnum] = true;
 		}

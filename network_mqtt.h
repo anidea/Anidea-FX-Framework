@@ -21,6 +21,17 @@
 #include "arduino.h"
 #include "game_rfid.h"
 #include "network.h"
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+
+// Options
+//#define AUTO_FIND_MQTT_SERVER // Enable locating MQTT server using mDNS
+//#define DEBUG_MQTT // Show debug information through serial
+
+#ifdef AUTO_FIND_MQTT_SERVER
+#include <EthernetUdp2.h>
+#include <ArduinoMDNS.h>
+#endif
 
 class Game;
 class PubSubClient;
@@ -39,6 +50,11 @@ private:
 	void reconnect();
 
 	static void callback(char*, uint8_t*, unsigned int);
+
+
+	#ifdef AUTO_FIND_MQTT_SERVER
+	static void serviceFound(const char* type, MDNSServiceProtocol /*proto*/, const char* name, IPAddress ip, unsigned short port, const char* txtContent);
+	#endif
 
 	void printData(char* data, char* channel);
 

@@ -22,19 +22,23 @@
 #include "game.h"
 #include "arduino.h"
 
+// Options
+#define ENABLE_DHCP // Enables obtaining an IP address with DHCP
 
 class Game;
 
 class Network
 {
   public:
-    Network();
-  
     Network(byte [], IPAddress, IPAddress, bool);
 
     virtual void loop(void);
 
     virtual void setGame(Game *pg) { pMyGame = pg; };
+
+	#ifdef ENABLE_DHCP
+	void getIP_DHCP();
+	#endif
 
     byte *MyMac;
     
@@ -46,7 +50,7 @@ class Network
     EthernetServer server;
 
   private:
-    void getIP(int);
+    void getIP();
 };
 
 #endif
