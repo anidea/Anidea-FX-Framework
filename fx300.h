@@ -38,6 +38,7 @@ const int INPUT4 = 18;
 const int INPUT5 = 19;
 
 const int RS485_ENABLE = OUTPUT5;
+HardwareSerial* const RS485_SERIAL = &Serial;
 
 const int LED = -1;
 

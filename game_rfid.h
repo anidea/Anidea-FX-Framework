@@ -19,8 +19,14 @@ public:
 
 	virtual byte getTagCount();
 
+	void saveTags();
+
+	void loadTags();
+
 private:
 	virtual void loop();
+
+	virtual void solved() override;
 
 	bool data_flag = false;
 };

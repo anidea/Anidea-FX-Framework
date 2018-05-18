@@ -1,7 +1,5 @@
 #include "game_rfid.h"
 
-//Uncomment to enable Serial debugging output
-#define DEBUG_RFID
 #include "fx200.h"
 
 // Number of readers
@@ -10,25 +8,31 @@ const int numberOfReaders = 3;
 // Our FX200 configuration
 FX200Configuration config
 {
-	/*  Read Style:*/ RFIDReadStyle::SEQUENTIAL, // EVENODD, SEQUENTIAL, or IMMEDIATE (used with user controlled timings)
+	/*  Read Style:*/ RFIDReadStyle::EVENODD, // EVENODD, SEQUENTIAL, or IMMEDIATE (used with user controlled timings)
 	/*   RS485 Pin:*/ RS485_ENABLE, // This pin is defined in fx300.h and fx450.h
-	/*  RS485 Uart:*/ &Serial, // This is the UART we want to use
+	/*  RS485 Uart:*/ RS485_SERIAL, // This UART is defined in fx300.h and fx450.h
 
 	/* This parameters are optional*/
 	/*   Read Time:*/ 400, // This is how long a reader will attempt to find a tag and also our interval
 	/* Expire Time:*/ 2000, // This is how long a reader will keep tag information before expiring
-	/*EEPROM Start:*/ Game::EEPROM_START
 };
 
 FX200<numberOfReaders> fx200(config);
 
 rfid::rfid() : Game()
 {
+	// Delay on startup if using an FX300
+	#if defined(FX350) || defined(FX300)
+		delay(3000);
+	#endif
+
 	fx200.init();
 
 	reset();
 
 	Serial.println(F("RFID Game"));
+
+	loadTags();
 }
 
 bool rfid::learn()
@@ -57,7 +61,7 @@ void rfid::loop()
 
 	case GAMESTATE_RUN:
 		// If hall programming detected, learn tags
-		if (hallLearnCommand()) learn();
+		if (hallLearnCommand() && learn()) saveTags();
 
 		// Scan tags for new data
 		fx200.scan();
@@ -81,6 +85,13 @@ void rfid::loop()
 	}
 }
 
+void rfid::solved()
+{
+	digitalWrite(RELAY0, LOW);
+	digitalWrite(OUTPUT3, HIGH);
+}
+
+
 bool rfid::isRFIDChanged()
 {
 	bool ret = data_flag;
@@ -88,7 +99,6 @@ bool rfid::isRFIDChanged()
 	return ret;
 }
 
-// For MQTT Networking
 String rfid::getTag(byte index)
 {
 	return fx200.getTag(index);
@@ -97,4 +107,27 @@ String rfid::getTag(byte index)
 byte rfid::getTagCount()
 {
 	return numberOfReaders;
+}
+
+void rfid::saveTags()
+{
+	EEPROM.write(EEPROM_START, numberOfReaders);
+	for (int i = 0; i < numberOfReaders; i++)
+	{
+		String tag = fx200.getTag(i);
+		EEPROMWriteString(EEPROM_START + 1 + i * 32, (char*) tag.c_str());
+	}
+}
+
+void rfid::loadTags()
+{
+	byte count = EEPROM.read(EEPROM_START);
+	if (count != numberOfReaders) return;
+
+	char storedTag[32];
+	for (int i = 0; i < numberOfReaders; i++)
+	{
+		EEPROMReadString(EEPROM_START + 1 + i * 32, 32, storedTag);
+		fx200.setSolvedTag(i, storedTag);
+	}
 }

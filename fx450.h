@@ -18,7 +18,7 @@
 #define fx450_h
 
 #include <EEPROM.h>
-
+#include <variant.h>
 //FX450 Header
 const int RELAY0 = 2;
 const int RELAY1 = 3;
@@ -40,6 +40,7 @@ const int INPUT5 = A5;
 const int ANALOG_IN = 9;
 
 const int RS485_ENABLE = 1;
+HardwareSerial* const RS485_SERIAL = &Serial5;
 
 const int LED = 13;
 
