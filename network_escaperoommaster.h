@@ -18,7 +18,6 @@
 #define escaperoommaster_h
 
 #include <Ethernet2.h>
-#include <ArduinoJson.h>
 #include "game.h"
 #include "arduino.h"
 

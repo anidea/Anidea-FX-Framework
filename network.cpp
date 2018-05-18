@@ -26,10 +26,10 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
   
     if (_MyIP[0] == 0) // MyIP is not set by program
     {
-  //    Serial.println("MyIP not set");
+  //    //Serial.println("MyIP not set");
       if (EEPROM.read(0) == 1) // MyIP is saved in EEPROM
       {
-  //      Serial.println("Reading MyIP from EEPROM");
+  //      //Serial.println("Reading MyIP from EEPROM");
         for (int i = 1; i < 5; i++)
         {
           MyIP[i - 1] = EEPROM.read(i);
@@ -37,8 +37,8 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
       }
       else // IP is not saved and needs to be provided by user
       {
-        Serial.println();
-  //      Serial.println("Getting IP from user");
+        //Serial.println();
+  //      //Serial.println("Getting IP from user");
         getIP(1);
       }
     }
@@ -49,10 +49,10 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
   
     if (_HostIP[0] == 0) // HostIP is not set by program
     {
-  //    Serial.println("HostIP not set");
+  //    //Serial.println("HostIP not set");
       if (EEPROM.read(5) == 1) // HostIP is saved in EEPROM
       {
-  //      Serial.println("Reading HostIP from EEPROM");
+  //      //Serial.println("Reading HostIP from EEPROM");
         for (int i = 6; i < 10; i++)
         {
           HostIP[i - 6] = EEPROM.read(i);
@@ -60,8 +60,8 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
       }
       else // IP is not saved and needs to be provided by user
       {
-        Serial.println();
-  //      Serial.println("Getting IP from user");
+        //Serial.println();
+  //      //Serial.println("Getting IP from user");
         getIP(2);
       }
     }
@@ -71,9 +71,7 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
     }
   
     unsigned long timeout = millis();
-    Serial.println();
-    Serial.println("Enter anything to configure IP...");
-    Serial.println();
+    Serial.println(F("\nEnter anything to configure IP...\n"));
     Serial.setTimeout(3000);
     while (millis() - timeout < 3000)
     {
@@ -85,7 +83,6 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
           Serial.read();
         }
         getIP(0);
-        Serial.println();
       }
     }
 
@@ -119,23 +116,23 @@ void Network::getIP(int type)
 {
   if (type == 0 || type == 1) // Get MyIP
   {
-    Serial.println("Please enter an IP address for the controller or type \"DHCP\" to auto generate one");
+    Serial.println(F("Please enter an IP address for the controller or type \"DHCP\" to auto generate one"));
     while(Serial.available() == 0){} // Wait for input
     Serial.setTimeout(100);
     String input = Serial.readString();
     if (input == "DHCP")
     {
-      Serial.println("Configuring with DHCP");
+      Serial.println(F("Configuring with DHCP"));
       if (Ethernet.begin(MyMac) == 0) // Start ethernet with DHCP
       {
         Serial.println(F("Failed to configure Ethernet using DHCP"));
       }
       else
       {
-        Serial.println("Succesfuly configured with DHCP");
+        Serial.println(F("Succesfuly configured with DHCP"));
         MyIP = Ethernet.localIP();
         Serial.println(MyIP);
-        Serial.print("Host name: ");
+        Serial.print(F("Host name: "));
         Serial.println(Ethernet.hostName());
       }
     }
@@ -143,11 +140,11 @@ void Network::getIP(int type)
     {
       if (MyIP.fromString(input))
       {
-        Serial.println("IP successfully read");
+        Serial.println(F("IP successfully read"));
       }
       else
       {
-        Serial.println("IP invalid");
+        Serial.println(F("IP invalid"));
       }
     }
     EEPROM.write(0, 1); // Indicate that MyIP has been written
@@ -159,7 +156,7 @@ void Network::getIP(int type)
 
   if (type == 0 || type == 2) // Get HostIP
   {
-    Serial.println("Please enter an IP address for the host (Enter 0 if using ERM)");
+    Serial.println(F("Please enter an IP address for the host (Enter 0 if using ERM)"));
     while(Serial.available() == 0){} // Wait for input
     Serial.setTimeout(100);
     String input = Serial.readString();
@@ -174,11 +171,11 @@ void Network::getIP(int type)
     {
       if (HostIP.fromString(input))
       {
-        Serial.println("IP successfully read");
+        Serial.println(F("IP successfully read"));
       }
       else
       {
-        Serial.println("IP invalid");
+        Serial.println(F("IP invalid"));
       }
     }
     EEPROM.write(5, 1); // Indicate that HostIP has been written
@@ -188,3 +185,4 @@ void Network::getIP(int type)
     }
   }
 }
+

@@ -9,58 +9,58 @@ void escaperoommaster::loop(void)
 
 void escaperoommaster::processRequest(EthernetClient& client, String requestStr) 
 {
-//  Serial.println(requestStr);
+//  //Serial.println(requestStr);
 
   if (requestStr.startsWith(F("GET /json")))
   {
-//    Serial.println(F("polled for JSON!"));
+//    //Serial.println(F("polled for JSON!"));
     createJSON(client);
   }
   else if (requestStr.startsWith(F("GET /status")))
   {
-//    Serial.println(F("polled for status!"));
+//    //Serial.println(F("polled for status!"));
     writeClientResponse(client, pMyGame->isSolved() ? F("triggered") : F("not_triggered"));
   }
   else if (requestStr.startsWith(F("GET /enable_status"))) 
   {
-//    Serial.println(F("polled for enable_status!"));
+//    //Serial.println(F("polled for enable_status!"));
     writeClientResponse(client, pMyGame->isEnabled() ? F("enabled") : F("disabled"));
   }
   else if (requestStr.startsWith(F("GET /reset_enable"))) 
   {
-//    Serial.println(F("Network prop reset_enable"));
+//    //Serial.println(F("Network prop reset_enable"));
     writeClientResponse(client, F("ok"));
     pMyGame->reset();
     pMyGame->enable();
   }
   else if (requestStr.startsWith(F("GET /reset_disable"))) 
   {
-//    Serial.println(F("Network prop reset_disable"));
+//    //Serial.println(F("Network prop reset_disable"));
     writeClientResponse(client, F("ok"));
     pMyGame->reset();
     pMyGame->disable();
   }
   else if (requestStr.startsWith(F("GET /reset"))) 
   {
-//    Serial.println(F("Network Room reset"));
+//    //Serial.println(F("Network Room reset"));
     writeClientResponse(client, F("ok"));
     pMyGame->reset();
   }
   else if (requestStr.startsWith(F("GET /trigger"))) 
   {
-//    Serial.println(F("Network prop solve"));
+//    //Serial.println(F("Network prop solve"));
     writeClientResponse(client, F("ok"));
     pMyGame->forceSolved();
   }
   else if (requestStr.startsWith(F("GET /enable"))) 
   {
-//    Serial.println(F("Network prop enable"));
+//    //Serial.println(F("Network prop enable"));
     writeClientResponse(client, F("ok"));
     pMyGame->enable();
   }
   else if (requestStr.startsWith(F("GET /disable"))) 
   {
-//    Serial.println(F("Network prop disable"));
+//    //Serial.println(F("Network prop disable"));
     writeClientResponse(client, F("ok"));
     pMyGame->disable();
   }
@@ -70,9 +70,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
     {
       if (requestStr.startsWith("GET /INPUT" + String(i))) 
       {
-//        Serial.print(F("polled for INPUT"));
-//        Serial.print(i);
-//        Serial.println(F(" status!"));
+//        //Serial.print(F("polled for INPUT"));
+//        //Serial.print(i);
+//        //Serial.println(F(" status!"));
         writeClientResponse(client, pMyGame->INPUT_STATES[i] ? F("triggered") : F("not_triggered"));
       }
     }
@@ -85,9 +85,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       {
         if (pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == true)
         {
-//          Serial.print(F("OUTPUT"));
-//          Serial.print(i);
-//          Serial.println(F(" turned off"));
+//          //Serial.print(F("OUTPUT"));
+//          //Serial.print(i);
+//          //Serial.println(F(" turned off"));
           writeClientResponse(client, F("ok"));
           pMyGame->OUTPUT_STATES[i] = false;
           pMyGame->OUTPUT_STATES_FLAG[i] = true;
@@ -97,9 +97,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       {
         if (pMyGame->OUTPUT_OVERRIDE_ENABLE[i] == true)
         {
-          Serial.print(F("OUTPUT"));
-          Serial.print(i);
-          Serial.println(F(" turned on"));
+          //Serial.print(F("OUTPUT"));
+          //Serial.print(i);
+          //Serial.println(F(" turned on"));
           writeClientResponse(client, F("ok"));
           pMyGame->OUTPUT_STATES[i] = true;
           pMyGame->OUTPUT_STATES_FLAG[i] = true;
@@ -107,9 +107,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       }
       else if (requestStr.startsWith("GET /OUTPUT" + String(i))) 
       {
-//        Serial.print(F("polled for OUTPUT"));
-//        Serial.print(i);
-//        Serial.println(F(" status!"));
+//        //Serial.print(F("polled for OUTPUT"));
+//        //Serial.print(i);
+//        //Serial.println(F(" status!"));
         writeClientResponse(client, digitalRead(OUTPUTS[i]) ? F("triggered") : F("not_triggered"));
       }
     }
@@ -122,9 +122,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       {
         if (pMyGame->RELAY_OVERRIDE_ENABLE[i] == true)
         {
-//          Serial.print(F("RELAY"));
-//          Serial.print(i);
-//          Serial.println(F(" turned off"));
+//          //Serial.print(F("RELAY"));
+//          //Serial.print(i);
+//          //Serial.println(F(" turned off"));
           writeClientResponse(client, F("ok"));
           pMyGame->RELAY_STATES[i] = false;
           pMyGame->RELAY_STATES_FLAG[i] = true;
@@ -134,9 +134,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       {
         if (pMyGame->RELAY_OVERRIDE_ENABLE[i] == true)
         {
-//          Serial.print(F("RELAY"));
-//          Serial.print(i);
-//          Serial.println(F(" turned off"));
+//          //Serial.print(F("RELAY"));
+//          //Serial.print(i);
+//          //Serial.println(F(" turned off"));
           writeClientResponse(client, F("ok"));
           pMyGame->RELAY_STATES[i] = true;
           pMyGame->RELAY_STATES_FLAG[i] = true;
@@ -144,9 +144,9 @@ void escaperoommaster::processRequest(EthernetClient& client, String requestStr)
       }
       else if (requestStr.startsWith("GET /RELAY" + String(i))) 
       {
-//        Serial.print(F("polled for RELAY"));
-//        Serial.print(i);
-//        Serial.println(F(" status!"));
+//        //Serial.print(F("polled for RELAY"));
+//        //Serial.print(i);
+//        //Serial.println(F(" status!"));
         writeClientResponse(client, digitalRead(RELAYS[i]) ? F("triggered") : F("not_triggered"));
       }
     }
@@ -163,7 +163,7 @@ void escaperoommaster::listenForEthernetClients()
 
   if (client)
   {
-//    Serial.println(F("Got a client"));
+//    //Serial.println(F("Got a client"));
     
     String requestStr;
     boolean firstLine = true;
@@ -201,7 +201,7 @@ void escaperoommaster::listenForEthernetClients()
 
 void escaperoommaster::writeClientResponse(EthernetClient& client, String bodyStr) 
 {
-//  Serial.println(F("HTTP 200"));
+//  //Serial.println(F("HTTP 200"));
   
   // send a standard http response header
   client.println(F("HTTP/1.1 200 OK"));
@@ -213,7 +213,7 @@ void escaperoommaster::writeClientResponse(EthernetClient& client, String bodySt
 
 void escaperoommaster::writeClientResponseNotFound(EthernetClient& client) 
 {
-//  Serial.println(F("HTTP 404"));
+//  //Serial.println(F("HTTP 404"));
   
   // send a standard http response header
   client.println(F("HTTP/1.1 404 Not Found"));
@@ -223,28 +223,68 @@ void escaperoommaster::writeClientResponseNotFound(EthernetClient& client)
 
 void escaperoommaster::createJSON(EthernetClient& client)
 {
-  StaticJsonBuffer<300> jsonBuffer;
-  String rootBuffer;
-  JsonObject& root = jsonBuffer.createObject();
-  root[F("status")] = pMyGame->isSolved();
-  root[F("enabled")] = pMyGame->isEnabled();
-  rootBuffer = "INPUT";
-  for (int i = 0; i < NUM_INPUTS; i++)
-  {
-    root[rootBuffer + i] = digitalRead(INPUTS[i]);
-  }
-  rootBuffer = "OUTPUT";
-  for (int i = 0; i < NUM_OUTPUTS; i++)
-  {
-    root[rootBuffer + i] = digitalRead(OUTPUTS[i]);
-  }
-  
-//  Serial.println(F("HTTP 200"));
-  
   // send a standard http response header
   client.println(F("HTTP/1.1 200 OK"));
   client.println(F("Content-Type: text/plain"));
   client.println(F("Access-Control-Allow-Origin: *"));  // ERM will not be able to connect without this header!
   client.println();
-  root.printTo(client);
+  client.print(F("{"));
+
+  client.print(F("\"status\":"));
+  client.print(pMyGame->isSolved() ? '1' : '0');
+  client.print(F(","));
+  
+  client.print(F("\"enabled\":"));
+  client.print(pMyGame->isEnabled() ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"INPUT0\":"));
+  client.print(digitalRead(INPUT0) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"INPUT1\":"));
+  client.print(digitalRead(INPUT1) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"INPUT2\":"));
+  client.print(digitalRead(INPUT2) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"INPUT3\":"));
+  client.print(digitalRead(INPUT3) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"INPUT4\":"));
+  client.print(digitalRead(INPUT4) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"INPUT5\":"));
+  client.print(digitalRead(INPUT5) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"OUTPUT0\":"));
+  client.print(digitalRead(OUTPUT0) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"OUTPUT1\":"));
+  client.print(digitalRead(OUTPUT1) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"OUTPUT2\":"));
+  client.print(digitalRead(OUTPUT2) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"OUTPUT3\":"));
+  client.print(digitalRead(OUTPUT3) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"OUTPUT4\":"));
+  client.print(digitalRead(OUTPUT4) == HIGH ? '1' : '0');
+  client.print(F(","));
+
+  client.print(F("\"OUTPUT5\":"));
+  client.print(digitalRead(OUTPUT5) == HIGH ? '1' : '0');
+
+  client.print(F("}"));
 }
+
