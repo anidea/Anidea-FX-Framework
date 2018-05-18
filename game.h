@@ -3,7 +3,7 @@
 
 #include "arduino.h"
 #include "network.h"
-
+#include "fx60.h"
 // Boards
 #if defined(FX300) || defined(FX350)
 #include "fx300.h"
@@ -95,9 +95,9 @@ class Game
 	uint8_t FX60_0_RELAY_STATES = 0;
 	uint8_t FX60_0_RELAY_STATES_FLAG = 0;
 
-	static const uint8_t FX60_0_INPUT_ENABLE = FX60_0_INPUT_OVERRIDES;
-	static const uint8_t FX60_0_OUTPUT_ENABLE = FX60_0_OUTPUT_OVERRIDES;
-	static const uint8_t FX60_0_RELAY_ENABLE = FX60_0_RELAY_OVERRIDES;
+	static const uint8_t FX60_0_INPUT_ENABLE = 0xFF;
+	static const uint8_t FX60_0_OUTPUT_ENABLE = 0xFF;
+	static const uint8_t FX60_0_RELAY_ENABLE = 0xFF;
 
 	TCA6424A FX60_0_I2C{ TCA6424A_ADDRESS_ADDR_LOW };
 
@@ -113,9 +113,9 @@ class Game
 	uint8_t FX60_1_RELAY_STATES = 0;
 	uint8_t FX60_1_RELAY_STATES_FLAG = 0;
 
-	static const uint8_t FX60_1_INPUT_ENABLE = FX60_1_INPUT_OVERRIDES;
-	static const uint8_t FX60_1_OUTPUT_ENABLE = FX60_1_OUTPUT_OVERRIDES;
-	static const uint8_t FX60_1_RELAY_ENABLE = FX60_1_RELAY_OVERRIDES;
+	static const uint8_t FX60_1_INPUT_ENABLE = 0xFF;
+	static const uint8_t FX60_1_OUTPUT_ENABLE = 0xFF;
+	static const uint8_t FX60_1_RELAY_ENABLE = 0xFF;
 
 	TCA6424A FX60_1_I2C{ TCA6424A_ADDRESS_ADDR_HIGH };
 

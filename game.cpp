@@ -143,7 +143,7 @@ void Game::loop(void)
   {
 	  uint8_t bitIndex = 1 << i;
 
-	  if (FX60_0_OUTPUT_OVERRIDES & bitIndex) //If override enabled
+	  if (FX60_0_OUTPUT_ENABLE & bitIndex) //If override enabled
 	  {
 		  if (FX60_0_OUTPUT_STATES_FLAG & bitIndex) //If state changed
 		  {
@@ -164,7 +164,7 @@ void Game::loop(void)
   {
 	  uint8_t bitIndex = 1 << i;
 
-	  if (FX60_0_RELAY_OVERRIDES & bitIndex)
+	  if (FX60_0_RELAY_ENABLE & bitIndex)
 	  {
 		  if (FX60_0_RELAY_STATES_FLAG & bitIndex) //If state changed
 		  {
@@ -194,7 +194,7 @@ void Game::loop(void)
   {
 	  uint8_t bitIndex = 1 << i;
 
-	  if (FX60_1_OUTPUT_OVERRIDES & bitIndex) //If override enabled
+	  if (FX60_1_OUTPUT_ENABLE & bitIndex) //If override enabled
 	  {
 		  if (FX60_1_OUTPUT_STATES_FLAG & bitIndex) //If state changed
 		  {
@@ -215,7 +215,7 @@ void Game::loop(void)
   {
 	  uint8_t bitIndex = 1 << i;
 
-	  if (FX60_1_RELAY_OVERRIDES & bitIndex)
+	  if (FX60_1_RELAY_ENABLE & bitIndex)
 	  {
 		  if (FX60_1_RELAY_STATES_FLAG & bitIndex) //If state changed
 		  {

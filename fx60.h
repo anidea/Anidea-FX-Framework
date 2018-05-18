@@ -1,6 +1,10 @@
 #pragma once
 #include <TCA6424A.h>
 
+// Uncomment to enable
+#define FX60_0_ENABLE
+#define FX60_1_ENABLE
+
 //FX450 Header
 const int FX60_RELAY0 = TCA6424A_P22; //OUTRELAY1
 const int FX60_RELAY1 = TCA6424A_P23; //OUTRELAY2
