@@ -152,11 +152,11 @@ void Network::getIP()
 	if (MyIP.fromString(input))
 	{
 		Serial.println("IP successfully read");
-		EEPROM.write(0, 1); // Indicate that MyIP has been written
 		for (int i = 1; i < 5; i++) // Write MyIP to EEPROM
 		{
 			EEPROM.write(i, MyIP[i - 1]);
 		}
+		EEPROM.write(0, 1); // Indicate that MyIP has been written
 	}
 	else
 	{
@@ -181,11 +181,11 @@ void Network::getIP()
 		if (HostIP.fromString(input))
 		{
 			Serial.println("IP successfully read");
-			EEPROM.write(5, 1); // Indicate that HostIP has been written
 			for (int i = 6; i < 10; i++) // Write HostIP to EEPROM
 			{
 				EEPROM.write(i, HostIP[i - 6]);
 			}
+			EEPROM.write(5, 1); // Indicate that HostIP has been written
 		}
 		else
 		{
@@ -207,6 +207,7 @@ void Network::getIP_DHCP()
 		Serial.println("Succesfuly configured with DHCP");
 		MyIP = Ethernet.localIP();
 		Serial.println(MyIP);
+		EEPROM.write(0, 0); // Indicate that MyIP has not been written and we are using DHCP
 	}
 }
 #endif
