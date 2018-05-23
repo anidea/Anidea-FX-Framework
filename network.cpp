@@ -169,7 +169,7 @@ void Network::receiveUDP()
 			Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
 			Udp.write("{\"DHCP\": \"");
 			char IPBuff[3];
-			Udp.write(utoa(EEPROM.read(MyIP_START + 1), IPBuff, 10));
+			Udp.write(utoa(EEPROM.read(MyIP_START), IPBuff, 10));
 			Udp.write("\", \"IP\": \"");
 			Udp.write(utoa(MyIP[0], IPBuff, 10));
 			Udp.write(".");

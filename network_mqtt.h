@@ -64,8 +64,8 @@ private:
 
 	int serverPort = 1883;
 
-	static char propName[];
-	static char channelName[];
+	static const char propName[];
+	static const char channelName[];
 
 	bool sent;
 

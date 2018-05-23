@@ -2,8 +2,8 @@
 #include "fx60.h"
 
 // Configuration
-char mqtt::propName[] = "myProp";
-char mqtt::channelName[] = "myChannel";
+const char mqtt::propName[] = "myProp";
+const char mqtt::channelName[] = "myChannel";
 
 #ifdef AUTO_FIND_MQTT_SERVER
 EthernetUDP udp;
@@ -85,15 +85,25 @@ void mqtt::sendChanges(void)
 	#define MQTT_BUF_SZ 128
 	char data[MQTT_BUF_SZ];
 	char channel[32];
+	char tmp[3];
+
+	const static char valueString[] PROGMEM = ", \"VALUE\": ";
 
 	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 
 	if (!pMyGame->solvedFlag && pMyGame->isSolved())
 	{
-		snprintf(data, MQTT_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"GAMESTATE\", \"VALUE\": %c}",pMyGame->_puzzleSolved);
+		// Construct string
+		const static char s1[] PROGMEM = "{\"DIRECTION\": \"FROM\", \"TYPE\": \"GAMESTATE\", \"VALUE\": ";
+		strcpy_P(data, s1);
+		strcat(data, pMyGame->_puzzleSolved == 1 ? "1" : "0");
+		strcat(data, "}");
+
+		// Publish and print
 		client->publish(channel, data);
 		printData(data, channel);
 
+		// Update flag so it's not sent again
 		pMyGame->solvedFlag = true;
 	}
 
@@ -101,9 +111,19 @@ void mqtt::sendChanges(void)
 	{
 		if (pMyGame->INPUT_STATES[i] != pMyGame->INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i]) // Loop through inputs and send state if changed
 		{
-			snprintf(data, MQTT_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"INPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, pMyGame->INPUT_STATES[i]);
+			// Construct string
+			const static char s1[] PROGMEM = "{\"DIRECTION\": \"FROM\", \"TYPE\": \"INPUT\", \"INDEX\": ";
+			strcpy_P(data, s1);
+			strcat(data, itoa(i, tmp, 10));
+			strcat_P(data, valueString);
+			strcat(data, pMyGame->INPUT_STATES[i] == 1 ? "1" : "0");
+			strcat(data, "}");
+
+			// Publish and print
 			client->publish(channel, data);
 			printData(data, channel);
+
+			// Update state so it's not published again
 			pMyGame->INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
 		}
 	}
@@ -112,9 +132,19 @@ void mqtt::sendChanges(void)
 	{
 		if (pMyGame->OUTPUT_STATES[i] != pMyGame->OUTPUT_STATE_OLD[i] && pMyGame->OUTPUT_OVERRIDE_ENABLE[i])
 		{
-			snprintf(data, MQTT_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"OUTPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, pMyGame->OUTPUT_STATES[i]);
+			// Construct string
+			const static char s1[] PROGMEM = "{\"DIRECTION\": \"FROM\", \"TYPE\": \"OUTPUT\", \"INDEX\": ";
+			strcpy_P(data, s1);
+			strcat(data, itoa(i, tmp, 10));
+			strcat_P(data, valueString);
+			strcat(data, pMyGame->OUTPUT_STATES[i] == 1 ? "1" : "0");
+			strcat(data, "}");
+
+			// Publish and print
 			client->publish(channel, data);
 			printData(data, channel);
+
+			// Update state so it's not published again
 			pMyGame->OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
 		}
 	}
@@ -123,9 +153,19 @@ void mqtt::sendChanges(void)
 	{
 		if (pMyGame->RELAY_STATES[i] != pMyGame->RELAY_STATE_OLD[i] && pMyGame->RELAY_OVERRIDE_ENABLE[i])
 		{
-			snprintf(data, MQTT_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"RELAY\", \"INDEX\": %d, \"VALUE\": %d}", i, pMyGame->RELAY_STATES[i]);
+			// Construct string
+			const static char s1[] PROGMEM = "{\"DIRECTION\": \"FROM\", \"TYPE\": \"RELAY\", \"INDEX\": %d, \"VALUE\": ";
+			strcpy_P(data, s1);
+			strcat(data, itoa(i, tmp, 10));
+			strcat_P(data, valueString);
+			strcat(data, pMyGame->RELAY_STATES[i] == 1 ? "1" : "0");
+			strcat(data, "}");
+
+			// Publish and print
 			client->publish(channel, data);
 			printData(data, channel);
+
+			// Update state so it's not published again
 			pMyGame->RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
 		}
 	}
