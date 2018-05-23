@@ -19,8 +19,7 @@ mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, 
 	mdns.startDiscoveringService("_mqtt._tcp", MDNSServiceTCP, 5000);
 	#endif
 
-	client = new PubSubClient();
-	client->setClient(ethClient);
+	client = new PubSubClient(ethClient);
 	client->setServer(HostIP, serverPort);
 	client->setCallback(mqtt::callback);
 }
@@ -28,8 +27,9 @@ mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, 
 #ifdef AUTO_FIND_MQTT_SERVER
 void mqtt::serviceFound(const char* type, MDNSServiceProtocol /*proto*/, const char* name, IPAddress ip, unsigned short port, const char* txtContent)
 {
-	//HostIP = ip;
 	mdns.stopDiscoveringService();
+	client->setServer(ip, port);
+	reconnect();
 }
 #endif
 
@@ -84,7 +84,7 @@ void mqtt::sendChanges(void)
 {
 	#define MQTT_BUF_SZ 128
 	char data[MQTT_BUF_SZ];
-	char channel[MQTT_BUF_SZ];
+	char channel[32];
 
 	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 

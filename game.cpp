@@ -319,8 +319,8 @@ void Game::EEPROMReadString(byte pos, byte len, char* data)
 	}
 	data[i] = 0;
 
-	Serial.print("Read: ");
-	Serial.println(data);
+	//Serial.print(F("Read: "));
+	//Serial.println(data);
 }
 
 void Game::EEPROMWriteString(byte pos, char* data)
@@ -329,11 +329,10 @@ void Game::EEPROMWriteString(byte pos, char* data)
 	for (i = 0; i < strlen(data); i++)
 	{
 		EEPROM.write(pos + i, data[i]);
-		Serial.println(data[i]);
 	}
 
 	EEPROM.write(pos + i, 0);
 
-	Serial.print("Wrote: ");
-	Serial.println(data);
+	//Serial.print(F("Wrote: "));
+	//Serial.println(data);
 }

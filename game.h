@@ -18,6 +18,12 @@
 #define HALL_NORTH_THRESH 410
 #define HALL_SOUTH_THRESH 614
 
+// EEPROM positions
+static const int EEPROM_START = 31; // Start all EEPROM storage from here because anything before is used by the framework
+static const int MyIP_START = 0;
+static const int HostIP_START = 5;
+static const int NAME_START = 10;
+
 class Network;
 
 class Game
@@ -28,7 +34,6 @@ class Game
     static const int GAMESTATE_RUN = 10;
     static const int GAMESTATE_SOLVED = 100;
     static const int GAMESTATE_ENDLOOP = 255;
-    static const int EEPROM_START = 10; // Start all EEPROM storage from here because anything before is used by the framework
   
 	int freeRunningTimer = 0;
 

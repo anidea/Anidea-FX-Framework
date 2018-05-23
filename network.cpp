@@ -33,9 +33,7 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 	
 	// Give user a chance to configure IP through serial
     unsigned long timeout = millis();
-    Serial.println();
-    Serial.println("Enter anything to configure IP...");
-    Serial.println();
+    Serial.println("\nEnter anything to configure IP...\n");
     Serial.setTimeout(3000);
     while (millis() - timeout < 3000)
     {
@@ -50,17 +48,42 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
         Serial.println();
       }
     }
+	
+	#ifdef GENERATE_NAME
+	// Check if name is written in EEPROM
+	if (EEPROM.read(NAME_START) == 0) // Name is not saved in EEPROM
+	{
+		// Write name to EEPROM to match DHCP hostName
+
+		// Write "WIZnet"
+		const char* WIZnet = "WIZnet";
+		for (int i = NAME_START + 1; i < NAME_START + 7; i++)
+		{
+			EEPROM.write(i, WIZnet[i - (NAME_START + 1)]);
+		}
+
+		// Write last 3 bytes of MAC
+		char tmp[7];
+		snprintf(tmp, 7, "%02X%02X%02X", MyMac[3], MyMac[4], MyMac[5]);
+		for (int i = NAME_START + 7; i < NAME_START + 13; i++)
+		{
+			EEPROM.write(i, tmp[i - (NAME_START + 7)]);
+		}
+		EEPROM.write(NAME_START + 13, '\0');
+		EEPROM.write(NAME_START, 1);
+	}
+	#endif // GENERATE_NAME
 
 	// Check if IP has been set, if not fall back to EEPROM and then DHCP if enabled
 	if (MyIP[0] == 0) // MyIP has not been set
 	{
-		Serial.println("MyIP not set");
-		if (EEPROM.read(0) == 1) // MyIP is saved in EEPROM
+		//Serial.println(F("MyIP not set"));
+		if (EEPROM.read(MyIP_START) == 1) // MyIP is saved in EEPROM
 		{
-			Serial.println("Reading MyIP from EEPROM");
-			for (int i = 1; i < 5; i++) // Read in from EEPROM
+			//Serial.println(F("Reading MyIP from EEPROM"));
+			for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Read in from EEPROM
 			{
-				MyIP[i - 1] = EEPROM.read(i);
+				MyIP[i - (MyIP_START + 1)] = EEPROM.read(i);
 			}
 		}
 		#ifdef ENABLE_DHCP
@@ -79,12 +102,12 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 	if (HostIP[0] == 0) // HostIP has not been set
 	{
 		//Serial.println("HostIP not set");
-		if (EEPROM.read(5) == 1) // HostIP is saved in EEPROM
+		if (EEPROM.read(HostIP_START) == 1) // HostIP is saved in EEPROM
 		{
 			//Serial.println("Reading HostIP from EEPROM");
-			for (int i = 6; i < 10; i++)
+			for (int i = HostIP_START + 1; i < HostIP_START + 5; i++)
 			{
-				HostIP[i - 6] = EEPROM.read(i);
+				HostIP[i - (HostIP_START + 1)] = EEPROM.read(i);
 			}
 		}
 	}
@@ -95,6 +118,9 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 	#endif
   
     Ethernet.begin(MyMac, MyIP);
+	#ifdef ENABLE_CONTROL_PANEL
+	Udp.begin(UDPport);
+	#endif
     
     delay(500);
     
@@ -113,8 +139,100 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 
 void Network::loop(void)
 {
-  
+	#ifdef ENABLE_CONTROL_PANEL
+	receiveUDP();
+	#endif
 }
+
+#ifdef ENABLE_CONTROL_PANEL
+void Network::receiveUDP()
+{
+	int packetSize = Udp.parsePacket();
+	if (packetSize)
+	{
+		char packetBuffer[64] = ""; //buffer to hold incoming packet,
+		/*Serial.print("Received packet of size ");
+		Serial.println(packetSize);
+		Serial.print("From ");
+		Serial.print(Udp.remoteIP());
+		Serial.print(", port ");
+		Serial.println(Udp.remotePort());*/
+
+		// Read the identifying part of the packet into packetBufffer
+		Udp.read(packetBuffer, 8);
+		//Serial.println(packetBuffer);
+
+		// Packet is from control panel scanning for devices
+		if (strcmp(packetBuffer, "AEI_scan") == 0)
+		{
+			//Serial.println(F("Received scan"));
+			Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
+			Udp.write("{\"DHCP\": \"");
+			char IPBuff[3];
+			Udp.write(utoa(EEPROM.read(MyIP_START + 1), IPBuff, 10));
+			Udp.write("\", \"IP\": \"");
+			Udp.write(utoa(MyIP[0], IPBuff, 10));
+			Udp.write(".");
+			Udp.write(utoa(MyIP[1], IPBuff, 10));
+			Udp.write(".");
+			Udp.write(utoa(MyIP[2], IPBuff, 10));
+			Udp.write(".");
+			Udp.write(utoa(MyIP[3], IPBuff, 10));
+			Udp.write("\", \"hostIP\": \"");
+			Udp.write(utoa(HostIP[0], IPBuff, 10));
+			Udp.write(".");
+			Udp.write(utoa(HostIP[1], IPBuff, 10));
+			Udp.write(".");
+			Udp.write(utoa(HostIP[2], IPBuff, 10));
+			Udp.write(".");
+			Udp.write(utoa(HostIP[3], IPBuff, 10));
+			Udp.write("\", \"Name\": \"");
+			for (int i = NAME_START + 1; i < NAME_START + 21; i++)
+			{
+				if (EEPROM.read(i) == '\0')
+				{
+					break;
+				}
+				Udp.write(EEPROM.read(i));
+			}
+			Udp.write("\"}");
+			Udp.endPacket();
+		}
+
+		// Packet is from control panel with new configuration for device
+		else if(strcmp(packetBuffer, "AEI_conf") == 0)
+		{
+			//Serial.println(F("Received new configuration"));
+			Udp.read(packetBuffer, 56);
+			EEPROM.write(MyIP_START, atoi(strtok(packetBuffer, " ")));
+			if (MyIP.fromString(strtok(NULL, " ")))
+			{
+				for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
+				{
+					EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
+				}
+			}
+			if (HostIP.fromString(strtok(NULL, " ")))
+			{
+				for (int i = HostIP_START + 1; i < HostIP_START + 5; i++) // Write HostIP to EEPROM
+				{
+					EEPROM.write(i, HostIP[i - (HostIP_START + 1)]);
+				}
+				EEPROM.write(5, 1); // Indicate that HostIP has been written
+			}
+			char *deviceName = strtok(NULL, " ");
+			for (int i = NAME_START + 1; i < NAME_START + 21; i++)
+			{
+				EEPROM.write(i, deviceName[i - (NAME_START + 1)]);
+				if (deviceName[i - (NAME_START + 1)] == '\0')
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+#endif
 
 void Network::getIP()
 {
@@ -137,11 +255,11 @@ void Network::getIP()
 		if (MyIP.fromString(input))
 		{
 			Serial.println("IP successfully read");
-			EEPROM.write(0, 1); // Indicate that MyIP has been written
-			for (int i = 1; i < 5; i++) // Write MyIP to EEPROM
+			for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
 			{
-				EEPROM.write(i, MyIP[i - 1]);
+				EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
 			}
+			EEPROM.write(MyIP_START, 1); // Indicate that MyIP has been written
 		}
 		else
 		{
@@ -152,11 +270,11 @@ void Network::getIP()
 	if (MyIP.fromString(input))
 	{
 		Serial.println("IP successfully read");
-		for (int i = 1; i < 5; i++) // Write MyIP to EEPROM
+		for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
 		{
-			EEPROM.write(i, MyIP[i - 1]);
+			EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
 		}
-		EEPROM.write(0, 1); // Indicate that MyIP has been written
+		EEPROM.write(MyIP_START, 1); // Indicate that MyIP has been written
 	}
 	else
 	{
@@ -181,11 +299,11 @@ void Network::getIP()
 		if (HostIP.fromString(input))
 		{
 			Serial.println("IP successfully read");
-			for (int i = 6; i < 10; i++) // Write HostIP to EEPROM
+			for (int i = HostIP_START + 1; i < HostIP_START + 5; i++) // Write HostIP to EEPROM
 			{
-				EEPROM.write(i, HostIP[i - 6]);
+				EEPROM.write(i, HostIP[i - (HostIP_START + 1)]);
 			}
-			EEPROM.write(5, 1); // Indicate that HostIP has been written
+			EEPROM.write(HostIP_START, 1); // Indicate that HostIP has been written
 		}
 		else
 		{
@@ -207,7 +325,7 @@ void Network::getIP_DHCP()
 		Serial.println("Succesfuly configured with DHCP");
 		MyIP = Ethernet.localIP();
 		Serial.println(MyIP);
-		EEPROM.write(0, 0); // Indicate that MyIP has not been written and we are using DHCP
+		EEPROM.write(MyIP_START, 0); // Indicate that MyIP has not been written and we are using DHCP
 	}
 }
 #endif

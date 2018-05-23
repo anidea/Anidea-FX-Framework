@@ -24,6 +24,12 @@
 
 // Options
 #define ENABLE_DHCP // Enables obtaining an IP address with DHCP
+#define ENABLE_CONTROL_PANEL // Enables interacting with control panel software
+//#define GENERATE_NAME
+
+#ifdef ENABLE_CONTROL_PANEL
+#include <EthernetUdp2.h>
+#endif
 
 class Game;
 
@@ -36,10 +42,6 @@ class Network
 
     virtual void setGame(Game *pg) { pMyGame = pg; };
 
-	#ifdef ENABLE_DHCP
-	void getIP_DHCP();
-	#endif
-
     byte *MyMac;
     
     IPAddress MyIP;
@@ -51,6 +53,18 @@ class Network
 
   private:
     void getIP();
+
+	#ifdef ENABLE_DHCP
+	void getIP_DHCP();
+	#endif
+
+	#ifdef ENABLE_CONTROL_PANEL
+	EthernetUDP Udp;
+
+	int UDPport = 8888;
+
+	void receiveUDP(void);
+	#endif
 };
 
 #endif
