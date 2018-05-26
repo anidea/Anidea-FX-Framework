@@ -60,7 +60,7 @@ void setup() {
 	if (++timeout > 20) break; // wait for serial port to connect. Needed for native USB port only
   }
 
-  Serial.println("Welcome to the FX-Framework");
+  Serial.println(F("Welcome to the FX-Framework"));
 
   // Start game last after hardware is setup
 
@@ -117,7 +117,7 @@ void tenHzTimer(struct tc_module *const module_inst)
 {
   myGame->tick();
 
-  //Serial.println("Tick");
+  //Serial.println(F("Tick"));
 }
 #endif
 

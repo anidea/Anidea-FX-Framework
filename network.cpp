@@ -33,7 +33,7 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 	
 	// Give user a chance to configure IP through serial
     unsigned long timeout = millis();
-    Serial.println("\nEnter anything to configure IP...\n");
+    Serial.println(F("\nEnter anything to configure IP...\n"));
     Serial.setTimeout(3000);
     while (millis() - timeout < 3000)
     {
@@ -94,17 +94,17 @@ Network::Network(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP, bool connect
 		#else
 		else // IP is not saved
 		{
-			Serial.println("Warning: No IP address has been set");
+			Serial.println(F("Warning: No IP address has been set"));
 		}
 		#endif
 	}
 
 	if (HostIP[0] == 0) // HostIP has not been set
 	{
-		//Serial.println("HostIP not set");
+		//Serial.println(F("HostIP not set"));
 		if (EEPROM.read(HostIP_START) == 1) // HostIP is saved in EEPROM
 		{
-			//Serial.println("Reading HostIP from EEPROM");
+			//Serial.println(F("Reading HostIP from EEPROM"));
 			for (int i = HostIP_START + 1; i < HostIP_START + 5; i++)
 			{
 				HostIP[i - (HostIP_START + 1)] = EEPROM.read(i);
@@ -237,16 +237,16 @@ void Network::receiveUDP()
 void Network::getIP()
 {
 	#ifdef ENABLE_DHCP
-		Serial.println("Please enter an IP address for the controller or type \"DHCP\" to auto generate one");
+		Serial.println(F("Please enter an IP address for the controller or type \"DHCP\" to auto generate one"));
 	#else
-		Serial.println("Please enter an IP address for the controller");
+		Serial.println(F("Please enter an IP address for the controller"));
 	#endif
 	while(Serial.available() == 0){} // Wait for input
 	Serial.setTimeout(100);
 	String input = Serial.readString();
 
 	#ifdef ENABLE_DHCP
-	if (input == "DHCP")
+	if (input == F("DHCP"))
 	{
 		getIP_DHCP();
 	}
@@ -254,7 +254,7 @@ void Network::getIP()
 	{
 		if (MyIP.fromString(input))
 		{
-			Serial.println("IP successfully read");
+			Serial.println(F("IP successfully read"));
 			for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
 			{
 				EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
@@ -263,13 +263,13 @@ void Network::getIP()
 		}
 		else
 		{
-			Serial.println("IP invalid");
+			Serial.println(F("IP invalid"));
 		}
 	}
 	#else
 	if (MyIP.fromString(input))
 	{
-		Serial.println("IP successfully read");
+		Serial.println(F("IP successfully read"));
 		for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
 		{
 			EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
@@ -278,16 +278,16 @@ void Network::getIP()
 	}
 	else
 	{
-		Serial.println("IP invalid");
+		Serial.println(F("IP invalid"));
 	}
 	#endif
 
-	Serial.println("Please enter an IP address for the host (Enter 0 if using ERM)");
+	Serial.println(F("Please enter an IP address for the host (Enter 0 if using ERM)"));
 	while(Serial.available() == 0){} // Wait for input
 	Serial.setTimeout(100);
 	input = Serial.readString();
   
-	if (input == "0")
+	if (input == F("0"))
 	{
 		for (int i = 0; i < 4; i++) // Set HostIP to 0.0.0.0
 		{
@@ -298,7 +298,7 @@ void Network::getIP()
 	{
 		if (HostIP.fromString(input))
 		{
-			Serial.println("IP successfully read");
+			Serial.println(F("IP successfully read"));
 			for (int i = HostIP_START + 1; i < HostIP_START + 5; i++) // Write HostIP to EEPROM
 			{
 				EEPROM.write(i, HostIP[i - (HostIP_START + 1)]);
@@ -307,7 +307,7 @@ void Network::getIP()
 		}
 		else
 		{
-		  Serial.println("IP invalid");
+		  Serial.println(F("IP invalid"));
 		}
 	}
 }
@@ -315,17 +315,21 @@ void Network::getIP()
 #ifdef ENABLE_DHCP
 void Network::getIP_DHCP()
 {
-	Serial.println("Configuring with DHCP");
+	Serial.println(F("Configuring with DHCP"));
 	if (Ethernet.begin(MyMac) == 0) // Start ethernet with DHCP
 	{
 		Serial.println(F("Failed to configure Ethernet using DHCP"));
 	}
 	else
 	{
-		Serial.println("Succesfuly configured with DHCP");
+		Serial.println(F("Succesfuly configured with DHCP"));
 		MyIP = Ethernet.localIP();
 		Serial.println(MyIP);
 		EEPROM.write(MyIP_START, 0); // Indicate that MyIP has not been written and we are using DHCP
+		for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write IP gotten from DHCP to EEPROM because it might be needed anyway
+		{
+			EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
+		}
 	}
 }
 #endif

@@ -2,8 +2,10 @@
 #include "fx60.h"
 
 // Configuration
-const char mqtt::propName[] = "myProp";
-const char mqtt::channelName[] = "myChannel";
+#define propName "myProp"
+#define channelName "myChannel"
+const static char channel[] PROGMEM = "/" propName "/" channelName;
+const static char heartbeatChannel[] PROGMEM = "/" propName "/" channelName "/heartbeat";
 
 #ifdef AUTO_FIND_MQTT_SERVER
 EthernetUDP udp;
@@ -62,20 +64,20 @@ void mqtt::tick()
 	if (!connected) retry_timer += TIMER_INTERVAL;
 }
 
-void mqtt::printData(char* data, char* channel)
+void mqtt::printData(char* data, const char* channel)
 {
 	#ifdef DEBUG_MQTT
-		Serial.print("Channel: ");
+		Serial.print(F("Channel: "));
 		Serial.print(channel);
 	
 		if (data[0])
 		{
-			Serial.print(" - Data: ");
+			Serial.print(F(" - Data: "));
 			Serial.println(data);
 		}
 		else
 		{
-			Serial.println("");
+			Serial.println();
 		}
 	#endif
 }
@@ -84,12 +86,9 @@ void mqtt::sendChanges(void)
 {
 	#define MQTT_BUF_SZ 128
 	char data[MQTT_BUF_SZ];
-	char channel[32];
 	char tmp[3];
 
 	const static char valueString[] PROGMEM = ", \"VALUE\": ";
-
-	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 
 	if (!pMyGame->solvedFlag && pMyGame->isSolved())
 	{
@@ -261,7 +260,6 @@ void mqtt::sendChanges(void)
 	if (pMyGame->isRFIDChanged())
 	{
 		#define MQTT_TAG_BUF_SZ 50+RFID_TAG_COUNT*RFID_STR_LEN_MAX
-		snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 
 		char tag_data[MQTT_TAG_BUF_SZ];
 		pMyGame->getTagData(tag_data, MQTT_TAG_BUF_SZ);
@@ -272,17 +270,14 @@ void mqtt::sendChanges(void)
 	// Broadcast heartbeat every 10 seconds to indicate that it is running
 	if (heartbeat_timer >= HEARTBEAT_INTERVAL)
 	{
-		snprintf(channel, MQTT_BUF_SZ, "/%s/%s/heartbeat", channelName, propName);
-		printData("", channel);
-		client->publish(channel, propName);
+		printData("", heartbeatChannel);
+		client->publish(heartbeatChannel, propName);
 		heartbeat_timer -= HEARTBEAT_INTERVAL;
 	}
 }
 
 void mqtt::callback(char* topic, uint8_t* payload, unsigned int length)
 {
-	char channel[MQTT_BUF_SZ];
-	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 	if (strcmp(topic, channel) == 0)
 	{
 		StaticJsonBuffer<512> jsonBuffer;
@@ -374,7 +369,7 @@ void mqtt::reconnect()
 	#ifdef DEBUG_MQTT
 		Serial.print(F("Attempting MQTT connection with device "));
 		Serial.print(propName);
-		Serial.print(" on channel ");
+		Serial.print(F(" on channel "));
 		Serial.println(channelName);
 	#endif
 	// Attempt to connect
@@ -383,8 +378,6 @@ void mqtt::reconnect()
 		#ifdef DEBUG_MQTT
 			Serial.println(F("connected"));
 		#endif
-		char channel[MQTT_BUF_SZ];
-		snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 		client->subscribe(channel);
 	}
 	else

@@ -56,16 +56,13 @@ private:
 	static void serviceFound(const char* type, MDNSServiceProtocol /*proto*/, const char* name, IPAddress ip, unsigned short port, const char* txtContent);
 	#endif
 
-	void printData(char* data, char* channel);
+	void printData(char* data, const char* channel);
 
 	EthernetClient ethClient = server.available();
 
 	PubSubClient* client = nullptr;
 
 	int serverPort = 1883;
-
-	static const char propName[];
-	static const char channelName[];
 
 	bool sent;
 
