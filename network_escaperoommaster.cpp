@@ -9,7 +9,7 @@ void escaperoommaster::loop(void)
 
 void escaperoommaster::processRequest(EthernetClient& client, String requestStr) 
 {
-//  Serial.println(requestStr);
+  //Serial.println(requestStr);
 
   if (requestStr.startsWith(F("GET /json")))
   {

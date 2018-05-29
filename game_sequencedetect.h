@@ -38,7 +38,6 @@ class sequencedetect : public Game
   private:
     // Global Game Variables
     int _puzzleSolved = 0;
-    int _gameState = 0;
     int _inputSequencePosition = 0;
     int _scanPreviousInputButton = NO_INPUT_DETECTED;
     int _runLightSequence = 0;

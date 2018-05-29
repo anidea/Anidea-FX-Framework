@@ -54,6 +54,9 @@ class Network
   private:
     void getIP();
 
+	void saveMyIP();
+	void saveHostIP();
+
 	#ifdef ENABLE_DHCP
 	void getIP_DHCP();
 	#endif

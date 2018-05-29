@@ -167,26 +167,29 @@ void Network::receiveUDP()
 		{
 			//Serial.println(F("Received scan"));
 			Udp.beginPacket(Udp.remoteIP(), Udp.remotePort());
-			Udp.write("{\"DHCP\": \"");
 			char IPBuff[3];
+
+			// Write DHCP state
 			Udp.write(utoa(EEPROM.read(MyIP_START), IPBuff, 10));
-			Udp.write("\", \"IP\": \"");
-			Udp.write(utoa(MyIP[0], IPBuff, 10));
-			Udp.write(".");
-			Udp.write(utoa(MyIP[1], IPBuff, 10));
-			Udp.write(".");
-			Udp.write(utoa(MyIP[2], IPBuff, 10));
-			Udp.write(".");
-			Udp.write(utoa(MyIP[3], IPBuff, 10));
-			Udp.write("\", \"hostIP\": \"");
-			Udp.write(utoa(HostIP[0], IPBuff, 10));
-			Udp.write(".");
-			Udp.write(utoa(HostIP[1], IPBuff, 10));
-			Udp.write(".");
-			Udp.write(utoa(HostIP[2], IPBuff, 10));
-			Udp.write(".");
-			Udp.write(utoa(HostIP[3], IPBuff, 10));
-			Udp.write("\", \"Name\": \"");
+			Udp.write(" ");
+
+			// Write MyIP
+			for (int i = 0; i < 4; i++)
+			{
+				Udp.write(utoa(MyIP[i], IPBuff, 10));
+				if (i < 3) Udp.write(".");
+			}
+			Udp.write(" ");
+
+			// Write HostIP
+			for (int i = 0; i < 4; i++)
+			{
+				Udp.write(utoa(HostIP[i], IPBuff, 10));
+				if (i < 3) Udp.write(".");
+			}
+			Udp.write(" ");
+
+			// Write name
 			for (int i = NAME_START + 1; i < NAME_START + 21; i++)
 			{
 				if (EEPROM.read(i) == '\0')
@@ -195,7 +198,11 @@ void Network::receiveUDP()
 				}
 				Udp.write(EEPROM.read(i));
 			}
-			Udp.write("\"}");
+			Udp.write(" ");
+
+			// Write game state
+			Udp.write(pMyGame->isSolved() ? '1' : '0');
+
 			Udp.endPacket();
 		}
 
@@ -204,7 +211,11 @@ void Network::receiveUDP()
 		{
 			//Serial.println(F("Received new configuration"));
 			Udp.read(packetBuffer, 56);
+
+			// Write DHCP state to EEPROM
 			EEPROM.write(MyIP_START, atoi(strtok(packetBuffer, " ")));
+
+			// Read in MyIP and write to EEPROM
 			if (MyIP.fromString(strtok(NULL, " ")))
 			{
 				for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
@@ -212,6 +223,8 @@ void Network::receiveUDP()
 					EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
 				}
 			}
+
+			// Read in HostIP and write to EEPROM
 			if (HostIP.fromString(strtok(NULL, " ")))
 			{
 				for (int i = HostIP_START + 1; i < HostIP_START + 5; i++) // Write HostIP to EEPROM
@@ -220,6 +233,8 @@ void Network::receiveUDP()
 				}
 				EEPROM.write(5, 1); // Indicate that HostIP has been written
 			}
+
+			// Read in device name and write to EEPROM
 			char *deviceName = strtok(NULL, " ");
 			for (int i = NAME_START + 1; i < NAME_START + 21; i++)
 			{
@@ -229,6 +244,18 @@ void Network::receiveUDP()
 					break;
 				}
 			}
+		}
+
+		// Force solve from panel
+		else if (strcmp(packetBuffer, "solve") == 0)
+		{
+			pMyGame->forceSolved();
+		}
+
+		// Force reset from panel
+		else if (strcmp(packetBuffer, "reset") == 0)
+		{
+			pMyGame->reset();
 		}
 	}
 }
@@ -255,11 +282,7 @@ void Network::getIP()
 		if (MyIP.fromString(input))
 		{
 			Serial.println(F("IP successfully read"));
-			for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
-			{
-				EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
-			}
-			EEPROM.write(MyIP_START, 1); // Indicate that MyIP has been written
+			saveMyIP();
 		}
 		else
 		{
@@ -270,11 +293,7 @@ void Network::getIP()
 	if (MyIP.fromString(input))
 	{
 		Serial.println(F("IP successfully read"));
-		for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
-		{
-			EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
-		}
-		EEPROM.write(MyIP_START, 1); // Indicate that MyIP has been written
+		saveMyIP();
 	}
 	else
 	{
@@ -312,6 +331,20 @@ void Network::getIP()
 	}
 }
 
+void Network::saveMyIP()
+{
+	for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write MyIP to EEPROM
+	{
+		EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
+	}
+	EEPROM.write(MyIP_START, 1); // Indicate that MyIP has been written
+}
+
+void Network::saveHostIP()
+{
+
+}
+
 #ifdef ENABLE_DHCP
 void Network::getIP_DHCP()
 {
@@ -325,11 +358,8 @@ void Network::getIP_DHCP()
 		Serial.println(F("Succesfuly configured with DHCP"));
 		MyIP = Ethernet.localIP();
 		Serial.println(MyIP);
+		saveMyIP();
 		EEPROM.write(MyIP_START, 0); // Indicate that MyIP has not been written and we are using DHCP
-		for (int i = MyIP_START + 1; i < MyIP_START + 5; i++) // Write IP gotten from DHCP to EEPROM because it might be needed anyway
-		{
-			EEPROM.write(i, MyIP[i - (MyIP_START + 1)]);
-		}
 	}
 }
 #endif
