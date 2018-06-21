@@ -386,7 +386,7 @@ void sequencedetect::solved(void)
   //Do game specific solved state
   _runLightSequence = 0;
   digitalWrite(SOLVED, LOW);        // Turn Off maglock
-  digitalWrite(LED, HIGH);          // Mimick LED for solved 
+  digitalWrite(STAT_LED, HIGH);          // Mimick LED for solved 
 
   // Turn all the lights on - Victory!
   allLightsOnOff(HIGH);  //steve testing bullsh*t - because Steve helped so much in testing
@@ -412,7 +412,7 @@ void sequencedetect::reset(void)
 
   // Set outputs
   digitalWrite(SOLVED, HIGH);    // Turn on maglock
-  digitalWrite(LED, LOW);           // Mimick LED for solved 
+  digitalWrite(STAT_LED, LOW);           // Mimick LED for solved 
 
   if (GAME_LIGHT_OUTPUT_NONE || GAME_LIGHT_OUTPUT_SEQUENCE || GAME_LIGHT_OUTPUT_SIMONSAYS)
   {
@@ -614,3 +614,4 @@ void sequencedetect::allLightsOnOff(int state)
   }
 
 }
+

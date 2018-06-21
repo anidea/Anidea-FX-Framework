@@ -131,3 +131,4 @@ void rfid::loadTags()
 		fx200.setSolvedTag(i, storedTag);
 	}
 }
+

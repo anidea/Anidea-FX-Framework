@@ -36,3 +36,4 @@ class network_empty : public Network
 };
 
 #endif
+

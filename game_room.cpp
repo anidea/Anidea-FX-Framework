@@ -4,7 +4,7 @@
 // Select which version of the room controller you have//
 /////////////////////////////////////////////////////////
 
-#define NUM_BUTTONS 0 // 0, 1, or 2
+#define NUM_BUTTONS 2 // 0, 1, or 2
 
 /////////////////////////////////////////////////////////
 //                                                     //
@@ -80,3 +80,4 @@ void room::reset(void)
   RELAY_STATES_FLAG[0] = 1;
   RELAY_STATES_FLAG[1] = 1;
 }
+

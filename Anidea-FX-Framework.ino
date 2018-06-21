@@ -14,7 +14,7 @@
    -------------------
 */
 
-#include "arduino.h"
+#include <Arduino.h>
 #include "game.h"
 #include "network.h"
 
@@ -35,8 +35,8 @@
 #include "game_rfid.h"
 
 // Generic game and network objects
-Game *myGame;
-Network *myNetwork;
+Game *myGame = nullptr;
+Network *myNetwork = nullptr;
 
 #if defined(FX300) || defined(FX350)
 #include <MsTimer2.h>
@@ -50,40 +50,61 @@ SAMDtimer *timer3_10Hz;
 
 //-------------------------------------------------------------------
 
-void setup() {
+void setup()
+{
   Serial.begin(115200); // Setup serial
 
   int timeout = 0;
   while (!Serial)
   {
-	delay(50);
-	if (++timeout > 20) break; // wait for serial port to connect. Needed for native USB port only
+	  delay(50);
+	  if (++timeout > 20) break; // wait for serial port to connect. Needed for native USB port only
   }
 
   Serial.println("Welcome to the FX-Framework");
+  Serial.print("Build date: ");
+  Serial.println(__DATE__);
+  Serial.print("Build time: ");
+  Serial.println(__TIME__);
 
   // Start game last after hardware is setup
 
   // Uncomment only one of these lines for the game you want
-//  myGame = new game_empty(); // Empty game to manually control inputs and outputs only
-//  myGame = new room(); // Used to control a whole room
-//  myGame = new simplegame(); //Simple game provided as an example
-//  myGame = new sequencedetect(); //Sequencedetect
-//  myGame = new sixwire(); //Sixwire
-//  myGame = new inputsequence(); //Detects a sequence of inputs
-//  myGame = new rfid();
+  //myGame = new game_empty(); // Empty game to manually control inputs and outputs only
+  //myGame = new room(); // Used to control a whole room
+  //myGame = new simplegame(); //Simple game provided as an example
+  //myGame = new sequencedetect(); //Sequencedetect
+  //myGame = new sixwire(); //Sixwire
+  //myGame = new inputsequence(); //Detects a sequence of inputs
+  //myGame = new rfid();
 
-  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xB6};   // This must be unique for each device
+  byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xA2};   // This must be unique for each device
   IPAddress MyIP(10, 0, 1, 205);                         // This must be unique for each device on the network. Leave blank to configure at run time.
   IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
-//  myNetwork = new network_empty(); //Empty network for use with FX300
-//  myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
-//  myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
-//  myNetwork = new mqtt(MyMac, MyIP, HostIP);
-//  myNetwork = new houdinimc(MyMac, MyIP, HostIP);
+  //myNetwork = new network_empty(); //Empty network for use with FX300
+  //myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
+  //myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
+  //myNetwork = new mqtt(MyMac, MyIP, HostIP);
+  //myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
+  bool missing = false;
+  
+  if (!myGame)
+  {
+    Serial.println("No game selected! Halting execution...");
+    missing = true;
+  }
+  
+  if (!myNetwork)
+  {
+    Serial.println("No network selected! Halting execution...");
+    missing = true;
+  }
+
+  if (missing) while (1) {}
+  
   myNetwork->setGame(myGame);
 
   // Setup timer for simon says, etc.
@@ -120,4 +141,5 @@ void tenHzTimer(struct tc_module *const module_inst)
   //Serial.println("Tick");
 }
 #endif
+
 

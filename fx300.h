@@ -40,7 +40,7 @@ const int INPUT5 = 19;
 const int RS485_ENABLE = OUTPUT5;
 HardwareSerial* const RS485_SERIAL = &Serial;
 
-const int LED = -1;
+const int STAT_LED = -1;
 
 const int HALL = 6;
 
@@ -57,3 +57,4 @@ const int OUTPUTS[NUM_OUTPUTS] = {OUTPUT0, OUTPUT1, OUTPUT2, OUTPUT3, OUTPUT4, O
 const int RELAYS[NUM_RELAYS] = {RELAY0, RELAY1};
 
 #endif
+

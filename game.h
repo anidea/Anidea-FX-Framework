@@ -124,11 +124,12 @@ class Game
 	uint8_t FX60_1_RSTATE_OLD = 0;
 #endif
 
-	void EEPROMReadString(byte pos, byte len, char* data);
-	void EEPROMWriteString(byte pos, char* data);
+	void EEPROMReadString(size_t pos, byte len, char* data);
+	void EEPROMWriteString(size_t pos, char* data);
 
   private:
 	  
 };
 
 #endif
+

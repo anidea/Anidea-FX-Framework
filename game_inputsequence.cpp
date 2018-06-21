@@ -401,3 +401,4 @@ int inputsequence::scanInputsSteady(void)
   }
   
 }
+

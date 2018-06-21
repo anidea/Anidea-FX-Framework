@@ -41,3 +41,4 @@ class sixwire : public Game
 };
 
 #endif
+

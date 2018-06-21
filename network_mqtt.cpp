@@ -233,7 +233,6 @@ void mqtt::sendChanges(void)
 
 void mqtt::callback(char* topic, uint8_t* payload, unsigned int length)
 {
-	rfid *rfidGame = static_cast<rfid*>(pMyGame);
 	char channel[MQTT_BUF_SZ];
 	snprintf(channel, MQTT_BUF_SZ, "/%s/%s", channelName, propName);
 	if (strcmp(topic, channel) == 0)
@@ -348,3 +347,4 @@ void mqtt::reconnect()
 		#endif
 	}
 }
+

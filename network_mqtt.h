@@ -19,7 +19,6 @@
 
 #include "game.h"
 #include "arduino.h"
-#include "game_rfid.h"
 #include "network.h"
 
 class Game;
@@ -63,3 +62,4 @@ private:
 };
 
 #endif
+

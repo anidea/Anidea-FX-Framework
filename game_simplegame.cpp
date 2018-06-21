@@ -161,3 +161,4 @@ void simplegame::reset(void)
   pressflag = 0;
   digitalWrite(lightPin, LOW);
 }
+

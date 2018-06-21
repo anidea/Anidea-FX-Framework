@@ -186,7 +186,7 @@ void sixwire::solved(void)
 
   //Do game specific solved state
   digitalWrite(SOLVED, LOW);        // Turn Off maglock
-  digitalWrite(LED, HIGH);          // Mimick LED for solved
+  digitalWrite(STAT_LED, HIGH);          // Mimick LED for solved
 }
 
 void sixwire::reset(void)
@@ -199,7 +199,7 @@ void sixwire::reset(void)
   //Reset game specific variables
   // Set outputs
   digitalWrite(SOLVED, HIGH);    // Turn on maglock
-  digitalWrite(LED, LOW);           // Mimick LED for solved 
+  digitalWrite(STAT_LED, LOW);           // Mimick LED for solved 
 }
 
 int sixwire::getDebouncedInput(int input)
@@ -225,3 +225,4 @@ int sixwire::getDebouncedInput(int input)
 
   return LOW;
 }
+

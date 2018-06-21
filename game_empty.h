@@ -17,3 +17,4 @@ class game_empty : public Game
 };
 
 #endif
+

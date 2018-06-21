@@ -30,3 +30,4 @@ class simplegame : public Game
 };
 
 #endif
+

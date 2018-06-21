@@ -298,3 +298,4 @@ void houdinimc::writeClientResponseNotFound(EthernetClient& client)
   client.println(F("Access-Control-Allow-Origin: *"));
   client.println();
 } 
+

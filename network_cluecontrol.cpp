@@ -142,3 +142,4 @@ void cluecontrol::listenForRequest()
   CCMod.CCValue = 0;  //clear the value to prevent re-triggering
 }
 
+

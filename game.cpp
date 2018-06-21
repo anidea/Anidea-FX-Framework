@@ -29,7 +29,7 @@ Game::Game()
   pinMode(INPUT5, INPUT);
 
   pinMode(RS485_ENABLE, OUTPUT);
-  pinMode(LED, OUTPUT);
+  pinMode(STAT_LED, OUTPUT);
 
   // Turn all overrides on
   for(int i = 0; i < NUM_INPUTS; ++i) //Or loop the array and init them.
@@ -310,7 +310,7 @@ void Game::disable(void)
   _enabled = false;
 }
 
-void Game::EEPROMReadString(byte pos, byte len, char* data)
+void Game::EEPROMReadString(size_t pos, byte len, char* data)
 {
 	byte i;
 	for (i = 0; i < len; i++)
@@ -323,7 +323,7 @@ void Game::EEPROMReadString(byte pos, byte len, char* data)
 	//Serial.println(data);
 }
 
-void Game::EEPROMWriteString(byte pos, char* data)
+void Game::EEPROMWriteString(size_t pos, char* data)
 {
 	byte i;
 	for (i = 0; i < strlen(data); i++)
@@ -400,3 +400,4 @@ bool Game::hallLearnCommand(bool exit)
 
 	return false;
 }
+
