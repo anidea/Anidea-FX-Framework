@@ -18,7 +18,7 @@ written and tested with Arduino 1.8.1
 #define fx450_h
 
 // Uncomment if using rev1
-//#define FX450_REV1
+#define FX450_REV1
 
 #include <EEPROM.h>
 #include <variant.h>
