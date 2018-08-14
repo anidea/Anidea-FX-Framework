@@ -17,8 +17,13 @@ written and tested with Arduino 1.8.1
 #ifndef fx450_h
 #define fx450_h
 
-// Uncomment if using rev1
-#define FX450_REV1
+// Uncomment revision used
+
+//#define FX450_REV0
+//#define FX450_REV1
+#if !defined(FX450_REV0) && !defined(FX450_REV1)
+#error "Please select a revision"
+#endif
 
 #include <EEPROM.h>
 #include <variant.h>
@@ -92,4 +97,5 @@ const int WIZ_CS = 10;
 #endif
 
 #endif
+
 

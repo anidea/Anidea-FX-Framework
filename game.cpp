@@ -340,8 +340,13 @@ void Game::EEPROMWriteString(size_t pos, char* data)
 
 bool Game::hallLearnCommand(bool exit)
 {
+#ifdef FX450
+	static const int HALL_NORTH_THRESH = -20;
+	static const int HALL_SOUTH_THRESH = 20;
+#else
 	static const int HALL_NORTH_THRESH = (.4 * 0x3FF);
 	static const int HALL_SOUTH_THRESH = (.6 * 0x3FF);
+#endif
 
 	static bool releaseNorth;
 	static bool learning = false;
@@ -353,8 +358,11 @@ bool Game::hallLearnCommand(bool exit)
 		released = true;
 		return true;
 	}
-
+#ifdef FX450_REV1
+	int read = readDigitalHall();
+#else
 	int read = analogRead(HALL);
+#endif
 
 	bool inNorth = read < HALL_NORTH_THRESH;
 	bool inSouth = read > HALL_SOUTH_THRESH;
@@ -401,3 +409,28 @@ bool Game::hallLearnCommand(bool exit)
 	return false;
 }
 
+
+int Game::readDigitalHall()
+{
+	int z = 0;
+
+	Wire.beginTransmission((uint8_t)113);
+	Wire.write(0x28);
+	bool error = Wire.endTransmission();
+	if (error) return 0;
+
+	Wire.requestFrom((uint8_t)113, (uint8_t)8);
+
+	Wire.read();
+	Wire.read();
+
+	z = Wire.read() << 4;
+
+	while (Wire.available()) Wire.read();
+
+	error = Wire.endTransmission();
+
+	if (error) return 0;
+
+	return z;
+}

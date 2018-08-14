@@ -45,7 +45,9 @@ class Game
 
     virtual void disable(); // Call to disable game
 
-	bool hallLearnCommand(bool exit = false);
+	  bool hallLearnCommand(bool exit = false);
+
+    int readDigitalHall();
 
     void setNetwork(Network *pn) { this->_pMyNetwork = pn; };
 
