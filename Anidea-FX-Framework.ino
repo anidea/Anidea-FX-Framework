@@ -80,7 +80,7 @@ void setup()
   //myGame = new simplegame(); //Simple game provided as an example
   //myGame = new sequencedetect(); //Sequencedetect
   //myGame = new sixwire(); //Sixwire
-  myGame = new inputsequence(); //Detects a sequence of inputs
+  //myGame = new inputsequence(); //Detects a sequence of inputs
   //myGame = new rfid();
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xA2};   // This must be unique for each device
@@ -92,7 +92,7 @@ void setup()
   //myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
   //myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
   //myNetwork = new mqtt(MyMac, MyIP, HostIP);
-	myNetwork = new mqtt_m3(MyMac, MyIP, HostIP);
+	//myNetwork = new mqtt_m3(MyMac, MyIP, HostIP);
 	//myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
 

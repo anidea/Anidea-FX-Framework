@@ -20,7 +20,7 @@ written and tested with Arduino 1.8.1
 // Uncomment revision used
 
 //#define FX450_REV0
-#define FX450_REV1
+//#define FX450_REV1
 #if !defined(FX450_REV0) && !defined(FX450_REV1)
 #error "Please select a revision"
 #endif

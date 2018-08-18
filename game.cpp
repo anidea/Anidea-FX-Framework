@@ -420,6 +420,19 @@ bool Game::hallLearnCommand(bool exit)
 
 int Game::readDigitalHall()
 {
+  auto signExtendBitfield = [](uint32_t data, int width) -> long
+  {
+    long x = (long) data;
+    long mask = 1L << (width - 1);
+  
+    if (width < 32)
+    {
+        x = x & ((1 << width) - 1); // make sure the upper bits are zero
+    }
+  
+    return (long)((x ^ mask) - mask);
+  };
+  
 	int z = 0;
 	static bool newHall = false;
 	uint8_t address = 113;
@@ -436,15 +449,20 @@ int Game::readDigitalHall()
 	}
 
 	Wire.requestFrom((uint8_t)address, (uint8_t)8);
+      
+  uint32_t value0x28 = Wire.read() << 24;
+  value0x28 += Wire.read() << 16;
+  value0x28 += Wire.read() << 8;
+  value0x28 += Wire.read();
 
-	Wire.read();
-	Wire.read();
+  uint32_t value0x29 = Wire.read() << 24;
+  value0x29 += Wire.read() << 16;
+  value0x29 += Wire.read() << 8;
+  value0x29 += Wire.read();
+  
+  int z = SignExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
 
-	z = Wire.read() << 4;
-
-	while (Wire.available()) Wire.read();
-
-	error = Wire.endTransmission();
+  error = Wire.endTransmission();
 
 	if (error) return 0;
 
