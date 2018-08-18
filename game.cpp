@@ -340,7 +340,7 @@ void Game::EEPROMWriteString(size_t pos, char* data)
 
 bool Game::hallLearnCommand(bool exit)
 {
-#ifdef FX450
+#ifdef FX450REV_1
 	static const int HALL_NORTH_THRESH = -20;
 	static const int HALL_SOUTH_THRESH = 20;
 #else
@@ -413,13 +413,21 @@ bool Game::hallLearnCommand(bool exit)
 int Game::readDigitalHall()
 {
 	int z = 0;
+	static bool newHall = false;
+	uint8_t address = newHall ? 0 : 113;
 
-	Wire.beginTransmission((uint8_t)113);
+	Wire.beginTransmission((uint8_t)address);
 	Wire.write(0x28);
 	bool error = Wire.endTransmission();
-	if (error) return 0;
+	
+	if (error && !newHall)
+	{
+		newHall = true;
+		if (!programDigitalHall()) newHall = false;
+		return 0;
+	}
 
-	Wire.requestFrom((uint8_t)113, (uint8_t)8);
+	Wire.requestFrom((uint8_t)address, (uint8_t)8);
 
 	Wire.read();
 	Wire.read();
@@ -433,4 +441,76 @@ int Game::readDigitalHall()
 	if (error) return 0;
 
 	return z;
+}
+
+bool Game::programDigitalHall()
+{
+	uint16_t error;
+
+	auto write = [&](uint32_t value) -> uint16_t
+	{
+		Wire.beginTransmission(0x0);
+		Wire.write(0x02);
+		Wire.write((byte)(value >> 24));
+		Wire.write((byte)(value >> 16));
+		Wire.write((byte)(value >> 8));
+		Wire.write((byte)(value));
+		return Wire.endTransmission();
+	};
+
+	auto read = [&](uint32_t& value) -> uint16_t
+	{
+		Wire.beginTransmission(0x0);
+		Wire.write(0x02);
+		error = Wire.endTransmission(false);
+
+		if (!error)
+		{
+			Wire.requestFrom(0x0, 4);
+			value =  (uint32_t)(Wire.read()) << 24;
+			value += (uint32_t)(Wire.read()) << 16;
+			value += (uint32_t)(Wire.read()) << 8;
+			value += (uint32_t)(Wire.read());
+		}
+
+		return error;
+	};
+
+	error = write(0x2C413534);
+
+	if (error)
+	{
+		Serial.print("Error while trying to enter customer access mode. error = ");
+		Serial.println(error);
+
+		return false;
+	}
+
+	uint32_t value0x02 = -1;
+	error = read(value0x02);
+
+	if (error)
+	{
+		Serial.print("Unable to read the ALS31300. error = ");
+		Serial.println(error);
+		return false;
+	}
+
+	value0x02 &= 0xFFFE03FF; //zero out address bits
+	value0x02 |= (113 << 10); //write address bits
+
+	error = write(value0x02);
+
+	if (error)
+	{
+		Serial.print("Unable to write the ALS31300. error = ");
+		Serial.println(error);
+
+		return false;
+	}
+
+	delay(100);
+
+	Serial.println(F("Hall programmed for address 113"));
+	return true;
 }

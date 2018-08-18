@@ -49,6 +49,8 @@ class Game
 
     int readDigitalHall();
 
+	bool programDigitalHall();
+
     void setNetwork(Network *pn) { this->_pMyNetwork = pn; };
 
     bool   isSolved(void)  {return _puzzleSolved; }
