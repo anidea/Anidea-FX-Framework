@@ -1,0 +1,10 @@
+
+.vs/Anidea-FX-Framework/v15/.suo
+__vm/.Anidea-FX-Framework.vsarduino.h
+__vm/Compile.vmps.xml
+__vm/Configuration.Debug.vmps.xml
+__vm/Configuration.Release.vmps.xml
+__vm/Upload.vmps.xml
+*.o
+*.d
+*.a

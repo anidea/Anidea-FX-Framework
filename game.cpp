@@ -11,7 +11,8 @@ bool Game::RELAY_STATES_FLAG[NUM_OUTPUTS] = {false};
 //
 Game::Game()
 {
-  pinMode(RELAY0, OUTPUT);
+	// Setup hardware
+	pinMode(RELAY0, OUTPUT);
   pinMode(RELAY1, OUTPUT);
 
   pinMode(OUTPUT0, OUTPUT);
@@ -31,6 +32,16 @@ Game::Game()
   pinMode(RS485_ENABLE, OUTPUT);
   pinMode(STAT_LED, OUTPUT);
 
+
+#ifdef DIGITAL_HALL
+	if (readDigitalHall() == 0)
+	{
+		Serial.println("Bitches!!");
+		// One time (should be at least) configure of new hall sensor from default address.
+		programDigitalHall();
+	}
+#endif
+
   // Turn all overrides on
   for(int i = 0; i < NUM_INPUTS; ++i) //Or loop the array and init them.
       INPUT_OVERRIDE_ENABLE[i] = true;
@@ -41,9 +52,6 @@ Game::Game()
   for(int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
       RELAY_OVERRIDE_ENABLE[i] = true;
 
-	#if defined(FX60_0_ENABLE) || defined(FX60_1_ENABLE)
-	  Wire.begin();   // I2C
-	#endif
 
 	#if defined(FX60_0_ENABLE)
 	  FX60_0_I2C.writeAll(0, 0, 0); // Clear all
@@ -340,7 +348,7 @@ void Game::EEPROMWriteString(size_t pos, char* data)
 
 bool Game::hallLearnCommand(bool exit)
 {
-#ifdef FX450REV_1
+#ifdef DIGITAL_HALL
 	static const int HALL_NORTH_THRESH = -20;
 	static const int HALL_SOUTH_THRESH = 20;
 #else
@@ -358,7 +366,7 @@ bool Game::hallLearnCommand(bool exit)
 		released = true;
 		return true;
 	}
-#ifdef FX450_REV1
+#ifdef DIGITAL_HALL
 	int read = readDigitalHall();
 #else
 	int read = analogRead(HALL);
@@ -414,16 +422,16 @@ int Game::readDigitalHall()
 {
 	int z = 0;
 	static bool newHall = false;
-	uint8_t address = newHall ? 0 : 113;
+	uint8_t address = 113;
 
 	Wire.beginTransmission((uint8_t)address);
 	Wire.write(0x28);
 	bool error = Wire.endTransmission();
 	
-	if (error && !newHall)
+	if (error)
 	{
-		newHall = true;
-		if (!programDigitalHall()) newHall = false;
+		Serial.println("Failed to find I2C Digital Hall Device");
+		
 		return 0;
 	}
 
@@ -440,12 +448,17 @@ int Game::readDigitalHall()
 
 	if (error) return 0;
 
+	Serial.print("Hall Read ");
+	Serial.println(z);
+
 	return z;
 }
 
 bool Game::programDigitalHall()
 {
 	uint16_t error;
+
+	Serial.println("is this cool?");
 
 	auto write = [&](uint32_t value) -> uint16_t
 	{
@@ -475,6 +488,9 @@ bool Game::programDigitalHall()
 
 		return error;
 	};
+
+	Serial.println("Configuring digital hall");
+
 
 	error = write(0x2C413534);
 
