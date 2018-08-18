@@ -33,6 +33,7 @@ class Network
     Network(byte [], IPAddress, IPAddress, bool);
 
     virtual void loop(void);
+		virtual void tick(void);
 
     virtual void setGame(Game *pg) { pMyGame = pg; };
 

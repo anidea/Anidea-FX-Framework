@@ -34,9 +34,10 @@ Game::Game()
 
 
 #ifdef DIGITAL_HALL
-	if (readDigitalHall() == 0)
+	int z;
+	if (readDigitalHall(z) == false)
 	{
-		// One time (should be at least) configure of new hall sensor from default address.
+		// One time (should madebe at least) configure of new hall sensor from default address.
 		Serial.println("About to configure digital hall");
 		programDigitalHall();
 	}
@@ -367,7 +368,8 @@ bool Game::hallLearnCommand(bool exit)
 		return true;
 	}
 #ifdef DIGITAL_HALL
-	int read = readDigitalHall();
+	int read;
+	readDigitalHall(read);
 #else
 	int read = analogRead(HALL);
 #endif
@@ -418,7 +420,7 @@ bool Game::hallLearnCommand(bool exit)
 }
 
 
-int Game::readDigitalHall()
+bool Game::readDigitalHall(int& zHallValue)
 {
   auto signExtendBitfield = [](uint32_t data, int width) -> long
   {
@@ -443,7 +445,7 @@ int Game::readDigitalHall()
 	{
 		Serial.println("Failed to find I2C Digital Hall Device");
 		
-		return 0;
+		return false;
 	}
 
 	Wire.requestFrom((uint8_t)address, (uint8_t)8);
@@ -458,26 +460,28 @@ int Game::readDigitalHall()
   value0x29 += Wire.read() << 8;
   value0x29 += Wire.read();
   
-  int z = signExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
+	zHallValue = signExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
 
   error = Wire.endTransmission();
 
-	if (error) return 0;
+	if (error) return false;
 
-	Serial.print("Hall Read ");
-	Serial.println(z);
+	//Serial.print("Hall Read ");
+	//Serial.println(zHallValue);
 
-	return z;
+	return true;
 }
 
 bool Game::programDigitalHall()
 {
 	uint16_t error;
 
-	auto write = [&](uint32_t value) -> uint16_t
+	Serial.println("is this cool?");
+
+	auto write = [&](uint32_t value, uint8_t reg = 0x02) -> uint16_t
 	{
 		Wire.beginTransmission(0x0);
-		Wire.write(0x02);
+		Wire.write(reg);
 		Wire.write((byte)(value >> 24));
 		Wire.write((byte)(value >> 16));
 		Wire.write((byte)(value >> 8));
@@ -494,7 +498,7 @@ bool Game::programDigitalHall()
 		if (!error)
 		{
 			Wire.requestFrom(0x0, 4);
-			value =  (uint32_t)(Wire.read()) << 24;
+			value = (uint32_t)(Wire.read()) << 24;
 			value += (uint32_t)(Wire.read()) << 16;
 			value += (uint32_t)(Wire.read()) << 8;
 			value += (uint32_t)(Wire.read());
@@ -505,8 +509,7 @@ bool Game::programDigitalHall()
 
 	Serial.println("Configuring digital hall");
 
-
-	error = write(0x2C413534);
+	error = write(0x2C413534, 0x35);
 
 	if (error)
 	{
@@ -543,4 +546,5 @@ bool Game::programDigitalHall()
 
 	Serial.println(F("Hall programmed for address 113"));
 	return true;
+
 }

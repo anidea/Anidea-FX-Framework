@@ -47,7 +47,7 @@ class Game
 
 	  bool hallLearnCommand(bool exit = false);
 
-    int readDigitalHall();
+    bool readDigitalHall(int& zHallValue);
 
 	bool programDigitalHall();
 

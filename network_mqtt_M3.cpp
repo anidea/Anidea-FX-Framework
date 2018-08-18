@@ -7,7 +7,7 @@
 char mqtt_m3::propName[] = "myProp";
 char mqtt_m3::channelName[] = "myChannel";
 
-//#define DEBUG_mqtt_m3
+#define DEBUG_MQTT_M3
 
 mqtt_m3::mqtt_m3(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
@@ -45,7 +45,7 @@ void mqtt_m3::tick()
 
 void mqtt_m3::printData(char* data, char* channel)
 {
-#ifdef DEBUG_mqtt_m3
+#ifdef DEBUG_MQTT_M3
 	Serial.print("Channel: ");
 	Serial.print(channel);
 
@@ -322,7 +322,7 @@ void mqtt_m3::callback(char* topic, uint8_t* payload, unsigned int length)
 
 void mqtt_m3::reconnect()
 {
-#ifdef DEBUG_mqtt_m3
+#ifdef DEBUG_MQTT_M3
 	Serial.print(F("Attempting mqtt_m3 connection with device "));
 	Serial.print(propName);
 	Serial.print(" on channel ");
@@ -331,7 +331,7 @@ void mqtt_m3::reconnect()
 	// Attempt to connect
 	if (client->connect(propName))
 	{
-#ifdef DEBUG_mqtt_m3
+#ifdef DEBUG_MQTT_M3
 		Serial.println(F("connected"));
 #endif
 		char channel[mqtt_m3_BUF_SZ];
@@ -340,7 +340,7 @@ void mqtt_m3::reconnect()
 	}
 	else
 	{
-#ifdef DEBUG_mqtt_m3
+#ifdef DEBUG_MQTT_M3
 		Serial.print(F("failed, rc="));
 		Serial.print(client->state());
 		Serial.println(F(" try again in 5 seconds"));
