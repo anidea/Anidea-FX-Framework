@@ -460,7 +460,7 @@ int Game::readDigitalHall()
   value0x29 += Wire.read() << 8;
   value0x29 += Wire.read();
   
-  int z = signExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
+  z = signExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
 
   error = Wire.endTransmission();
 
