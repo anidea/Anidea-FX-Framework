@@ -112,6 +112,10 @@ void Network::loop(void)
   
 }
 
+void Network::tick(void)
+{
+}
+
 void Network::getIP(int type)
 {
   if (type == 0 || type == 1) // Get MyIP

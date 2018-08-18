@@ -15,6 +15,8 @@ mqtt::mqtt(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, 
 	client->setClient(ethClient);
 	client->setServer(HostIP, serverPort);
 	client->setCallback(mqtt::callback);
+
+	retry_timer = RETRY_INTERVAL + 1;
 }
 
 void mqtt::loop(void)

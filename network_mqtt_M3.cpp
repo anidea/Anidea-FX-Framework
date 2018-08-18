@@ -15,6 +15,8 @@ mqtt_m3::mqtt_m3(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_M
 	client->setClient(ethClient);
 	client->setServer(HostIP, serverPort);
 	client->setCallback(mqtt_m3::callback);
+
+	retry_timer = RETRY_INTERVAL + 1;
 }
 
 void mqtt_m3::loop(void)

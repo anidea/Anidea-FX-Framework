@@ -22,8 +22,8 @@ class inputsequence : public Game
 
     // Configure the steady state input filter
     // Inputs must be steady for COUNT * TIME before being accepted
-    static const int STEADY_STATE_INPUTS_COUNT = 25;
-    static const int STEADY_STATE_INPUTS_TIME = 10;  // 25 * 10 = 1/4 second
+    static const int STEADY_STATE_INPUTS_COUNT = 10;
+    static const int STEADY_STATE_INPUTS_TIME = 10;  // 25 * 10 = 1/10 second
     static const int NO_INPUT_DETECTED = -1;
 
     // Game Definition Variables
