@@ -460,7 +460,7 @@ int Game::readDigitalHall()
   value0x29 += Wire.read() << 8;
   value0x29 += Wire.read();
   
-  int z = SignExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
+  int z = signExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
 
   error = Wire.endTransmission();
 
@@ -478,10 +478,10 @@ bool Game::programDigitalHall()
 
 	Serial.println("is this cool?");
 
-	auto write = [&](uint32_t value) -> uint16_t
+	auto write = [&](uint32_t value, uint8_t reg = 0x02) -> uint16_t
 	{
 		Wire.beginTransmission(0x0);
-		Wire.write(0x02);
+		Wire.write(reg);
 		Wire.write((byte)(value >> 24));
 		Wire.write((byte)(value >> 16));
 		Wire.write((byte)(value >> 8));
@@ -509,8 +509,7 @@ bool Game::programDigitalHall()
 
 	Serial.println("Configuring digital hall");
 
-
-	error = write(0x2C413534);
+	error = write(0x2C413534, 0x35);
 
 	if (error)
 	{
