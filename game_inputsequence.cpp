@@ -19,9 +19,12 @@
 
 
 /*
+
+*** this is effectively the same game as sequence_detect run with no lights.  Probably better to just not use this one. ***
+
   // pin assignments
 
-   AEI FX300
+   FX300/FX350/FX450
    ------------------------
  * *INPUTS*
     Button or hall inputs are specified in a list below.  High is active
@@ -58,6 +61,8 @@
    If enabled below, ENABLE low will allow the game to be played
 
    Once the entire sequence is entered, the solved routine is run and the solved relay will disengage.
+
+
    
 */
 

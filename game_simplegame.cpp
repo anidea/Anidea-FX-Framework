@@ -20,7 +20,7 @@
 /*
   // pin assignments
 
-   AEI FX300
+	FX300/FX350/FX450
    ------------------------
  * *INPUTS*
     1 input defined by buttonPin that is connected to VIN through a button

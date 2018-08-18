@@ -36,8 +36,8 @@ Game::Game()
 #ifdef DIGITAL_HALL
 	if (readDigitalHall() == 0)
 	{
-		Serial.println("Bitches!!");
 		// One time (should be at least) configure of new hall sensor from default address.
+		Serial.println("About to configure digital hall");
 		programDigitalHall();
 	}
 #endif
@@ -433,8 +433,6 @@ int Game::readDigitalHall()
     return (long)((x ^ mask) - mask);
   };
   
-	int z = 0;
-	static bool newHall = false;
 	uint8_t address = 113;
 
 	Wire.beginTransmission((uint8_t)address);
@@ -460,7 +458,7 @@ int Game::readDigitalHall()
   value0x29 += Wire.read() << 8;
   value0x29 += Wire.read();
   
-  int z = SignExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
+  int z = signExtendBitfield(((value0x28 >> 4) & 0x0FF0) | ((value0x29 >> 8) & 0x0F), 12);
 
   error = Wire.endTransmission();
 
@@ -475,8 +473,6 @@ int Game::readDigitalHall()
 bool Game::programDigitalHall()
 {
 	uint16_t error;
-
-	Serial.println("is this cool?");
 
 	auto write = [&](uint32_t value) -> uint16_t
 	{

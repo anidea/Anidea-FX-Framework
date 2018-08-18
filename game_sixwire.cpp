@@ -1,7 +1,7 @@
 #include "game_sixwire.h"
 
 /*
-  FX300 6 wires prop controller
+  FX300/FX350/FX450 - 6 wires prop controller
   Tests for up to 6 connections for patch panels or general connections
   2017 Gabriel Goldstein
   Anidea Engineering
@@ -12,7 +12,8 @@
 
 /*
   // pin assignments
-   AEI FX300
+
+	 FX300/FX350/FX450
    ------------------------
  * *INPUTS*
     Inputs are specified in a list below.  This game interates through up to 6 input/output lines and makes sure they are connected properly.

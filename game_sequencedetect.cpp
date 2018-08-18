@@ -89,7 +89,7 @@ sequencedetect::sequencedetect() : Game()
   RELAY_OVERRIDE_ENABLE[0] = 1;
   RELAY_OVERRIDE_ENABLE[1] = 0;
 
-  Serial.println(F("FX300 6 input sequence detector"));
+  Serial.println(F("FX 6 input sequence detector"));
 
   reset();
 }

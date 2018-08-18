@@ -2,6 +2,8 @@
 
 #include "fx200.h"
 
+// This will be a mess on a FX300/FX350 because of the shared serial port.  Use at your own risk/fun.
+
 // Number of readers
 const int numberOfReaders = 3;
 

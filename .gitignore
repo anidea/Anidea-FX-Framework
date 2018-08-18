@@ -8,3 +8,17 @@ __vm/Upload.vmps.xml
 *.o
 *.d
 *.a
+Anidea-FX-Framework.vcxproj
+Anidea-FX-Framework.sln
+Anidea-FX-Framework.vcxproj.filters
+Anidea-FX-Framework.vcxproj.user
+*.bin
+Release/board.buildinfo
+Release/Anidea-FX-Framework.with_bootloader.hex
+Release/Anidea-FX-Framework.map
+Release/Anidea-FX-Framework.ino.with_bootloader.hex
+Release/Anidea-FX-Framework.ino.map
+Release/Anidea-FX-Framework.ino.hex
+Release/Anidea-FX-Framework.ino.elf
+Release/Anidea-FX-Framework.hex
+Release/Anidea-FX-Framework.elf
