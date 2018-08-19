@@ -89,6 +89,12 @@ sequencedetect::sequencedetect() : Game()
   RELAY_OVERRIDE_ENABLE[0] = 1;
   RELAY_OVERRIDE_ENABLE[1] = 0;
 
+	// Copy eeprom to shadow register
+	for (int i = 0; i < GAME_MAX_SEQUENCE; i++)
+	{
+		_eepromShadow[i] = EEPROM.read(EEPROM_START + i);
+	}
+
   Serial.println(F("FX 6 input sequence detector"));
 
   reset();
@@ -136,7 +142,7 @@ void sequencedetect::tick(void)
           if (currentLightSequence >= 0)
           {
             // Turn off light only if we aren't at the beginning of the sequence
-            digitalWrite(_outputLightsPinList[EEPROM.read(EEPROM_START + currentLightSequence)], LOW); // Turn off current light
+            digitalWrite(_outputLightsPinList[_eepromShadow[currentLightSequence]], LOW); // Turn off current light
           }
   
         }else{
@@ -147,7 +153,7 @@ void sequencedetect::tick(void)
   
           currentLightSequence++;
     
-          int nextLight = EEPROM.read(EEPROM_START + currentLightSequence);
+          int nextLight = _eepromShadow[currentLightSequence];
     
           if (nextLight == 0xFF)
           {
@@ -158,7 +164,7 @@ void sequencedetect::tick(void)
           }else{
             // Next light
             
-            digitalWrite(_outputLightsPinList[EEPROM.read(EEPROM_START + currentLightSequence)], HIGH); // Turn on next light
+            digitalWrite(_outputLightsPinList[_eepromShadow[currentLightSequence]], HIGH); // Turn on next light
             
           }
         }
@@ -227,7 +233,7 @@ void sequencedetect::loop(void)
   
       scanCurrentInputButton = scanInputsSteady();
 
-      if (0xFF == EEPROM.read(EEPROM_START + _inputSequencePosition))
+      if (0xFF == _eepromShadow[_inputSequencePosition])
       {
         // Sequence end detected
 
@@ -251,10 +257,16 @@ void sequencedetect::loop(void)
 
         if (_waitForNoInput == 0)
         {
-          if (scanCurrentInputButton == EEPROM.read(EEPROM_START + _inputSequencePosition))
+          if ((scanCurrentInputButton == _eepromShadow[_inputSequencePosition]) ||
+							(_inputSequencePosition == 1 && scanCurrentInputButton == _eepromShadow[0]))
           {
             // Current button read is the same as the recorded sequence
   
+						if (_inputSequencePosition == 1 && scanCurrentInputButton == _eepromShadow[0])
+						{
+							_inputSequencePosition = 0;	// Reset back to first button press
+						}
+
             _waitForNoInput = 1;
   
             // First good button
@@ -498,9 +510,12 @@ void sequencedetect::recordInputButtonSequence(void)
   
   Serial.println(F("Sequence "));
 
+	memset(_eepromShadow, 0xFF, sizeof(_eepromShadow));
+
   while((input = EEPROM.read(EEPROM_START + i)) != 0xFF)
   {
-    Serial.println(input, DEC);
+		_eepromShadow[i] = input;	// copy back to shadow
+		Serial.println(input, DEC);
     i++;
   }
     

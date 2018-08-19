@@ -48,7 +48,6 @@ private:
 	int serverPort = 1883;
 
 	static char propName[];
-	static char channelName[];
 
 	bool sent;
 
@@ -58,7 +57,7 @@ private:
 	static const uint16_t RETRY_INTERVAL = 5000; // 5 second interval
 	uint16_t retry_timer = 0;
 
-	bool connected = false;
+	bool netConnected = false;
 };
 
 #endif

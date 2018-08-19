@@ -5,7 +5,27 @@
 
 // Configuration
 char mqtt_m3::propName[] = "myProp";
-char mqtt_m3::channelName[] = "myChannel";
+
+const static char channel_command[] PROGMEM = "/Command";
+const static char channel_enable[] PROGMEM = "/Command/Enable";
+const static char channel_solve[] PROGMEM = "/Command/Solve";
+const static char channel_reset[] PROGMEM = "/Command/Reset";
+const static char channel_disable[] PROGMEM = "/Command/Disable";
+
+const static char channel_heartbeat[] PROGMEM = "/heartbeat";
+
+const static char channel_output[] PROGMEM = "/Output_";
+const static char channel_input[] PROGMEM = "/Input_";
+const static char channel_relay[] PROGMEM = "/Relay_";
+
+#ifdef FX60_0_ENABLE
+const static char channel_FX60_0_relay[] PROGMEM = propName "/Command/FX60_0_RELAY_";
+const static char channel_FX60_0_output[] PROGMEM = propName "/Command/FX60_0_OUTPUT_";
+#endif
+#ifdef FX60_1_ENABLE
+const static char channel_FX60_1_relay[] PROGMEM = propName "/Command/FX60_1_RELAY_";
+const static char channel_FX60_1_output[] PROGMEM = propName "/Command/FX60_1_OUTPUT_";
+#endif
 
 #define DEBUG_MQTT_M3
 
@@ -15,16 +35,15 @@ mqtt_m3::mqtt_m3(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_M
 	client->setClient(ethClient);
 	client->setServer(HostIP, serverPort);
 	client->setCallback(mqtt_m3::callback);
-
-	retry_timer = RETRY_INTERVAL + 1;
 }
 
 void mqtt_m3::loop(void)
 {
 	Network::loop();
+
 	if (!client->connected())
 	{
-		connected = false;
+		netConnected = false;
 		if (retry_timer > RETRY_INTERVAL)
 		{
 			reconnect();
@@ -33,7 +52,7 @@ void mqtt_m3::loop(void)
 	}
 	else
 	{
-		connected = true;
+		netConnected = true;
 		sendChanges();
 		client->loop();
 	}
@@ -42,18 +61,18 @@ void mqtt_m3::loop(void)
 void mqtt_m3::tick()
 {
 	heartbeat_timer += TIMER_INTERVAL;
-	if (!connected) retry_timer += TIMER_INTERVAL;
+	if (!netConnected) retry_timer += TIMER_INTERVAL;
 }
 
 void mqtt_m3::printData(char* data, char* channel)
 {
 #ifdef DEBUG_MQTT_M3
-	Serial.print("Channel: ");
+	Serial.print(F("Channel: "));
 	Serial.print(channel);
 
 	if (data[0])
 	{
-		Serial.print(" - Data: ");
+		Serial.print(F(" - Data: "));
 		Serial.println(data);
 	}
 	else
@@ -63,55 +82,55 @@ void mqtt_m3::printData(char* data, char* channel)
 #endif
 }
 
-void mqtt_m3::sendChanges(void)
+void mqtt_m3::sendChanges()
 {
 #define mqtt_m3_BUF_SZ 128
 	char data[mqtt_m3_BUF_SZ];
-	char channel[mqtt_m3_BUF_SZ];
-
-	snprintf(channel, mqtt_m3_BUF_SZ, "/%s/%s", channelName, propName);
 
 	if (!pMyGame->solvedFlag && pMyGame->isSolved())
 	{
-		snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"GAMESTATE\", \"VALUE\": %c}", pMyGame->_puzzleSolved);
-		client->publish(channel, data);
-		printData(data, channel);
+		snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s", propName, channel_solve);
 
+		client->publish(data, pMyGame->isSolved() ? "Yes" : "No");
 		pMyGame->solvedFlag = true;
 	}
 
 	for (int i = 0; i < NUM_INPUTS; i++)
 	{
-		if (pMyGame->INPUT_STATES[i] != pMyGame->INPUT_STATE_OLD[i] && pMyGame->INPUT_OVERRIDE_ENABLE[i]) // Loop through inputs and send state if changed
+		if (pMyGame->INPUT_STATES[i] != pMyGame->INPUT_STATE_OLD[i])
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"INPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, pMyGame->INPUT_STATES[i]);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_input, pMyGame->INPUT_STATES[i]);
+
+			client->publish(data, pMyGame->INPUT_STATES[i] ? "Yes" : "No");
+
 			pMyGame->INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
 		}
 	}
 
 	for (int i = 0; i < NUM_OUTPUTS; i++)
 	{
-		if (pMyGame->OUTPUT_STATES[i] != pMyGame->OUTPUT_STATE_OLD[i] && pMyGame->OUTPUT_OVERRIDE_ENABLE[i])
+		if (pMyGame->OUTPUT_STATES[i] != pMyGame->OUTPUT_STATE_OLD[i])
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"OUTPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, pMyGame->OUTPUT_STATES[i]);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_output, pMyGame->OUTPUT_STATES[i]);
+
+			client->publish(data, pMyGame->OUTPUT_STATES[i] ? "Yes" : "No");
+
 			pMyGame->OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
 		}
 	}
 
 	for (int i = 0; i < NUM_RELAYS; i++)
 	{
-		if (pMyGame->RELAY_STATES[i] != pMyGame->RELAY_STATE_OLD[i] && pMyGame->RELAY_OVERRIDE_ENABLE[i])
+		if (pMyGame->RELAY_STATES[i] != pMyGame->RELAY_STATE_OLD[i])
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"RELAY\", \"INDEX\": %d, \"VALUE\": %d}", i, pMyGame->RELAY_STATES[i]);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_relay, pMyGame->RELAY_STATES[i]);
+
+			client->publish(data, pMyGame->RELAY_STATES[i] ? "Yes" : "No");
+
 			pMyGame->RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
 		}
 	}
+
 
 #if defined(FX60_0_ENABLE)
 	for (int i = 0; i < FX60_NUM_INPUTS; i++)
@@ -120,9 +139,11 @@ void mqtt_m3::sendChanges(void)
 
 		if ((pMyGame->FX60_0_INPUT_STATES & bitIndex) != (pMyGame->FX60_0_ISTATE_OLD & bitIndex) && (pMyGame->FX60_0_INPUT_ENABLE & bitIndex))
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"FX60_0_INPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, (pMyGame->FX60_0_INPUT_STATES & bitIndex) ? HIGH : LOW);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_FX60_0_relay, pMyGame->FX60_0_INPUT_STATES & bitIndex ? 1 : 0);
+
+			client->publish(data, (pMyGame->FX60_0_INPUT_STATES & bitIndex) ? "Yes" : "No");
+
+			// Update state so it's not published again
 			pMyGame->FX60_0_ISTATE_OLD &= ~bitIndex; //zero out current_bit
 			pMyGame->FX60_0_ISTATE_OLD |= pMyGame->FX60_0_INPUT_STATES & bitIndex; //set new bit
 		}
@@ -134,9 +155,11 @@ void mqtt_m3::sendChanges(void)
 
 		if ((pMyGame->FX60_0_OUTPUT_STATES & bitIndex) != (pMyGame->FX60_0_OSTATE_OLD & bitIndex) && (pMyGame->FX60_0_OUTPUT_ENABLE & bitIndex))
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"FX60_0_OUTPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, (pMyGame->FX60_0_OUTPUT_STATES & bitIndex) ? HIGH : LOW);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_FX60_0_output, pMyGame->FX60_0_OUTPUT_STATES & bitIndex ? 1 : 0);
+
+			client->publish(data, (pMyGame->FX60_0_OUTPUT_STATES & bitIndex) ? "Yes" : "No");
+
+			// Update state so it's not published again
 			pMyGame->FX60_0_OSTATE_OLD &= ~bitIndex; //zero out current_bit
 			pMyGame->FX60_0_OSTATE_OLD |= pMyGame->FX60_0_OUTPUT_STATES & bitIndex; //set new bit
 		}
@@ -148,15 +171,16 @@ void mqtt_m3::sendChanges(void)
 
 		if ((pMyGame->FX60_0_RELAY_STATES & bitIndex) != (pMyGame->FX60_0_RSTATE_OLD & bitIndex) && (pMyGame->FX60_0_RELAY_ENABLE & bitIndex))
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"FX60_0_RELAY\", \"INDEX\": %d, \"VALUE\": %d}", i, (pMyGame->FX60_0_RELAY_STATES & bitIndex) ? HIGH : LOW);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_FX60_0_relay, pMyGame->FX60_0_RELAY_STATES & bitIndex ? 1 : 0);
+
+			client->publish(data, (pMyGame->FX60_0_RELAY_STATES & bitIndex) ? "Yes" : "No");
+
+			// Update state so it's not published again
 			pMyGame->FX60_0_RSTATE_OLD &= ~bitIndex; //zero out current_bit
 			pMyGame->FX60_0_RSTATE_OLD |= pMyGame->FX60_0_RELAY_STATES & bitIndex; //set new bit
 		}
 	}
 #endif
-
 #if defined(FX60_1_ENABLE)
 	for (int i = 0; i < FX60_NUM_INPUTS; i++)
 	{
@@ -164,9 +188,11 @@ void mqtt_m3::sendChanges(void)
 
 		if ((pMyGame->FX60_1_INPUT_STATES & bitIndex) != (pMyGame->FX60_1_ISTATE_OLD & bitIndex) && (pMyGame->FX60_1_INPUT_ENABLE & bitIndex))
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"FX60_1_INPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, (pMyGame->FX60_1_INPUT_STATES & bitIndex) ? HIGH : LOW);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_FX60_1_relay, pMyGame->FX60_1_INPUT_STATES & bitIndex ? 1 : 0);
+
+			client->publish(data, (pMyGame->FX60_1_INPUT_STATES & bitIndex) ? "Yes" : "No");
+
+			// Update state so it's not published again
 			pMyGame->FX60_1_ISTATE_OLD &= ~bitIndex; //zero out current_bit
 			pMyGame->FX60_1_ISTATE_OLD |= pMyGame->FX60_1_INPUT_STATES & bitIndex; //set new bit
 		}
@@ -178,9 +204,12 @@ void mqtt_m3::sendChanges(void)
 
 		if ((pMyGame->FX60_1_OUTPUT_STATES & bitIndex) != (pMyGame->FX60_1_OSTATE_OLD & bitIndex) && (pMyGame->FX60_1_OUTPUT_ENABLE & bitIndex))
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"FX60_1_OUTPUT\", \"INDEX\": %d, \"VALUE\": %d}", i, (pMyGame->FX60_1_OUTPUT_STATES & bitIndex) ? HIGH : LOW);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_FX60_1_output, pMyGame->FX60_1_OUTPUT_STATES & bitIndex ? 1 : 0);
+
+			client->publish(data, (pMyGame->FX60_1_OUTPUT_STATES & bitIndex) ? "Yes" : "No");
+
+
+			// Update state so it's not published again
 			pMyGame->FX60_1_OSTATE_OLD &= ~bitIndex; //zero out current_bit
 			pMyGame->FX60_1_OSTATE_OLD |= pMyGame->FX60_1_OUTPUT_STATES & bitIndex; //set new bit
 		}
@@ -192,143 +221,150 @@ void mqtt_m3::sendChanges(void)
 
 		if ((pMyGame->FX60_1_RELAY_STATES & bitIndex) != (pMyGame->FX60_1_RSTATE_OLD & bitIndex) && (pMyGame->FX60_1_RELAY_ENABLE & bitIndex))
 		{
-			snprintf(data, mqtt_m3_BUF_SZ, "{\"DIRECTION\": \"FROM\", \"TYPE\": \"FX60_1_RELAY\", \"INDEX\": %d, \"VALUE\": %d}", i, (pMyGame->FX60_1_RELAY_STATES & bitIndex) ? HIGH : LOW);
-			client->publish(channel, data);
-			printData(data, channel);
+			snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s%d", propName, channel_FX60_1_relay, pMyGame->FX60_1_RELAY_STATES & bitIndex ? 1 : 0);
+
+			client->publish(data, (pMyGame->FX60_1_RELAY_STATES & bitIndex) ? "Yes" : "No");
+
+			// Update state so it's not published again
 			pMyGame->FX60_1_RSTATE_OLD &= ~bitIndex; //zero out current_bit
 			pMyGame->FX60_1_RSTATE_OLD |= pMyGame->FX60_1_RELAY_STATES & bitIndex; //set new bit
 		}
 	}
 #endif
 
-	if (pMyGame->isRFIDChanged())
-	{
-		byte count = pMyGame->getTagCount();
-		size_t mqtt_m3_TAG_BUF_SZ = 50 + count * 32;
-
-		snprintf(channel, mqtt_m3_BUF_SZ, "/%s/%s", channelName, propName);
-
-		char* tag_data = new char[mqtt_m3_TAG_BUF_SZ];
-		snprintf(tag_data, mqtt_m3_TAG_BUF_SZ, "{\"DIRECTION\":\"FROM\", \"TYPE\":\"RFID\", \"VALUE\":[");
-		for (int i = 0; i < count; i++)
-		{
-			snprintf(tag_data + strlen(tag_data), mqtt_m3_TAG_BUF_SZ, "\"%s\"", pMyGame->getTag(i).c_str());
-			if (i != count - 1) snprintf(tag_data + strlen(tag_data), mqtt_m3_TAG_BUF_SZ, ", ");
-		}
-		snprintf(tag_data + strlen(tag_data), mqtt_m3_TAG_BUF_SZ, "] }");
-
-		printData(tag_data, channel);
-		client->publish(channel, tag_data);
-
-		delete[] tag_data;
-	}
 
 	// Broadcast heartbeat every 10 seconds to indicate that it is running
 	if (heartbeat_timer >= HEARTBEAT_INTERVAL)
 	{
-		snprintf(channel, mqtt_m3_BUF_SZ, "/%s/%s/heartbeat", channelName, propName);
-		printData("", channel);
-		client->publish(channel, propName);
+		snprintf(data, mqtt_m3_BUF_SZ, "/%s/%s", propName, channel_heartbeat);
+
+		client->publish(data, "");
+
 		heartbeat_timer -= HEARTBEAT_INTERVAL;
 	}
 }
 
 void mqtt_m3::callback(char* topic, uint8_t* payload, unsigned int length)
 {
-	char channel[mqtt_m3_BUF_SZ];
-	snprintf(channel, mqtt_m3_BUF_SZ, "/%s/%s", channelName, propName);
-	if (strcmp(topic, channel) == 0)
+	Serial.println(F("Callback"));
+	Serial.println(topic);
+	Serial.println((char*)payload);
+	Serial.println(length);
+
+	if (length == 0) return;
+
+	String topicName = strtok(topic, "/");
+	if (topicName != String(propName)) return;
+	String topicCommand = strtok(NULL, "/");
+	if ('/' + topicCommand != channel_command) return;
+	String topicStripped = '/' + String(strtok(NULL, "/"));
+	char* topicStrippedCstr = strdup(topicStripped.c_str());
+
+	if (topicStripped == channel_enable) // Enable
 	{
-		StaticJsonBuffer<512> jsonBuffer;
-		JsonObject& root = jsonBuffer.parseObject(payload);
+		pMyGame->enable();
+	}
+	else if (topicStripped == channel_solve) // Solved
+	{
+		pMyGame->forceSolved();
+	}
+	else if (topicStripped == channel_reset) // Solved
+	{
+		pMyGame->reset();
+	}
+	else if (topicStripped == channel_disable) // Solved
+	{
+		pMyGame->disable();
+	}
 
-		const char* dir = root["DIRECTION"];
-		const char* type = root["TYPE"];
-		if (strcmp(dir, "FROM") == 0) return; //from this prop, return
+	if (topicStripped.compareTo(channel_output) >= 15) // Digital outputs
+	{
+		strtok(topicStrippedCstr, "_");
+		byte num = atoi(strtok(NULL, "_"));
+		if (num > NUM_OUTPUTS) return;
+		pMyGame->OUTPUT_STATES[num] = strncmp((char*)payload, "Yes", length) == 0;
+		pMyGame->OUTPUT_STATES_FLAG[num] = true;
+		return;
+	}
 
-		if (strcmp(type, "OUTPUT") == 0) // Change output state
-		{
-			int OUTPUTnum = root["INDEX"];
-			bool OUTPUTstate = root["VALUE"];
+	if (topicStripped.compareTo(channel_relay) >= 7) // Relays
+	{
+		strtok(topicStrippedCstr, "_");
+		byte num = atoi(strtok(NULL, "_"));
+		if (num > NUM_RELAYS) return;
+		pMyGame->RELAY_STATES[num] = strncmp((char*)payload, "HIGH", length) == 0;
+		pMyGame->RELAY_STATES_FLAG[num] = true;
+		return;
+	}
 
-			pMyGame->OUTPUT_STATES[OUTPUTnum] = OUTPUTstate;
-			pMyGame->OUTPUT_STATES_FLAG[OUTPUTnum] = true;
-		}
-		else if (strcmp(type, "RELAY") == 0) // Change relay state
-		{
-			int RELAYnum = root["INDEX"];
-			bool RELAYstate = root["VALUE"];
-			pMyGame->RELAY_STATES[RELAYnum] = RELAYstate;
-			pMyGame->RELAY_STATES_FLAG[RELAYnum] = true;
-		}
 #ifdef FX60_0_ENABLE
-		else if (strcmp(type, "FX60_0_RELAY") == 0)
-		{
-			int relayNum = root["INDEX"];
-			int relayState = root["VALUE"];
+	if (strcmp_P(topic, channel_FX60_0_relay) == 0)
+	{
+		strtok(topic, "_");
+		strtok(NULL, "_");
+		strtok(NULL, "_");
+		byte relayNum = atoi(strtok(NULL, "_"));
 
-			uint8_t bitIndex = 1 << relayNum;
+		uint8_t bitIndex = 1 << relayNum;
 
-			pMyGame->FX60_0_RELAY_STATES &= ~bitIndex;
-			pMyGame->FX60_0_RELAY_STATES |= bitIndex * relayState;
-			pMyGame->FX60_0_RELAY_STATES_FLAG |= bitIndex;
-		}
-		else if (strcmp(type, "FX60_0_OUTPUT") == 0)
-		{
-			int outputNum = root["INDEX"];
-			int outputState = root["VALUE"];
+		pMyGame->FX60_0_RELAY_STATES &= ~bitIndex;
+		pMyGame->FX60_0_RELAY_STATES |= bitIndex * (strncmp(payload, "HIGH", length) == 0);
+		pMyGame->FX60_0_RELAY_STATES_FLAG |= bitIndex;
+		return;
+	}
+	if (strcmp_P(topic, channel_FX60_0_output) == 0)
+	{
+		strtok(topic, "_");
+		strtok(NULL, "_");
+		strtok(NULL, "_");
+		byte outputNum = atoi(strtok(NULL, "_"));
 
-			uint8_t bitIndex = 1 << outputNum;
+		uint8_t bitIndex = 1 << outputNum;
 
-			pMyGame->FX60_0_OUTPUT_STATES &= ~bitIndex;
-			pMyGame->FX60_0_OUTPUT_STATES |= bitIndex * outputState;
-			pMyGame->FX60_0_OUTPUT_STATES_FLAG |= bitIndex;
-		}
+		pMyGame->FX60_0_OUTPUT_STATES &= ~bitIndex;
+		pMyGame->FX60_0_OUTPUT_STATES |= bitIndex * (strncmp(payload, "HIGH", length) == 0);
+		pMyGame->FX60_0_OUTPUT_STATES_FLAG |= bitIndex;
+		return;
+	}
 #endif
 #ifdef FX60_1_ENABLE
-		else if (strcmp(type, "FX60_1_RELAY") == 0)
-		{
-			int relayNum = root["INDEX"];
-			int relayState = root["VALUE"];
+	if (strcmp_P(topic, channel_FX60_1_relay) == 0)
+	{
+		strtok(topic, "_");
+		strtok(NULL, "_");
+		strtok(NULL, "_");
+		byte relayNum = atoi(strtok(NULL, "_"));
 
-			uint8_t bitIndex = 1 << relayNum;
+		uint8_t bitIndex = 1 << relayNum;
 
-			pMyGame->FX60_1_RELAY_STATES &= ~bitIndex;
-			pMyGame->FX60_1_RELAY_STATES |= bitIndex * relayState;
-			pMyGame->FX60_1_RELAY_STATES_FLAG |= bitIndex;
-		}
-		else if (strcmp(type, "FX60_1_OUTPUT") == 0)
-		{
-			int outputNum = root["INDEX"];
-			int outputState = root["VALUE"];
-
-			uint8_t bitIndex = 1 << outputNum;
-
-			pMyGame->FX60_1_OUTPUT_STATES &= ~bitIndex;
-			pMyGame->FX60_1_OUTPUT_STATES |= bitIndex * outputState;
-			pMyGame->FX60_1_OUTPUT_STATES_FLAG |= bitIndex;
-		}
-#endif
-		else if (strcmp(type, "RESET") == 0)
-		{
-			pMyGame->reset();
-		}
-		else if (strcmp(type, "GAMESTATE") == 0)
-		{
-			bool solved = root["VALUE"];
-			if (solved) pMyGame->forceSolved();
-			else pMyGame->reset();
-		}
+		pMyGame->FX60_1_RELAY_STATES &= ~bitIndex;
+		pMyGame->FX60_1_RELAY_STATES |= bitIndex * (strncmp(payload, "HIGH", length) == 0);
+		pMyGame->FX60_1_RELAY_STATES_FLAG |= bitIndex;
+		return;
 	}
+	if (strcmp_P(topic, channel_FX60_1_output) == 0)
+	{
+		strtok(topic, "_");
+		strtok(NULL, "_");
+		strtok(NULL, "_");
+		byte outputNum = atoi(strtok(NULL, "_"));
+
+		uint8_t bitIndex = 1 << outputNum;
+
+		pMyGame->FX60_1_OUTPUT_STATES &= ~bitIndex;
+		pMyGame->FX60_1_OUTPUT_STATES |= bitIndex * (strncmp(payload, "HIGH", length) == 0);
+		pMyGame->FX60_1_OUTPUT_STATES_FLAG |= bitIndex;
+		return;
+	}
+#endif
 }
 
 void mqtt_m3::reconnect()
 {
+
 #ifdef DEBUG_MQTT_M3
-	Serial.print(F("Attempting mqtt_m3 connection with device "));
-	Serial.print(propName);
-	Serial.print(" on channel ");
-	Serial.println(channelName);
+	Serial.print(F("Attempting MQTT connection with device "));
+	Serial.println(propName);
 #endif
 	// Attempt to connect
 	if (client->connect(propName))
@@ -336,9 +372,143 @@ void mqtt_m3::reconnect()
 #ifdef DEBUG_MQTT_M3
 		Serial.println(F("connected"));
 #endif
-		char channel[mqtt_m3_BUF_SZ];
-		snprintf(channel, mqtt_m3_BUF_SZ, "/%s/%s", channelName, propName);
-		client->subscribe(channel);
+		const int CHANNEL_BUF_SZ = 64;
+		char channelBuffer[CHANNEL_BUF_SZ];
+		char tmp[3];
+
+		// Enable
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_enable);
+		client->subscribe(channelBuffer);
+
+		Serial.println(channelBuffer);
+
+		// Solved
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_solve);
+		client->subscribe(channelBuffer);
+
+		// Solved
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_reset);
+		client->subscribe(channelBuffer);
+
+		Serial.println(channelBuffer);
+
+		// Outputs
+		for (int i = 0; i < NUM_OUTPUTS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_command);
+			strcat_P(channelBuffer, channel_output);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->subscribe(channelBuffer);
+
+			Serial.println(channelBuffer);
+		}
+
+		// Relays
+		for (int i = 0; i < NUM_RELAYS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_command);
+			strcat_P(channelBuffer, channel_relay);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->subscribe(channelBuffer);
+
+			Serial.println(channelBuffer);
+		}
+
+		// Send a message on all topics
+
+		// Command
+
+		// Construct channel name/Command/Enable
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_enable);
+		client->publish(channelBuffer, "");
+
+		Serial.println(channelBuffer);
+
+		// Construct channel name/Command/Solved
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_solve);
+		client->publish(channelBuffer, "");
+
+		Serial.println(channelBuffer);
+		// Construct channel name/Command/digitalOutput_
+		for (int i = 0; i < NUM_OUTPUTS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_output);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->publish(channelBuffer, "");
+
+			Serial.println(channelBuffer);
+		}
+
+		// Construct channel name/Command/analogOutput_
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_output);
+		client->publish(channelBuffer, "");
+
+		Serial.println(channelBuffer);
+
+		// Construct channel name/Command/Relay_
+		for (int i = 0; i < NUM_RELAYS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_relay);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->publish(channelBuffer, "");
+
+			Serial.println(channelBuffer);
+		}
+
+		// Properties
+
+		// Construct channel name/Enable
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_enable);
+		client->publish(channelBuffer, "");
+
+		Serial.println(channelBuffer);
+
+		for (int i = 0; i < NUM_INPUTS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_input);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->publish(channelBuffer, "");
+
+			Serial.println(channelBuffer);
+		}
+
+		for (int i = 0; i < NUM_OUTPUTS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_output);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->publish(channelBuffer, "");
+
+			Serial.println(channelBuffer);
+		}
+
+		for (int i = 0; i < NUM_RELAYS; i++)
+		{
+			strcpy_P(channelBuffer, propName);
+			strcat_P(channelBuffer, channel_relay);
+			strcat(channelBuffer, itoa(i, tmp, 10));
+			client->publish(channelBuffer, "");
+
+			Serial.println(channelBuffer);
+		}
+
+		strcpy_P(channelBuffer, propName);
+		strcat_P(channelBuffer, channel_heartbeat);
+		client->publish(channelBuffer, "");
+
+		Serial.println(channelBuffer);
 	}
 	else
 	{
@@ -347,6 +517,6 @@ void mqtt_m3::reconnect()
 		Serial.print(client->state());
 		Serial.println(F(" try again in 5 seconds"));
 #endif
+
 	}
 }
-
