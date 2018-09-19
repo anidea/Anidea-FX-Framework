@@ -145,6 +145,8 @@ void tenHzTimer(struct tc_module *const module_inst)
 {
   if (myGame != nullptr) myGame->tick();
 
+  if (myNetwork != nullptr) myNetwork->tick();
+	
   //Serial.println("Tick");
 }
 #endif
