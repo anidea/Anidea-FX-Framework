@@ -58,6 +58,7 @@ private:
 	uint16_t retry_timer = 0;
 
 	bool netConnected = false;
+	static bool recon;
 };
 
 #endif

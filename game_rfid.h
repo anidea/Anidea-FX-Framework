@@ -19,6 +19,8 @@ public:
 
 	virtual byte getTagCount();
 
+	virtual void reset();
+
 	void saveTags();
 
 	void loadTags();

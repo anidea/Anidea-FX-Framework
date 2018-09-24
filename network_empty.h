@@ -20,14 +20,14 @@
 #include "game.h"
 #include "arduino.h"
 
-byte MyMac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-IPAddress MyIP(0, 0, 0, 0);
-IPAddress HostIP(0, 0, 0, 0);
-
 class Game;
 
 class network_empty : public Network
 {
+	byte MyMac[6] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	IPAddress MyIP;
+	IPAddress HostIP;
+
   public:
     network_empty() : Network(MyMac, MyIP, HostIP, false) {};
 

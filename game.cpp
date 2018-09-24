@@ -32,6 +32,8 @@ Game::Game()
   pinMode(RS485_ENABLE, OUTPUT);
   pinMode(STAT_LED, OUTPUT);
 
+  pinMode(WIZ_CS, OUTPUT);
+  digitalWrite(WIZ_CS, HIGH);
 
 #ifdef DIGITAL_HALL
 	int z;
@@ -91,14 +93,20 @@ void Game::loop(void)
 {
   // put your main code here, to run repeatedly:
 
-  delay(10); // Keep game running at a reasonable rate, not micro speed. 100x a second, ehternet adds significant delays
+  //delay(10); // Keep game running at a reasonable rate, not micro speed. 100x a second, ehternet adds significant delays
 
 			 // Read input states
   for (int i = 0; i < NUM_INPUTS; i++)
   {
 	  if (INPUT_OVERRIDE_ENABLE[i])
 	  {
-		  INPUT_STATES[i] = digitalRead(INPUTS[i]);
+		  bool high = digitalRead(INPUTS[i]);
+		  if (INPUT_STATES[i] != high)
+		  {
+			  INPUT_STATE_OLD[i] = INPUT_STATES[i];
+		  }
+
+		  INPUT_STATES[i] = high;
 	  }
   }
 
@@ -111,10 +119,6 @@ void Game::loop(void)
 		  {
 			  digitalWrite(OUTPUTS[i], OUTPUT_STATES[i]);
 			  OUTPUT_STATES_FLAG[i] = false;
-		  }
-		  else
-		  {
-			  OUTPUT_STATES[i] = digitalRead(OUTPUTS[i]);
 		  }
 	  }
   }
@@ -131,10 +135,6 @@ void Game::loop(void)
 			  digitalWrite(RELAYS[i], RELAY_STATES[i]);
 
 			  RELAY_STATES_FLAG[i] = false;
-		  }
-		  else
-		  {
-			  RELAY_STATES[i] = digitalRead(RELAYS[i]);
 		  }
 	  }
   }
@@ -262,6 +262,7 @@ void Game::solved(void)
   Serial.println(F("Puzzle Solved!"));
   _puzzleSolved = 1;
   _gameState = GAMESTATE_ENDLOOP;
+  solvedFlag = false;
 }
 
 ///////////////////////////////////
@@ -275,14 +276,14 @@ void Game::reset(void)
 	for (int i = 0; i < NUM_OUTPUTS; ++i) //Or loop the array and init them.
 	{
 		OUTPUT_STATES[i] = 0;
-		OUTPUT_STATES_FLAG[i] = false;
+		OUTPUT_STATES_FLAG[i] = true;
 		digitalWrite(OUTPUTS[i], LOW);
 	}
 
 	for (int i = 0; i < NUM_RELAYS; ++i) //Or loop the array and init them.
 	{
 		RELAY_STATES[i] = 1;
-		RELAY_STATES_FLAG[i] = false;
+		RELAY_STATES_FLAG[i] = true;
 		digitalWrite(RELAYS[i], HIGH);
 	}
 	  
@@ -476,8 +477,6 @@ bool Game::programDigitalHall()
 {
 	uint16_t error;
 
-	Serial.println("is this cool?");
-
 	auto write = [&](uint32_t value, uint8_t reg = 0x02) -> uint16_t
 	{
 		Wire.beginTransmission(0x0);
@@ -546,5 +545,4 @@ bool Game::programDigitalHall()
 
 	Serial.println(F("Hall programmed for address 113"));
 	return true;
-
 }

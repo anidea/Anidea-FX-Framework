@@ -2,10 +2,8 @@
 
 #include "fx200.h"
 
-// This will be a mess on a FX300/FX350 because of the shared serial port.  Use at your own risk/fun.
-
 // Number of readers
-const int numberOfReaders = 3;
+const int numberOfReaders = 4;
 
 // Our FX200 configuration
 FX200Configuration config
@@ -53,7 +51,7 @@ bool rfid::learn()
 
 void rfid::loop()
 {
-	//Game::loop();
+	Game::loop();
 
 	switch (_gameState)
 	{
@@ -89,6 +87,8 @@ void rfid::loop()
 
 void rfid::solved()
 {
+	Game::solved();
+
 	digitalWrite(RELAY0, LOW);
 	digitalWrite(OUTPUT3, HIGH);
 }
@@ -109,6 +109,18 @@ String rfid::getTag(byte index)
 byte rfid::getTagCount()
 {
 	return numberOfReaders;
+}
+
+void rfid::reset()
+{
+	Game::reset();
+
+	uint32_t t = millis();
+
+	while (millis() - t < 2000)
+	{
+		fx200.scan(); // purge tags
+	}
 }
 
 void rfid::saveTags()

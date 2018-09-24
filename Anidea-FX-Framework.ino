@@ -84,8 +84,8 @@ void setup()
   //myGame = new rfid();
 
   byte MyMac[] = {0x90, 0xA2, 0xDA, 0x0E, 0x94, 0xA2};   // This must be unique for each device
-  IPAddress MyIP(10, 0, 1, 205);                         // This must be unique for each device on the network. Leave blank to configure at run time.
-  IPAddress HostIP(10, 0, 1, 115);                       // This should be the IP of the device running the management software. Not needed for ERM
+  IPAddress MyIP(0, 0, 0, 0);                         // This must be unique for each device on the network. Leave blank to configure at run time.
+  IPAddress HostIP(0, 0, 0, 0);                       // This should be the IP of the device running the management software. Not needed for ERM
 
   // Uncomment only one of these lines for the network you want
   //myNetwork = new network_empty(); //Empty network for use with FX300

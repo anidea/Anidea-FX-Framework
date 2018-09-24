@@ -61,8 +61,6 @@
    If enabled below, ENABLE low will allow the game to be played
 
    Once the entire sequence is entered, the solved routine is run and the solved relay will disengage.
-
-
    
 */
 
