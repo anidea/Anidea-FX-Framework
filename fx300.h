@@ -44,6 +44,8 @@ const int STAT_LED = -1;
 
 const int HALL = 6;
 
+const int WIZ_CS = 10;
+
 const int NUM_INPUTS = 6;
 
 const int NUM_OUTPUTS = 6;

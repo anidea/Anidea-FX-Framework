@@ -1,6 +1,9 @@
 #include <PubSubClient.h>
 #include "network_mqtt.h"
+
+#if defined(FX60_0_ENABLE) || defined(FX60_1_ENABLE)
 #include "fx60.h"
+#endif
 #include <ArduinoJson.h>
 
 // Configuration

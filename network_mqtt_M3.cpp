@@ -1,7 +1,10 @@
 #include <PubSubClient.h>
 #include "network_mqtt_m3.h"
+
+#if defined(FX60_0_ENABLE) || defined(FX60_1_ENABLE)
 #include "fx60.h"
-#include <ArduinoJson.h>
+#endif
+//#include <ArduinoJson.h>
 
 // Configuration
 char mqtt_m3::propName[] = "myProp";
@@ -85,7 +88,13 @@ void mqtt_m3::printData(char* data, char* channel)
 
 void mqtt_m3::sendChanges()
 {
-  #define mqtt_m3_BUF_SZ 128
+#if defined(FX350)  
+#define mqtt_m3_BUF_SZ 64
+	// NOTE **** change MQTT_MAX_PACKET_SIZE in PubSubClient.h
+#else
+#define mqtt_m3_BUF_SZ 128
+#endif
+
   char data[mqtt_m3_BUF_SZ];
   
   if (!pMyGame->solvedFlag)

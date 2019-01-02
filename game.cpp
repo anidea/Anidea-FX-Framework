@@ -423,6 +423,8 @@ bool Game::hallLearnCommand(bool exit)
 
 bool Game::readDigitalHall(int& zHallValue)
 {
+
+#ifdef DIGITAL_HALL
   auto signExtendBitfield = [](uint32_t data, int width) -> long
   {
     long x = (long) data;
@@ -469,12 +471,14 @@ bool Game::readDigitalHall(int& zHallValue)
 
 	//Serial.print("Hall Read ");
 	//Serial.println(zHallValue);
-
+#endif
 	return true;
 }
 
 bool Game::programDigitalHall()
 {
+#ifdef DIGITAL_HALL
+	
 	uint16_t error;
 
 	auto write = [&](uint32_t value, uint8_t reg = 0x02) -> uint16_t
@@ -544,5 +548,7 @@ bool Game::programDigitalHall()
 	delay(100);
 
 	Serial.println(F("Hall programmed for address 113"));
+
+#endif
 	return true;
 }

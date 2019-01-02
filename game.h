@@ -3,7 +3,10 @@
 
 #include "arduino.h"
 #include "network.h"
+
+#if defined(FX60_0_ENABLE) || defined(FX60_1_ENABLE)
 #include "fx60.h"
+#endif
 // Boards
 #if defined(FX300) || defined(FX350)
 #include "fx300.h"
