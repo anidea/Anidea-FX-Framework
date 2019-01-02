@@ -40,7 +40,7 @@ Game::Game()
 	if (readDigitalHall(z) == false)
 	{
 		// One time (should madebe at least) configure of new hall sensor from default address.
-		Serial.println("About to configure digital hall");
+		Serial.println("About to configure digital hall.  Cycle power completely when complete.");
 		programDigitalHall();
 	}
 #endif
