@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include "network.h"
 #include "game.h"
+#include "fx200.h"
 
 class Network;
 
@@ -31,6 +32,11 @@ private:
 	virtual void solved() override;
 
 	bool data_flag = false;
+
+	const static int numberOfReaders = 4;
+
+	static FX200Configuration config;
+	static FX200<numberOfReaders> fx200;
 };
 
 #endif
