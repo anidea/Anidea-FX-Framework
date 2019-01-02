@@ -19,21 +19,21 @@
 #include "network.h"
 
 // Networks
-//#include "network_empty.h"
-//#include "network_escaperoommaster.h"
-//#include "network_cluecontrol.h"
-//#include "network_houdinimc.h"
-//#include "network_mqtt.h"
+#include "network_empty.h"
+#include "network_escaperoommaster.h"
+#include "network_cluecontrol.h"
+#include "network_houdinimc.h"
+#include "network_mqtt.h"
 #include "network_mqtt_M3.h"
 
 // Games
-//#include "game_empty.h"
+#include "game_empty.h"
 #include "game_room.h"
-//#include "game_simplegame.h"
-//#include "game_sequencedetect.h"
-//#include "game_sixwire.h"
-//#include "game_inputsequence.h"
-//#include "game_rfid.h"
+#include "game_simplegame.h"
+#include "game_sequencedetect.h"
+#include "game_sixwire.h"
+#include "game_inputsequence.h"
+#include "game_rfid.h"
 
 // Generic game and network objects
 Game *myGame = nullptr;
@@ -79,7 +79,7 @@ void setup()
 
   // Uncomment only one of these lines for the game you want
   //myGame = new game_empty(); // Empty game to manually control inputs and outputs only
-  myGame = new room(); // Used to control a whole room
+  //myGame = new room(); // Used to control a whole room
   //myGame = new simplegame(); //Simple game provided as an example
   //myGame = new sequencedetect(); //Sequencedetect
   //myGame = new sixwire(); //Sixwire
@@ -95,8 +95,8 @@ void setup()
   //myNetwork = new escaperoommaster(MyMac, MyIP, HostIP);
   //myNetwork = new cluecontrol(MyMac, MyIP, HostIP);
   //myNetwork = new mqtt(MyMac, MyIP, HostIP);
-myNetwork = new mqtt_m3(MyMac, MyIP, HostIP);
-	//myNetwork = new houdinimc(MyMac, MyIP, HostIP);
+  //myNetwork = new mqtt_m3(MyMac, MyIP, HostIP);
+  //myNetwork = new houdinimc(MyMac, MyIP, HostIP);
 
 
   bool missing = false;
