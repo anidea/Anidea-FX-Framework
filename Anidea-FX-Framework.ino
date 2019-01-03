@@ -140,6 +140,8 @@ void loop()
 void tenHzTimer()
 {
   if (myGame != nullptr) myGame->tick();
+  
+  if (myNetwork != nullptr) myNetwork->tick();
 }
 #endif
 
