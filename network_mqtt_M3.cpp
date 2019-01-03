@@ -6,30 +6,44 @@
 #endif
 //#include <ArduinoJson.h>
 
+#ifdef FX350
+#define FX350MQTTPROGMEM
+#else
+#define FX350MQTTPROGMEM PROGMEM
+#endif
+
 // Configuration
 char mqtt_m3::propName[] = "myProp";
 bool mqtt_m3::recon = false;
-const static char channel_command[] PROGMEM = "set";
-const static char channel_enable[] PROGMEM = "enable";
-const static char channel_solve[] PROGMEM = "solve";
-const static char channel_reset[] PROGMEM = "reset";
-const static char channel_disable[] PROGMEM = "disable";
-const static char channel_learn[] PROGMEM = "learn";
+const static char channel_command[] FX350MQTTPROGMEM = "set";
+const static char channel_enable[] FX350MQTTPROGMEM = "enable";
+const static char channel_solve[] FX350MQTTPROGMEM = "solve";
+const static char channel_reset[] FX350MQTTPROGMEM = "reset";
+const static char channel_disable[] FX350MQTTPROGMEM = "disable";
+const static char channel_learn[] FX350MQTTPROGMEM = "learn";
 
-const static char channel_heartbeat[] PROGMEM = "heartbeat";
+const static char channel_heartbeat[] FX350MQTTPROGMEM = "heartbeat";
 
-const static char channel_output[] PROGMEM = "output";
-const static char channel_input[] PROGMEM = "input";
-const static char channel_relay[] PROGMEM = "relay";
+const static char channel_output[] FX350MQTTPROGMEM = "output";
+const static char channel_input[] FX350MQTTPROGMEM = "input";
+const static char channel_relay[] FX350MQTTPROGMEM = "relay";
 
 #ifdef FX60_0_ENABLE
-const static char channel_FX60_0[] PROGMEM = propName "fx60_0";
+const static char channel_FX60_0[] FX350MQTTPROGMEM = propName "fx60_0";
 #endif
 #ifdef FX60_1_ENABLE
-const static char channel_FX60_1[] PROGMEM = propName "fx60_1";
+const static char channel_FX60_1[] FX350MQTTPROGMEM = propName "fx60_1";
 #endif
 
-//#define DEBUG_MQTT
+#define DEBUG_MQTT
+
+/*
+#if defined(FX350)  
+#define mqtt_m3_BUF_SZ 128
+	// NOTE **** change MQTT_MAX_PACKET_SIZE in PubSubClient.h
+#else*/
+#define mqtt_m3_BUF_SZ 128
+/*#endif*/
 
 mqtt_m3::mqtt_m3(byte _MyMac[], IPAddress _MyIP, IPAddress _HostIP) : Network(_MyMac, _MyIP, _HostIP, true)
 {
@@ -66,6 +80,8 @@ void mqtt_m3::tick()
 {
   heartbeat_timer += TIMER_INTERVAL;
   if (!netConnected) retry_timer += TIMER_INTERVAL;
+
+  //Serial.println(F("Tick"));
 }
 
 void mqtt_m3::printData(char* data, char* channel)
@@ -88,21 +104,19 @@ void mqtt_m3::printData(char* data, char* channel)
 
 void mqtt_m3::sendChanges()
 {
-#if defined(FX350)  
-#define mqtt_m3_BUF_SZ 64
-	// NOTE **** change MQTT_MAX_PACKET_SIZE in PubSubClient.h
-#else
-#define mqtt_m3_BUF_SZ 128
-#endif
+
 
   char data[mqtt_m3_BUF_SZ];
   
   if (!pMyGame->solvedFlag)
   {
     snprintf(data, mqtt_m3_BUF_SZ, "%s/%s", propName, channel_solve);
+	
+	client->publish(data, pMyGame->isSolved() ? "Yes" : "No");
+    
+	pMyGame->solvedFlag = true;
 
-    client->publish(data, pMyGame->isSolved() ? "Yes" : "No");
-    pMyGame->solvedFlag = true;
+	printData(data, NULL);
   }
   
   for (int i = 0; i < NUM_INPUTS; i++)
@@ -114,6 +128,8 @@ void mqtt_m3::sendChanges()
       client->publish(data, pMyGame->INPUT_STATES[i]? "Yes" : "No");
 	  
       pMyGame->INPUT_STATE_OLD[i] = pMyGame->INPUT_STATES[i];
+
+	  printData(data, NULL);
     }
   }
 
@@ -126,6 +142,8 @@ void mqtt_m3::sendChanges()
       client->publish(data, pMyGame->OUTPUT_STATES[i]? "Yes" : "No");
 
       pMyGame->OUTPUT_STATE_OLD[i] = pMyGame->OUTPUT_STATES[i];
+
+	  printData(data, NULL);
     }
   }
 
@@ -138,6 +156,8 @@ void mqtt_m3::sendChanges()
       client->publish(data, pMyGame->RELAY_STATES[i]? "Yes" : "No");
 
       pMyGame->RELAY_STATE_OLD[i] = pMyGame->RELAY_STATES[i];
+
+	  printData(data, NULL);
     }
   }
 
@@ -417,7 +437,7 @@ void mqtt_m3::reconnect()
 #ifdef DEBUG_MQTT
     Serial.println(F("connected"));
 #endif
-    const int CHANNEL_BUF_SZ = 64;
+    const int CHANNEL_BUF_SZ = mqtt_m3_BUF_SZ;
     char channelBuffer[CHANNEL_BUF_SZ];
     char tmp[3];
 
