@@ -19,7 +19,10 @@ class sixwire : public Game
     virtual void reset(); // Call to reset game
 
   private:
-    // Software configuration defines
+	  int checkAllMatch();
+	  
+	  
+	  // Software configuration defines
     static const int DEBOUNCE_COUNT = 6;   // Try to keep even
     static const int DEBOUNCE_TIME = 5;
     
@@ -27,7 +30,7 @@ class sixwire : public Game
     static const int PATCH_COUNT = 6;
 
     // FX300 Relays
-    static const int SOLVED = RELAY1;
+    ///static const int SOLVED = RELAY1;
   
     int getDebouncedInput(int);
   

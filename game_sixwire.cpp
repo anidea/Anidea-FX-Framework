@@ -72,8 +72,6 @@ void sixwire::loop(void)
   // Do generic loop actions
   Game::loop();
   
-  int allMatched = 1;
-
   switch (_gameState)
   {
     case GAMESTATE_START:
@@ -92,68 +90,8 @@ void sixwire::loop(void)
     case GAMESTATE_RUN:
       // check for proper wiring
 
-      // Iterate through all the patch cables
-      for (int i = 0; i < PATCH_COUNT; i++)
-      {
-        // Set outputs
-        for (int j = 0; j < PATCH_COUNT; j++)
-        {
-          if (i == j)
-          {
-            digitalWrite(outputPinList[j], HIGH); // Turn on one high at a time
-          }else{
-            digitalWrite(outputPinList[j], LOW); // Turn off the rest
-          }
-        }
 
-        delay(10);  // Let all the pins settle
-
-        // Read inputs
-        for (int j = 0; j < PATCH_COUNT; j++)
-        {
-          if (i == j)
-          {
-            if (digitalRead(inputPinList[j]) == HIGH)  // Should be low when wired correctly
-            {
-              allMatched = 0;
-              
-              Serial.print(F("Failed Match Low "));
-              Serial.print(i);
-              Serial.print(F(", "));
-              Serial.print(j);
-              Serial.println();
-
-              break;
-            }
-          }else{
-            if (digitalRead(inputPinList[j]) == LOW)  // Should be high when wired correctly
-            {
-              allMatched = 0;
-
-              Serial.print(F("Failed Match High "));
-              Serial.print(i);
-              Serial.print(F(", "));
-              Serial.print(j);
-              Serial.println("");
-
-              break;
-            }
-          }
-        }
-
-        if (allMatched == 0)
-        {
-          // We only need one to fail
-
-          #if 1     // Disable (0) if you want all cables always tested
-          break;
-          #endif
-
-        }
-      
-      }
-
-      if (allMatched == 1)
+      if (checkAllMatch())
       {
       
         _gameState = GAMESTATE_SOLVED;  // Win
@@ -168,11 +106,19 @@ void sixwire::loop(void)
       // Run solved and any other one time routine
       solved();
       
+	  _gameState = GAMESTATE_ENDLOOP;
+
       break;
  
     default:
     case GAMESTATE_ENDLOOP:
       // Wait for reset
+
+		if (checkAllMatch() == 0)
+		{
+			_gameState = GAMESTATE_START;
+		}
+
 
       break;
   }
@@ -186,7 +132,8 @@ void sixwire::solved(void)
   Game::solved();
 
   //Do game specific solved state
-  digitalWrite(SOLVED, LOW);        // Turn Off maglock
+  digitalWrite(RELAY0, LOW);        // Turn Off maglock
+  digitalWrite(RELAY1, LOW);        // Turn Off maglock
   digitalWrite(STAT_LED, HIGH);          // Mimick LED for solved
 }
 
@@ -199,8 +146,9 @@ void sixwire::reset(void)
 
   //Reset game specific variables
   // Set outputs
-  digitalWrite(SOLVED, HIGH);    // Turn on maglock
-  digitalWrite(STAT_LED, LOW);           // Mimick LED for solved 
+  digitalWrite(RELAY0, HIGH);    // Turn on maglock
+  digitalWrite(RELAY1, HIGH);    // Turn on maglock
+  digitalWrite(STAT_LED, LOW);   // Mimick LED for solved 
 }
 
 int sixwire::getDebouncedInput(int input)
@@ -227,3 +175,73 @@ int sixwire::getDebouncedInput(int input)
   return LOW;
 }
 
+
+int sixwire::checkAllMatch()
+{
+	int allMatched = 1;
+	
+	// Iterate through all the patch cables
+	for (int i = 0; i < PATCH_COUNT; i++)
+	{
+		// Set outputs
+		for (int j = 0; j < PATCH_COUNT; j++)
+		{
+			if (i == j)
+			{
+				digitalWrite(outputPinList[j], HIGH); // Turn on one high at a time
+			}
+			else {
+				digitalWrite(outputPinList[j], LOW); // Turn off the rest
+			}
+		}
+
+		delay(10);  // Let all the pins settle
+
+		// Read inputs
+		for (int j = 0; j < PATCH_COUNT; j++)
+		{
+			if (i == j)
+			{
+				if (digitalRead(inputPinList[j]) == HIGH)  // Should be low when wired correctly
+				{
+					allMatched = 0;
+
+					Serial.print(F("Failed Match Low "));
+					Serial.print(i);
+					Serial.print(F(", "));
+					Serial.print(j);
+					Serial.println();
+
+					break;
+				}
+			}
+			else {
+				if (digitalRead(inputPinList[j]) == LOW)  // Should be high when wired correctly
+				{
+					allMatched = 0;
+
+					Serial.print(F("Failed Match High "));
+					Serial.print(i);
+					Serial.print(F(", "));
+					Serial.print(j);
+					Serial.println("");
+
+					break;
+				}
+			}
+		}
+
+		if (allMatched == 0)
+		{
+			// We only need one to fail
+
+#if 1     // Disable (0) if you want all cables always tested
+			break;
+#endif
+
+		}
+
+	}
+
+	return(allMatched);
+}
