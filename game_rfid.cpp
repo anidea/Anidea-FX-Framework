@@ -8,7 +8,7 @@
 const int numberOfReaders = 4;
 
 // Our FX200 configuration
-FX200Configuration config
+FX200Configuration rfid::config
 {
 	/*  Read Style:*/ RFIDReadStyle::EVENODD, // EVENODD, SEQUENTIAL, or IMMEDIATE (used with user controlled timings)
 	/*   RS485 Pin:*/ RS485_ENABLE, // This pin is defined in fx300.h and fx450.h
@@ -19,7 +19,7 @@ FX200Configuration config
 	/* Expire Time:*/ 2000, // This is how long a reader will keep tag information before expiring
 };
 
-FX200<numberOfReaders> fx200(config);
+FX200<numberOfReaders> rfid::fx200(config);
 
 rfid::rfid() : Game()
 {
