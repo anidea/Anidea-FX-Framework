@@ -36,6 +36,8 @@ Game::Game()
   digitalWrite(WIZ_CS, HIGH);
 
 #ifdef DIGITAL_HALL
+	Wire.begin();
+	
 	int z;
 	if (readDigitalHall(z) == false)
 	{
